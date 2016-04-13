@@ -7,7 +7,6 @@ AllCops:
   Exclude:
     - 'bin/**/*'
     - 'spec/dummy/**/*'
-  RunRailsCops: true
   DisplayCopNames: true
   StyleGuideCopsOnly: false
 

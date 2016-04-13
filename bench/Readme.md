@@ -1,7 +1,7 @@
 # Triggers benchmarks
 
 This benchmark uses standrad _pg_bench_ table `pgbench_accounts`.
-We consider several approaches of calculating record diff: one uses _hstore_ extension and two others iterate through record fields.
+We consider several approaches for calculating records diff: one uses _hstore_ extension and two others iterate through record fields.
 
 # Usage
 
@@ -32,7 +32,7 @@ make keys2
 make plain
 ```
 
-You can specify the number of transaction through `T` variable (by default 10000):
+You can specify the number of transactions through `T` variable (by default 10000):
 
 ```sh
 make T=1000000
