@@ -8,21 +8,35 @@ ifndef T
 	T = 10000
 endif
 
-all:
-	make plain
-	make hstore
-	make keys
+all: plain hstore keys keys2
 
 setup:
-	pgbench -i -q $(DB)
+	createdb $(DB) -w
+	psql -q -d $(DB) -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
 
-plain: setup
+plain:
+	$(info )
+	$(info ======  [START] Update without triggers ======)
+	pgbench -i -q $(DB)
 	pgbench -f bench.sql -t $(T) -r $(DB)
 
-hstore: setup
+hstore:
+	$(info )
+	$(info ======  [START] Update with hstore-based triggers ======)
+	pgbench -i -q $(DB)
 	psql -q -d $(DB) -f hstore_trigger_setup.sql 
-	pgbench -f bench.sql -t $(T) -r $(DB)     
+	pgbench -f bench.sql -t $(T) -r $(DB)
 
-keys: setup
+keys:
+	$(info )
+	$(info ======  [START] Update with loop thru keys triggers (v1) ======)
+	pgbench -i -q $(DB)
 	psql -q -d $(DB) -f keys_trigger_setup.sql
+	pgbench -f bench.sql -t $(T) -r $(DB) 
+
+keys2:
+	$(info )
+	$(info ======  [START] Update with loop thru keys triggers (v2) ======)
+	pgbench -i -q $(DB)
+	psql -q -d $(DB) -f keys2_trigger_setup.sql
 	pgbench -f bench.sql -t $(T) -r $(DB)  
