@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Build Status](https://travis-ci.org/palkan/logidze.svg?branch=master)](https://travis-ci.org/palkan/logidze) [![Vexor Status](https://ci.vexor.io/projects/55e92786-f1de-4e69-8f58-889453c2d71c/status.svg)](https://ci.vexor.io/ui/projects/55e92786-f1de-4e69-8f58-889453c2d71c/builds)
+[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Vexor Status](https://ci.vexor.io/projects/163dc587-613e-4643-a071-a56edbe12f34/status.svg)](https://ci.vexor.io/ui/projects/163dc587-613e-4643-a071-a56edbe12f34/builds)
 
 # Logidze
 
