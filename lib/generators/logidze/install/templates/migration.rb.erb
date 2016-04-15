@@ -1,0 +1,39 @@
+class <%= @migration_class_name %> < ActiveRecord::Migration
+  def up
+    execute <<-SQL
+      CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
+        DECLARE
+          changes_h jsonb;
+          size integer;
+          buffer jsonb;
+        BEGIN
+          size := jsonb_array_length(NEW.log);
+          
+          changes_h := hstore_to_jsonb_loose(
+            hstore(NEW.*) - hstore(OLD.*)
+          );
+
+          NEW.log := jsonb_set(
+            NEW.log,
+            ARRAY[size::text],
+            jsonb_build_object(
+              'ts',
+              extract(epoch from now())::int,
+              'i',
+              (NEW.log#>>ARRAY[(size - 1)::text, 'i'])::int + 1,
+              'd',
+              changes_h
+            ),
+            true
+          );
+          return NEW;
+        END;
+        $body$
+        LANGUAGE plpgsql;
+    SQL
+  end
+
+  def down
+    execute "DROP FUNCTION logidze_logger();"
+  end
+end
