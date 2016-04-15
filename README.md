@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Vexor Status](https://ci.vexor.io/projects/163dc587-613e-4643-a071-a56edbe12f34/status.svg)](https://ci.vexor.io/ui/projects/163dc587-613e-4643-a071-a56edbe12f34/builds)
+[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Circle CI](https://circleci.com/gh/palkan/logidze.svg?style=svg)](https://circleci.com/gh/palkan/logidze)
 
 # Logidze
 

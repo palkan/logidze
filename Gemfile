@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'pry-byebug'
 # Specify your gem's dependencies in logidze.gemspec
 gemspec
 
