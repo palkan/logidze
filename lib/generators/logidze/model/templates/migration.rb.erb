@@ -1,0 +1,17 @@
+class <%= @migration_class_name %> < ActiveRecord::Migration
+  def up
+    add_column :<%= table_name %>, :log_data, :jsonb, default: '{}', null: false
+
+    execute <<-SQL
+      CREATE TRIGGER logidze_on_<%= table_name %>
+      BEFORE UPDATE OR INSERT ON <%= table_name %> FOR EACH ROW
+      EXECUTE PROCEDURE logidze_logger();
+    SQL
+  end
+
+  def down
+    execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+
+    remove_column :<%= table_name %>, :log_data
+  end
+end

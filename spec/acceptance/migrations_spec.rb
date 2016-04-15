@@ -13,7 +13,7 @@ describe "Logidze migrations" do
     end
   end
 
-  xdescribe "#model" do
+  describe "#model" do
     include_context "cleanup models"
 
     it "creates migration and patches model" do

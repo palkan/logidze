@@ -1,0 +1,8 @@
+Description:
+  Generates the necessary migration to enable logging for model
+  
+Examples:
+  rails generate logidze:model User
+
+    This will generate the migration to add log column and trigger.
+    This will also add `has_logidze` to model.
