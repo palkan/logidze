@@ -13,7 +13,7 @@ module Logidze
       def inject_logidze_to_model
         indents = "  " * (class_name.scan("::").count + 1)
 
-        inject_into_class(File.join("app", "models", "#{file_path}.rb"), class_name.demodulize, "#{indents}has_logidze\n")
+        inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze\n")
       end
 
       def migration_name
@@ -26,6 +26,12 @@ module Logidze
 
       def migration_class_name
         migration_name.camelize
+      end
+
+      private
+
+      def model_file_path
+        File.join("app", "models", "#{file_path}.rb")
       end
     end
   end

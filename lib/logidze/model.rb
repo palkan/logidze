@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'active_support'
 
 module Logidze
@@ -21,13 +22,13 @@ module Logidze
     TIME_FACTOR = 1_000
 
     # History key
-    HISTORY = 'h'.freeze
+    HISTORY = 'h'
     # Version key
-    VERSION = 'v'.freeze
+    VERSION = 'v'
     # Timestamp key
-    TS = 'ts'.freeze
+    TS = 'ts'
     # Changes key
-    CHANGES = 'c'.freeze
+    CHANGES = 'c'
 
     # Return a dirty copy of record at specified time
     # If time is less then the first version, then return nil.

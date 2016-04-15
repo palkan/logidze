@@ -7,8 +7,10 @@ AllCops:
   Exclude:
     - 'bin/**/*'
     - 'spec/dummy/**/*'
+    - 'tmp/**/*'
   DisplayCopNames: true
   StyleGuideCopsOnly: false
+  TargetRubyVersion: 2.3
 
 Style/AccessorMethodName:
   Enabled: false
