@@ -12,10 +12,8 @@ module Logidze
         migration_template "migration.rb.erb", "db/migrate/logidze_install.rb"
       end
 
-      # Define the next_migration_number method (necessary for the migration_template method to work)
-      def self.next_migration_number(_)
-        sleep 1 # make sure each time we get a different timestamp
-        Time.new.utc.strftime("%Y%m%d%H%M%S")
+      def self.next_migration_number(dir)
+        ::ActiveRecord::Generators::Base.next_migration_number(dir)
       end
     end
   end
