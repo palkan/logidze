@@ -8,6 +8,10 @@ module Logidze
 
       source_root File.expand_path('../templates', __FILE__)
 
+      def generate_hstore_migration
+        migration_template "hstore.rb.erb", "db/migrate/enable_hstore.rb"
+      end
+
       def generate_migration
         migration_template "migration.rb.erb", "db/migrate/logidze_install.rb"
       end

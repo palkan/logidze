@@ -1,0 +1,5 @@
+class <%= @migration_class_name %> < ActiveRecord::Migration
+	def change
+		enable_extension :hstore
+	end
+end

@@ -7,13 +7,14 @@ describe Logidze::Model, :db do
       age: 10,
       active: false,
       log_data: {
-        'v' => 4,
+        'v' => 5,
         'h' =>
           [
             { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } },
-            { 'v' => 2, 'ts' => time(200), 'c' => { 'name' => 'test', 'active' => true } },
-            { 'v' => 3, 'ts' => time(300), 'c' => { 'age' => 0 } },
-            { 'v' => 4, 'ts' => time(400), 'c' => { 'age' => 10, 'active' => false } }
+            { 'v' => 2, 'ts' => time(200), 'c' => { 'active' => true } },
+            { 'v' => 3, 'ts' => time(200), 'c' => { 'name' => 'test' } },
+            { 'v' => 4, 'ts' => time(300), 'c' => { 'age' => 0 } },
+            { 'v' => 5, 'ts' => time(400), 'c' => { 'age' => 10, 'active' => false } }
           ]
       })
   end
@@ -126,9 +127,17 @@ describe Logidze::Model, :db do
 
     it "revert record several times", :aggregate_failures do
       user.undo!
+      expect(user.reload.age).to eq 0
+
       user.undo!
+      expect(user.age).to be_nil
+
+      user.undo!
+      expect(user.name).to be_nil
+
       user.undo!
       user.reload
+
       expect(user.name).to be_nil
       expect(user.age).to be_nil
       expect(user.active).to be_nil

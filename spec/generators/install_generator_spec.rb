@@ -9,10 +9,21 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
     run_generator
   end
 
-  subject { migration_file('db/migrate/logidze_install.rb') }
+  describe "trigger migration" do
+    subject { migration_file('db/migrate/logidze_install.rb') }
 
-  describe "migration" do
-    it { is_expected.to exist }
-    it { is_expected.to contain /create or replace function logidze_logger/i }
+    it "creates migration", :aggregate_failures do
+      is_expected.to exist
+      is_expected.to contain /create or replace function logidze_logger/i
+    end
+  end
+
+  describe "hstore migration" do
+    subject { migration_file('db/migrate/enable_hstore.rb') }
+
+    it "creates migration", :aggregate_failures do
+      is_expected.to exist
+      is_expected.to contain /enable_extension :hstore/i
+    end
   end
 end

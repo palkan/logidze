@@ -17,13 +17,17 @@ describe "Logidze migrations" do
     include_context "cleanup models"
 
     it "creates migration and patches model" do
-      successfully "rails generate model Post"
+      successfully "rails generate logidze:install"
 
       successfully "rake db:migrate"
 
-      successfully "rails generate logidze:model Post"
+      successfully "rails generate model Movie"
 
-      verify_file_contains "app/models/post.rb", "has_logidze"
+      successfully "rake db:migrate"
+
+      successfully "rails generate logidze:model Movie"
+
+      verify_file_contains "app/models/movie.rb", "has_logidze"
 
       successfully "rake db:migrate"
 

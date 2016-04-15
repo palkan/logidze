@@ -1,9 +1,4 @@
-require "bundler"
-require "pry-byebug"
-
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
-
-ENV["RAILS_ENV"] = "test"
+require "spec_helper"
 
 RSpec.configure do |config|
   config.include Logidze::AcceptanceHelpers
@@ -16,6 +11,7 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     Dir.chdir("spec/dummy") do
+      ActiveRecord::Base.connection_pool.disconnect!
       system <<-CMD
         rake db:drop db:create db:migrate
       CMD

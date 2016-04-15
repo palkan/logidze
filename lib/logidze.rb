@@ -7,4 +7,11 @@ module Logidze
   require 'logidze/has_logidze'
 
   require 'logidze/engine' if defined?(Rails)
+
+  def self.without_logging
+  	ActiveRecord::Base.connection.execute "SET session_replication_role = replica;"
+  	res = yield
+  	ActiveRecord::Base.connection.execute "SET session_replication_role = DEFAULT;"
+  	res
+  end
 end

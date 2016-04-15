@@ -3,29 +3,65 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     execute <<-SQL
       CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         DECLARE
-          changes_h jsonb;
+          changes jsonb;
+          new_v integer;
+          ts bigint;
           size integer;
-          buffer jsonb;
         BEGIN
-          size := jsonb_array_length(NEW.log);
-          
-          changes_h := hstore_to_jsonb_loose(
-            hstore(NEW.*) - hstore(OLD.*)
-          );
+          ts := (extract(epoch from now()) * 1000)::bigint;
 
-          NEW.log := jsonb_set(
-            NEW.log,
-            ARRAY[size::text],
-            jsonb_build_object(
-              'ts',
-              extract(epoch from now())::int,
-              'i',
-              (NEW.log#>>ARRAY[(size - 1)::text, 'i'])::int + 1,
-              'd',
-              changes_h
-            ),
-            true
-          );
+          IF TG_OP = 'INSERT' THEN
+            changes := to_jsonb(NEW.*) - 'log_data';
+            new_v := 1;
+
+            NEW.log_data := json_build_object(
+              'v',
+              1,
+              'h',
+              jsonb_build_array(
+                jsonb_build_object(
+                  'ts',
+                  ts,
+                  'v',
+                  new_v,
+                  'c',
+                  changes
+                )
+              )
+            );
+          ELSIF TG_OP = 'UPDATE' THEN
+            IF NEW = OLD THEN
+              RETURN NEW;
+            END IF;
+
+            changes := hstore_to_jsonb_loose(
+              hstore(NEW.*) - hstore(OLD.*)
+            ) - 'log_data';
+
+            new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
+
+            size := jsonb_array_length(NEW.log_data->'h');
+
+            NEW.log_data := jsonb_set(
+              NEW.log_data,
+              ARRAY['h', size::text],
+              jsonb_build_object(
+                'ts',
+                ts,
+                'v',
+                new_v,
+                'c',
+                changes
+              ),
+              true
+            );
+
+            NEW.log_data := jsonb_set(
+              NEW.log_data,
+              '{v}',
+              to_jsonb(new_v)
+            );
+          END IF;
           return NEW;
         END;
         $body$

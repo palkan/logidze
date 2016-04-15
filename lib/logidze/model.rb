@@ -50,6 +50,11 @@ module Logidze
       apply_diff(changes_to(ts))
     end
 
+    def at_version!(version)
+      return self if current_version == version
+      apply_diff(changes_to_version(version))
+    end
+
     # Return diff object representing changes since specified time.
     #
     # @example
@@ -76,7 +81,7 @@ module Logidze
     def undo!
       version = previous_version
       return false if version.nil?
-      switch_to!(version)
+      switch_to!(version.fetch(VERSION))
     end
 
     # Restore record to the _future_ version (if `undo!` was applied)
@@ -84,13 +89,13 @@ module Logidze
     def redo!
       version = next_version
       return false if version.nil?
-      switch_to!(version)
+      switch_to!(version.fetch(VERSION))
     end
 
     def switch_to!(version)
-      at!(version.fetch(TS))
-      log_data[VERSION] = version.fetch(VERSION)
-      save!
+      at_version!(version)
+      log_data[VERSION] = version
+      Logidze.without_logging { save! }
     end
 
     def log_history
@@ -112,6 +117,16 @@ module Logidze
       diff = data.dup
       log_history.detect do |v|
         break true if v.fetch(TS) > ts
+        diff.merge!(v.fetch(CHANGES))
+        false
+      end
+      diff
+    end
+
+    def changes_to_version(version, data = {})
+      diff = data.dup
+      log_history.detect do |v|
+        break true unless v.fetch(VERSION) <= version
         diff.merge!(v.fetch(CHANGES))
         false
       end
