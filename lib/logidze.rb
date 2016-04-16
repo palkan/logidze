@@ -10,6 +10,10 @@ module Logidze
 
   require 'logidze/engine' if defined?(Rails)
 
+  # Temporary disable DB triggers.
+  #
+  # @example
+  #   Logidze.without_logging { Post.update_all(active: true) }
   def self.without_logging
     ActiveRecord::Base.connection.execute "SET session_replication_role = replica;"
     res = yield

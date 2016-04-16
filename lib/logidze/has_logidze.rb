@@ -7,6 +7,8 @@ module Logidze
     extend ActiveSupport::Concern
 
     module ClassMethods # :nodoc:
+      # Include methods to work with history.
+      #
       # rubocop:disable Style/PredicateName
       def has_logidze
         include Logidze::Model

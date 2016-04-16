@@ -22,6 +22,11 @@ module Logidze
       def diff_from(ts)
         all.map { |record| record.diff_from(ts) }
       end
+
+      # Alias for Logidze.without_logging
+      def without_logging(&block)
+        Logidze.without_logging(&block)
+      end
     end
 
     # Use this to convert Ruby time to milliseconds
@@ -42,7 +47,8 @@ module Logidze
     # Revert record to the version at specified time (without saving to DB)
     def at!(ts)
       ts = parse_time(ts)
-      return self if log_data.current_ts?(ts) || !log_data.exists_ts?(ts)
+      return self if log_data.current_ts?(ts)
+      return false unless log_data.exists_ts?(ts)
 
       apply_diff(log_data.changes_to(time: ts))
     end
@@ -50,7 +56,7 @@ module Logidze
     # Return a dirty copy of specified version of record
     def at_version(version)
       return self if log_data.version == version
-      return nil unless log_data.find_version(version)
+      return nil unless log_data.find_by_version(version)
 
       object_at = dup
       object_at.apply_diff(log_data.changes_to(version: version))
@@ -58,7 +64,9 @@ module Logidze
 
     # Revert record to the specified version (without saving to DB)
     def at_version!(version)
-      return self if log_data.version == version || log_data.find_version(version).nil?
+      return self if log_data.version == version
+      return false unless log_data.find_by_version(version)
+
       apply_diff(log_data.changes_to(version: version))
     end
 
@@ -89,10 +97,12 @@ module Logidze
       switch_to!(version.version)
     end
 
+    # Restore record to the specified version.
+    # Return false if version is unknown.
     def switch_to!(version)
-      at_version!(version)
+      return false unless at_version!(version)
       log_data.version = version
-      Logidze.without_logging { save! }
+      self.class.without_logging { save! }
     end
 
     protected

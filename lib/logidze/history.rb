@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Logidze
-  # Log data coder
+  # Log data coder used for attribute serialization
   class History
     # History key
     HISTORY = 'h'
@@ -64,15 +64,15 @@ module Logidze
     end
 
     def current_version
-      find_version(version)
+      find_by_version(version)
     end
 
     def previous_version
-      find_version(version - 1)
+      find_by_version(version - 1)
     end
 
     def next_version
-      find_version(version + 1)
+      find_by_version(version + 1)
     end
 
     # Return diff from the initial state to specified time or version.
@@ -99,7 +99,7 @@ module Logidze
     def diff_from(time: nil, version: nil)
       raise "Time or version must be specified" if time.nil? && version.nil?
 
-      from_version = version.nil? ? find_by_time(time) : find_version(version)
+      from_version = version.nil? ? find_by_time(time) : find_by_version(version)
       from_version ||= versions.first
 
       base = changes_to(version: from_version.version)
@@ -120,7 +120,7 @@ module Logidze
     end
 
     # Return version by number or nil
-    def find_version(num)
+    def find_by_version(num)
       versions.find { |v| v.version == num }
     end
 

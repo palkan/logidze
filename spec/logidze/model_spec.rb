@@ -64,6 +64,15 @@ describe Logidze::Model, :db do
     end
   end
 
+  describe "#at_version" do
+    it "returns specified version", :aggregate_failures do
+      user_old = user.at_version(4)
+      expect(user_old.name).to eq 'test'
+      expect(user_old.age).to eq 0
+      expect(user_old.active).to eq true
+    end
+  end
+
   describe "#at!" do
     it "update object in-place", :aggregate_failures do
       user.at!(time(350))
@@ -173,6 +182,21 @@ describe Logidze::Model, :db do
         })
 
       expect(u.redo!).to eq false
+    end
+  end
+
+  describe "#switch_to!" do
+    it "revert record to the specified version", :aggregate_failures do
+      expect(user.switch_to!(3)).to eq true
+      user.reload
+      expect(user.log_version).to eq 3
+      expect(user.name).to eq 'test'
+      expect(user.age).to be_nil
+      expect(user.active).to eq true
+    end
+
+    it "return false if version is unknown" do
+      expect(user.switch_to!(10)).to eq false
     end
   end
 

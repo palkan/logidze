@@ -28,10 +28,6 @@ module Logidze
           "#{migration_name}.rb"
         end
 
-        def migration_class_name
-          migration_name.camelize
-        end
-
         def limit
           options[:limit]
         end

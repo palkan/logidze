@@ -115,6 +115,6 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   end
 
   def down
-    execute "DROP FUNCTION logidze_logger();"
+    execute "DROP FUNCTION logidze_logger() CASCADE;"
   end
 end
