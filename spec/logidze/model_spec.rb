@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Logidze::Model, :db do
@@ -20,21 +21,7 @@ describe Logidze::Model, :db do
   end
 
   describe "#at" do
-    it "returns version at first time", :aggregate_failures do
-      user_old = user.at(time(100))
-      expect(user_old.name).to be_nil
-      expect(user_old.age).to be_nil
-      expect(user_old.active).to be_nil
-    end
-
-    it "returns version at intermediate time (one change)", :aggregate_failures do
-      user_old = user.at(time(140))
-      expect(user_old.name).to be_nil
-      expect(user_old.age).to be_nil
-      expect(user_old.active).to be_nil
-    end
-
-    it "returns version at intermediate time (several changes)", :aggregate_failures do
+    it "returns version at specified time", :aggregate_failures do
       user_old = user.at(time(350))
       expect(user_old.name).to eq 'test'
       expect(user_old.age).to eq 0
@@ -90,20 +77,7 @@ describe Logidze::Model, :db do
   end
 
   describe "#diff_from" do
-    it "returns diff from initial" do
-      expect(user.diff_from(time))
-        .to eq(
-          "id" => user.id,
-          "changes" =>
-            {
-              "name" => { "old" => nil, "new" => "test" },
-              "age" => { "old" => nil, "new" => 10 },
-              "active" => { "old" => nil, "new" => false }
-            }
-        )
-    end
-
-    it "returns diff from intermediate time" do
+    it "returns diff from specified time" do
       expect(user.diff_from(time(350)))
         .to eq(
           "id" => user.id,

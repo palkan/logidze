@@ -6,6 +6,12 @@ module Logidze
   module Model
     extend ActiveSupport::Concern
 
+    included do
+      serialize :log_data, Logidze::History
+
+      delegate :version, :size, to: :log_data, prefix: "log"
+    end
+
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
       def at(ts)
@@ -21,38 +27,39 @@ module Logidze
     # Use this to convert Ruby time to milliseconds
     TIME_FACTOR = 1_000
 
-    # History key
-    HISTORY = 'h'
-    # Version key
-    VERSION = 'v'
-    # Timestamp key
-    TS = 'ts'
-    # Changes key
-    CHANGES = 'c'
-
     # Return a dirty copy of record at specified time
     # If time is less then the first version, then return nil.
     # If time is greater then the last version, then return self.
     def at(ts)
       ts = parse_time(ts)
-      return nil unless version_exists?(ts)
-      return self if same_version?(ts)
+      return nil unless log_data.exists_ts?(ts)
+      return self if log_data.current_ts?(ts)
 
       object_at = dup
-      object_at.apply_diff(changes_to(ts))
+      object_at.apply_diff(log_data.changes_to(time: ts))
     end
 
     # Revert record to the version at specified time (without saving to DB)
     def at!(ts)
       ts = parse_time(ts)
-      return self if same_version?(ts) || !version_exists?(ts)
+      return self if log_data.current_ts?(ts) || !log_data.exists_ts?(ts)
 
-      apply_diff(changes_to(ts))
+      apply_diff(log_data.changes_to(time: ts))
     end
 
+    # Return a dirty copy of specified version of record
+    def at_version(version)
+      return self if log_data.version == version
+      return nil unless log_data.find_version(version)
+
+      object_at = dup
+      object_at.apply_diff(log_data.changes_to(version: version))
+    end
+
+    # Revert record to the specified version (without saving to DB)
     def at_version!(version)
-      return self if current_version == version
-      apply_diff(changes_to_version(version))
+      return self if log_data.version == version || log_data.find_version(version).nil?
+      apply_diff(log_data.changes_to(version: version))
     end
 
     # Return diff object representing changes since specified time.
@@ -63,47 +70,29 @@ module Logidze
     #   #=> { "id" => 1, "changes" => { "title" => { "old" => "Hello!", "new" => "World" } } }
     def diff_from(ts)
       ts = parse_time(ts)
-
-      base = changes_to(ts)
-      diff = changes_to(log_history.last.fetch(TS), base)
-
-      changes_hash = {}
-
-      diff.each do |k, v|
-        changes_hash[k] = { "old" => base[k], "new" => v } unless v == base[k]
-      end
-
-      { "id" => id, "changes" => changes_hash }
+      { "id" => id, "changes" => log_data.diff_from(time: ts) }
     end
 
     # Restore record to the previous version.
     # Return false if no previous version found, otherwise return updated record.
     def undo!
-      version = previous_version
+      version = log_data.previous_version
       return false if version.nil?
-      switch_to!(version.fetch(VERSION))
+      switch_to!(version.version)
     end
 
     # Restore record to the _future_ version (if `undo!` was applied)
     # Return false if no future version found, otherwise return updated record.
     def redo!
-      version = next_version
+      version = log_data.next_version
       return false if version.nil?
-      switch_to!(version.fetch(VERSION))
+      switch_to!(version.version)
     end
 
     def switch_to!(version)
       at_version!(version)
-      log_data[VERSION] = version
+      log_data.version = version
       Logidze.without_logging { save! }
-    end
-
-    def log_history
-      log_data.fetch(HISTORY)
-    end
-
-    def log_version
-      log_data.fetch(VERSION)
     end
 
     protected
@@ -111,53 +100,6 @@ module Logidze
     def apply_diff(diff)
       diff.each { |k, v| send("#{k}=", v) }
       self
-    end
-
-    def changes_to(ts, data = {})
-      diff = data.dup
-      log_history.detect do |v|
-        break true if v.fetch(TS) > ts
-        diff.merge!(v.fetch(CHANGES))
-        false
-      end
-      diff
-    end
-
-    def changes_to_version(version, data = {})
-      diff = data.dup
-      log_history.detect do |v|
-        break true unless v.fetch(VERSION) <= version
-        diff.merge!(v.fetch(CHANGES))
-        false
-      end
-      diff
-    end
-
-    private
-
-    def find_version(version)
-      log_history.find { |v| v.fetch(VERSION) == version }
-    end
-
-    def current_version
-      find_version(log_version)
-    end
-
-    def previous_version
-      find_version(log_version - 1)
-    end
-
-    def next_version
-      find_version(log_version + 1)
-    end
-
-    def version_exists?(ts)
-      log_history.present? && log_history.first.fetch(TS) <= ts
-    end
-
-    def same_version?(ts)
-      (current_version.fetch(TS) <= ts) &&
-        (next_version.nil? || (next_version.fetch(TS) < ts))
     end
 
     def parse_time(ts)

@@ -7,6 +7,11 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
           new_v integer;
           ts bigint;
           size integer;
+          history_limit integer;
+          current_version integer;
+          merged jsonb;
+          iterator integer;
+          item record;
         BEGIN
           ts := (extract(epoch from now()) * 1000)::bigint;
 
@@ -30,8 +35,26 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
               )
             );
           ELSIF TG_OP = 'UPDATE' THEN
+            history_limit := TG_ARGV[0];
+            current_version := (NEW.log_data->>'v')::int;
+
             IF NEW = OLD THEN
               RETURN NEW;
+            END IF;
+
+            IF current_version < (NEW.log_data#>>'{h,-1,v}')::int THEN
+              iterator := 0;
+              FOR item in SELECT * FROM jsonb_array_elements(NEW.log_data->'h')
+              LOOP
+                IF (item.value->>'v')::int > current_version THEN
+                  NEW.log_data := jsonb_set(
+                    NEW.log_data,
+                    '{h}',
+                    (NEW.log_data->'h') - iterator
+                  );
+                END IF;
+                iterator := iterator + 1;
+              END LOOP;
             END IF;
 
             changes := hstore_to_jsonb_loose(
@@ -61,7 +84,29 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
               '{v}',
               to_jsonb(new_v)
             );
+
+            IF history_limit IS NOT NULL AND history_limit = size THEN
+              merged := jsonb_build_object(
+                'ts',
+                NEW.log_data#>'{h,1,ts}',
+                'v',
+                NEW.log_data#>'{h,1,v}',
+                'c',
+                (NEW.log_data#>'{h,0,c}') || (NEW.log_data#>'{h,1,c}')
+              );
+
+              NEW.log_data := jsonb_set(
+                NEW.log_data,
+                '{h}',
+                jsonb_set(
+                  NEW.log_data->'h',
+                  '{1}',
+                  merged 
+                ) - 0
+              );
+            END IF;
           END IF;
+
           return NEW;
         END;
         $body$

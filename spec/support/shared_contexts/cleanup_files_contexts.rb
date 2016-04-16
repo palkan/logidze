@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 shared_context "cleanup migrations" do
   before(:all) { @old_migrations = Dir["spec/dummy/db/migrate/*"] }
   after(:all) { FileUtils.rm(Dir["spec/dummy/db/migrate/*"] - @old_migrations) }

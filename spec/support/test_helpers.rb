@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Logidze
   module TestHelpers #:nodoc:
     BASE_TIME = Time.parse("2016-04-12 12:00:00").to_i

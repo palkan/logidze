@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 require 'generators/logidze/model/model_generator'
 
@@ -16,6 +17,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       subject { migration_file('db/migrate/add_logidze_to_users.rb') }
 
       let(:path) { File.join(destination_root, "app", "models", "user.rb") }
+      let(:args) { ["user"] }
 
       before do
         File.write(
@@ -25,7 +27,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
             end
             RAW
         )
-        run_generator ["user"]
+        run_generator(args)
       end
 
       it "creates migration", :aggregate_failures do
@@ -38,6 +40,15 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         is_expected.to contain "remove_column :users, :log_data"
 
         expect(file('app/models/user.rb')).to contain "has_logidze"
+      end
+
+      context "with limit" do
+        let(:args) { ["user", "--limit=5"] }
+
+        it "creates trigger with limit" do
+          is_expected.to exist
+          is_expected.to contain /execute procedure logidze_logger\(5\);/i
+        end
       end
     end
 

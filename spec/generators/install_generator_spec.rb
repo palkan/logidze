@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 require 'generators/logidze/install/install_generator'
 
@@ -14,7 +15,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
 
     it "creates migration", :aggregate_failures do
       is_expected.to exist
-      is_expected.to contain /create or replace function logidze_logger/i
+      is_expected.to contain /create or replace function logidze_logger()/i
     end
   end
 
