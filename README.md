@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Circle CI](https://circleci.com/gh/palkan/logidze.svg?style=svg)](https://circleci.com/gh/palkan/logidze)
+[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Circle CI](https://circleci.com/gh/palkan/logidze/tree/master.svg?style=svg)](https://circleci.com/gh/palkan/logidze/tree/master)
 
 # Logidze
 

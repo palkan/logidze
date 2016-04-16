@@ -3,13 +3,15 @@ machine:
     version: 2.3.0
 
   environment:
-    LOGIDZE_DB_NAME: circle_test
-    LOGIDZE_DB_USER: ubuntu
+    DATABASE_URL: postgres://postgres@127.0.0.1:5433/test_database
 
 dependencies:
   pre:
     - gem install bundler -v 1.11.2
+    - sudo service postgresql stop 9.4
+    - sudo cp -v /etc/postgresql/9.{4,5}/main/pg_hba.conf && sudo service postgresql restart 9.5
 
 database:
   override:
     - bundle exec rake dummy:db:test:prepare
+  
