@@ -26,6 +26,7 @@ Thumbs.db
 
 .bundle/
 log/*.log
+*.gz
 pkg/
 spec/dummy/db/*.sqlite3
 spec/dummy/db/*.sqlite3-journal
