@@ -107,6 +107,16 @@ describe "Logidze triggers", :db do
       expect(post.rating).to eq 10
       expect(post.title).to eq "Triggers"
     end
+
+    it "there and back again" do
+      post.update!(rating: 5)
+
+      post_was = post.reload
+
+      post.undo!
+      post.redo!
+      expect(post.reload).to eq post_was
+    end
   end
 
   describe "limit" do
