@@ -79,15 +79,12 @@ module Logidze
     # Optional `data` paramater can be used as initial diff state.
     def changes_to(time: nil, version: nil, data: {}, from: 0)
       raise "Time or version must be specified" if time.nil? && version.nil?
-      diff = data.dup
       filter = time.nil? ? method(:version_filter) : method(:time_filter)
-      versions.detect do |v|
+      versions.each_with_object(data.dup) do |v, acc|
         next if v.version < from
-        break true if filter.call(v, version, time)
-        diff.merge!(v.changes)
-        false
+        break acc if filter.call(v, version, time)
+        acc.merge!(v.changes)
       end
-      diff
     end
 
     # Return diff object representing changes since specified time or version.
