@@ -5,6 +5,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     execute <<-SQL
       CREATE TRIGGER logidze_on_<%= table_name %>
       BEFORE UPDATE OR INSERT ON <%= table_name %> FOR EACH ROW
+      WHEN (current_setting('logidze.disabled') <> 'on')
       EXECUTE PROCEDURE logidze_logger(<%= limit || '' %>);
     SQL
   end

@@ -15,9 +15,11 @@ module Logidze
   # @example
   #   Logidze.without_logging { Post.update_all(active: true) }
   def self.without_logging
-    ActiveRecord::Base.connection.execute "SET session_replication_role = replica;"
-    res = yield
-    ActiveRecord::Base.connection.execute "SET session_replication_role = DEFAULT;"
-    res
+    ActiveRecord::Base.transaction do
+      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled = 'on';"
+      res = yield
+      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled = DEFAULT;"
+      res
+    end
   end
 end

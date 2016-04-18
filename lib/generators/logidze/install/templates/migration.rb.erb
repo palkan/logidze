@@ -1,6 +1,15 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   def up
-    execute <<-SQL
+    execute <<~SQL
+      DO $$
+        BEGIN
+        EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.disabled TO off';
+        END;
+      $$
+      LANGUAGE plpgsql;
+    SQL
+
+    execute <<~SQL
       CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         DECLARE
           changes jsonb;
@@ -115,6 +124,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   end
 
   def down
-    execute "DROP FUNCTION logidze_logger() CASCADE;"
+    execute <<~SQL
+      DROP FUNCTION logidze_logger() CASCADE;
+    SQL
   end
 end

@@ -9,6 +9,9 @@ describe "Logidze triggers", :db do
       successfully "rails generate logidze:install"
       successfully "rails generate logidze:model post --limit 4"
       successfully "rake db:migrate"
+
+      # Close active connections to handle db variables
+      ActiveRecord::Base.connection_pool.disconnect!
     end
   end
 
