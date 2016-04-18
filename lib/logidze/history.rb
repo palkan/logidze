@@ -141,13 +141,9 @@ module Logidze
     private
 
     def build_changes(a, b)
-      changes_hash = {}
-
-      b.each do |k, v|
-        changes_hash[k] = { "old" => a[k], "new" => v } unless v == a[k]
+      b.each_with_object({}) do |kv, acc|
+        acc[kv.first] = { "old" => a[kv.first], "new" => kv.last } unless kv.last == a[kv.first]
       end
-
-      changes_hash
     end
 
     def version_filter(item, version, _)
