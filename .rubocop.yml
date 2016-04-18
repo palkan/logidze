@@ -8,6 +8,7 @@ AllCops:
     - 'bin/**/*'
     - 'spec/dummy/**/*'
     - 'tmp/**/*'
+    - 'bench/**/*'
   DisplayCopNames: true
   StyleGuideCopsOnly: false
   TargetRubyVersion: 2.3

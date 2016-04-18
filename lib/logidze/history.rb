@@ -80,10 +80,10 @@ module Logidze
     def changes_to(time: nil, version: nil, data: {}, from: 0)
       raise "Time or version must be specified" if time.nil? && version.nil?
       diff = data.dup
-      filter = time.nil? ? versions_filter(:version, version) : versions_filter(:time, time)
+      filter = time.nil? ? method(:version_filter) : method(:time_filter)
       versions.detect do |v|
-        next false if v.version < from
-        break true if filter.call(v)
+        next if v.version < from
+        break true if filter.call(v, version, time)
         diff.merge!(v.changes)
         false
       end
@@ -150,8 +150,12 @@ module Logidze
       changes_hash
     end
 
-    def versions_filter(field, val)
-      ->(v) { v.send(field) > val }
+    def version_filter(item, version, _)
+      item.version > version
+    end
+
+    def time_filter(item, _, time)
+      item.time > time
     end
   end
 end
