@@ -30,7 +30,7 @@ gem 'logidze'
 rails generate logidze:install
 ```
 
-This creates migration for adding trigger function.
+This creates migration for adding trigger function and enabling hstore extension.
 
 Run migrations:
 

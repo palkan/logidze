@@ -9,7 +9,7 @@ WHERE NOT jsonb_build_object(key, value) <@ arg2;
 
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION jsonb_minus_logger() RETURNS TRIGGER AS $body$
+CREATE OR REPLACE FUNCTION jsonb_minus_2_logger() RETURNS TRIGGER AS $body$
   DECLARE
     changes_h jsonb;
     size integer;
@@ -44,4 +44,4 @@ UPDATE pgbench_accounts SET log = to_jsonb(ARRAY[json_build_object('i', 0)])::js
 
 CREATE TRIGGER hstore_log_accounts
 BEFORE UPDATE ON pgbench_accounts FOR EACH ROW
-EXECUTE PROCEDURE hstore_logger();
+EXECUTE PROCEDURE jsonb_minus_2_logger();

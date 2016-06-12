@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION keys_logger() RETURNS TRIGGER AS $body$
+CREATE OR REPLACE FUNCTION keys_2_logger() RETURNS TRIGGER AS $body$
   DECLARE
     size integer;
     old_j jsonb;
@@ -41,4 +41,4 @@ UPDATE pgbench_accounts SET log = to_jsonb(ARRAY[json_build_object('i', 0)])::js
 
 CREATE TRIGGER keys_log_accounts
 BEFORE UPDATE ON pgbench_accounts FOR EACH ROW
-EXECUTE PROCEDURE keys_logger();
+EXECUTE PROCEDURE keys_2_logger();

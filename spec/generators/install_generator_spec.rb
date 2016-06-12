@@ -15,9 +15,17 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
 
     it "creates migration", :aggregate_failures do
       is_expected.to exist
-      is_expected.to contain /create or replace function jsonb_minus/i
       is_expected.to contain /create or replace function logidze_logger()/i
       is_expected.to contain /alter database .* set logidze\.disabled to off/i
+    end
+  end
+
+  describe "hstore migration" do
+    subject { migration_file('db/migrate/enable_hstore.rb') }
+
+    it "creates migration", :aggregate_failures do
+      is_expected.to exist
+      is_expected.to contain /enable_extension :hstore/i
     end
   end
 end

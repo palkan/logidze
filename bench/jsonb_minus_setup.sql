@@ -46,4 +46,4 @@ UPDATE pgbench_accounts SET log = to_jsonb(ARRAY[json_build_object('i', 0)])::js
 
 CREATE TRIGGER hstore_log_accounts
 BEFORE UPDATE ON pgbench_accounts FOR EACH ROW
-EXECUTE PROCEDURE hstore_logger();
+EXECUTE PROCEDURE jsonb_minus_logger();

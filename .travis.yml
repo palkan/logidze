@@ -24,6 +24,7 @@ before_install:
 
 before_script:
   - bundle exec rake dummy:db:create
+  - psql -U postgres -d logidze -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
   - bundle exec rake dummy:db:test:prepare
 
 matrix:

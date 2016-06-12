@@ -13,6 +13,10 @@ module Logidze
         migration_template "migration.rb.erb", "db/migrate/logidze_install.rb"
       end
 
+      def generate_hstore_migration
+        migration_template "hstore.rb.erb", "db/migrate/enable_hstore.rb"
+      end
+
       def self.next_migration_number(dir)
         ::ActiveRecord::Generators::Base.next_migration_number(dir)
       end

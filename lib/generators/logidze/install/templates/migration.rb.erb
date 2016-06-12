@@ -10,21 +10,6 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     SQL
 
     execute <<~SQL
-      CREATE OR REPLACE FUNCTION jsonb_minus(arg1 jsonb, arg2 jsonb) RETURNS jsonb
-        AS $$
-
-        SELECT 
-          COALESCE(json_object_agg(key, value), '{}')::jsonb
-        FROM 
-          jsonb_each(arg1)
-        WHERE 
-          arg1 -> key <> arg2 -> key 
-          OR arg2 -> key IS NULL;
-
-        $$ LANGUAGE SQL;
-    SQL
-
-    execute <<~SQL
       CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         DECLARE
           changes jsonb;
@@ -81,7 +66,9 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
               END LOOP;
             END IF;
 
-            changes := jsonb_minus(row_to_json(NEW)::jsonb, row_to_json(OLD)::jsonb) - 'log_data';
+            changes := hstore_to_jsonb_loose(
+              hstore(NEW.*) - hstore(OLD.*)
+            ) - 'log_data';
 
             new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
 
