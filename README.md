@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Circle CI](https://circleci.com/gh/palkan/logidze/tree/master.svg?style=svg)](https://circleci.com/gh/palkan/logidze/tree/master)
+[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Build Status](https://travis-ci.org/palkan/logidze.svg?branch=master)](https://travis-ci.org/palkan/logidze) [![Circle CI](https://circleci.com/gh/palkan/logidze/tree/master.svg?style=svg)](https://circleci.com/gh/palkan/logidze/tree/master)
 
 # Logidze
 
@@ -12,6 +12,9 @@ Currently only PostgreSQL 9.5+ is supported.
 Other requirements:
 - Ruby ~>2.3;
 - Rails ~>4.2;
+
+<a href="https://evilmartians.com/">
+<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
 
 ## Installation
 
@@ -162,8 +165,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/palkan
 - Enhance `update_all` to support mass-logging
 - Other DB adapters
 
-
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
