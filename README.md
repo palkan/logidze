@@ -27,7 +27,8 @@ gem 'logidze'
 rails generate logidze:install
 ```
 
-This creates two migrations: one for enabling Hstore extension and one for creating trigger function.
+This generates migration for creating trigger function.
+
 Run migrations:
 
 ```ruby

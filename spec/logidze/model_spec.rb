@@ -17,7 +17,8 @@ describe Logidze::Model, :db do
             { 'v' => 4, 'ts' => time(300), 'c' => { 'age' => 0 } },
             { 'v' => 5, 'ts' => time(400), 'c' => { 'age' => 10, 'active' => false } }
           ]
-      })
+      }
+    )
   end
 
   describe "#at" do
@@ -134,7 +135,8 @@ describe Logidze::Model, :db do
           [
             { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } }
           ]
-        })
+        }
+      )
 
       expect(u.undo!).to eq false
     end
@@ -179,7 +181,8 @@ describe Logidze::Model, :db do
           [
             { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } }
           ]
-        })
+        }
+      )
 
       expect(u.redo!).to eq false
     end

@@ -1,7 +1,7 @@
 # Triggers benchmarks
 
-This benchmark uses standrad _pg_bench_ table `pgbench_accounts`.
-We consider several approaches for calculating records diff: one uses _hstore_ extension and two others iterate through record fields.
+This benchmark uses standard _pg\_bench_ table `pgbench_accounts`.
+We consider several approaches for calculating records diff: one uses _hstore_ extension, two uses jsonb functions and two others iterate through record fields.
 
 # Usage
 
@@ -24,6 +24,10 @@ or separate benchmark:
 ```sh
 make hstore
 
+make jsonb
+
+make jsonb2
+
 make keys
 
 make keys2
@@ -32,7 +36,7 @@ make keys2
 make plain
 ```
 
-You can specify the number of transactions through `T` variable (by default 10000):
+You can specify the number of transactions by `T` variable (defaults to 10000):
 
 ```sh
 make T=1000000
@@ -40,11 +44,15 @@ make T=1000000
 
 # Results
 
-The benchmark shows that hstore variant is more efficient then others (running on MacPro 2013, 2.4 GHz Core i5, 4GB, SSD, 1 million transactions per test):
+The benchmark shows that hstore and jsonb variants are of the same efficiency (running on MacPro 2013, 2.4 GHz Core i5, 4GB, SSD, 1 million transactions per test):
 
 |Mode    | TPS  | Statement latency (ms) |
 |--------|------|------------------------|
-| plain  | 3538 | 0.113                  |
-| hstore | 2902 | 0.168                  |
-| keys   | 2636 | 0.206                  |
-| keys2  | 2490 | 0.220                  |
+| plain  | 3805 | 0.106                  |
+| hstore | 3061 | 0.165                  |
+| jsonb  | 3079 | 0.165                  |
+| jsonb2 | 3057 | 0.166                  |
+| keys   | 2606 | 0.209                  |
+| keys2  | 2610 | 0.216                  |
+
+_Logidze_ uses jsonb variant.

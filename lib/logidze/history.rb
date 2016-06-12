@@ -78,7 +78,7 @@ module Logidze
     # Return diff from the initial state to specified time or version.
     # Optional `data` paramater can be used as initial diff state.
     def changes_to(time: nil, version: nil, data: {}, from: 0)
-      raise "Time or version must be specified" if time.nil? && version.nil?
+      raise ArgumentError, "Time or version must be specified" if time.nil? && version.nil?
       filter = time.nil? ? method(:version_filter) : method(:time_filter)
       versions.each_with_object(data.dup) do |v, acc|
         next if v.version < from
@@ -93,8 +93,9 @@ module Logidze
     #
     #   diff_from(time: 2.days.ago)
     #   #=> { "id" => 1, "changes" => { "title" => { "old" => "Hello!", "new" => "World" } } }
+    # rubocop:disable Metrics/AbcSize
     def diff_from(time: nil, version: nil)
-      raise "Time or version must be specified" if time.nil? && version.nil?
+      raise ArgumentError, "Time or version must be specified" if time.nil? && version.nil?
 
       from_version = version.nil? ? find_by_time(time) : find_by_version(version)
       from_version ||= versions.first
@@ -104,6 +105,7 @@ module Logidze
 
       build_changes(base, diff)
     end
+    # rubocop:enable Metrics/AbcSize
 
     # Return true iff time greater or equal to the first version time
     def exists_ts?(time)

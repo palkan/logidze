@@ -8,7 +8,7 @@ ifndef T
 	T = 10000
 endif
 
-all: plain hstore keys keys2
+all: plain hstore jsonb jsonb2 keys keys2
 
 setup:
 	createdb $(DB) -w
@@ -25,6 +25,20 @@ hstore:
 	$(info ======  [START] Update with hstore-based triggers ======)
 	pgbench -i -q $(DB)
 	psql -q -d $(DB) -f hstore_trigger_setup.sql 
+	pgbench -f bench.sql -t $(T) -r $(DB)
+
+jsonb:
+	$(info )
+	$(info ======  [START] Update with jsonb-minus triggers ======)
+	pgbench -i -q $(DB)
+	psql -q -d $(DB) -f jsonb_minus_setup.sql 
+	pgbench -f bench.sql -t $(T) -r $(DB)
+
+jsonb2:
+	$(info )
+	$(info ======  [START] Update with jsonb-minus triggers ======)
+	pgbench -i -q $(DB)
+	psql -q -d $(DB) -f jsonb_minus_2_setup.sql 
 	pgbench -f bench.sql -t $(T) -r $(DB)
 
 keys:

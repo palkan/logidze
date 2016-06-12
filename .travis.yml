@@ -1,12 +1,19 @@
 language: ruby
+cache:
+  bundler: true
 rvm:
   - 2.3.0
-before_install: gem install bundler -v 1.11.2
+before_install:
+  - gem install bundler -v 1.11.2
+
+addons:
+  postgresql: 9.5
+
 env:
   global:
     - LOGIDZE_DB_USER=postgres
     - LOGIDZE_DB_NAME=logidze
+
 before_script:
-  - createdb logidze -w
-  - psql -U postgres -d logidze -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
+  - bundle exec rake dummy:db:create
   - bundle exec rake dummy:db:test:prepare
