@@ -2,12 +2,12 @@
 
 # Logidze
 
-Logidze provides tools for logging changes of your DB tables.
+Logidze provides tools for logging DB records changes.
 **This is not [audited](https://github.com/collectiveidea/audited) or [paper_trail](https://github.com/airblade/paper_trail) alternative!**
 
 Logidze allows you to create DB-level log (using triggers) and gives you an API to browse this log.
 Log is stored with the record itself in JSONB column. No additional tables required.
-Currently only PostgreSQL 9.5+ is supported.
+Currently, only PostgreSQL 9.5+ is supported.
 
 Other requirements:
 - Ruby ~>2.3;
@@ -30,7 +30,7 @@ gem 'logidze'
 rails generate logidze:install
 ```
 
-This generates migration for creating trigger function.
+This creates migration for adding trigger function.
 
 Run migrations:
 
@@ -45,7 +45,7 @@ rails generate logidze:model Post
 rake db:migrate
 ```
 
-You can provide `limit` option to generate to limit the size of log (by default it's unlimited):
+You can provide `limit` option to `generate` to limit the size of the log (by default it's unlimited):
 
 ```ruby
 rails generate logidze:mode Post --limit=10
@@ -71,7 +71,7 @@ post.log_size #=> 3
 # Get copy of a record at a given time 
 old_post = post.at(2.days.ago)
 
-# or revert the record itself to the previous state (without commiting to DB)
+# or revert the record itself to the previous state (without committing to DB)
 post.at!('201-04-15 12:00:00')
 
 # If no version found
@@ -106,14 +106,14 @@ There are also `#undo!` and `#redo!` options (and more general `#switch_to!`):
 # Revert record to the previous state (and stores this state in DB)
 post.undo!
 
-# You can now user redo! to return back
+# You can now user redo! to revert back
 post.redo!
 
-# More generally you can revert record to arbirtary version
+# More generally you can revert record to arbitrary version
 post.switch_to!(2)
 ```
 
-If you update record after `#undo!` or `#switch_to!`, you lose all "future" versions and `#redo!` is no longer possible.
+If you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no longer possible.
 
 ## Disable logging temporary
 
@@ -140,7 +140,7 @@ The `log_data` column has the following format:
         "v": 1,  // change number
         "ts": 1460805759352, // change timestamp in milliseconds
         "c": { 
-            "attr": "new value",  // udpated fields with new values
+            "attr": "new value",  // updated fields with new values
             "attr2": "new value"
             }
         }
@@ -148,11 +148,11 @@ The `log_data` column has the following format:
 }
 ```
 
-If you specified limit in you trigger definition then log size would not exceed the specified size. When new change occurs and there is no more room for it the two oldest changes get merged. 
+If you specified the limit in you trigger definition then log size would not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes get merged.
 
 ## Development
 
-For development setup run `./bin/setup`. This will run `bundle install` and create test DB.
+For development setup run `./bin/setup`. This runs `bundle install` and creates test DB.
 
 ## Contributing
 
