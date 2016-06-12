@@ -11,7 +11,7 @@ Create database:
 make setup
 ```
 
-You can provide database name through `DB` variable (by default "logidze_bench").
+You can provide database name by `DB` variable (defaults to "logidze_bench").
 
 Run all benchmarks:
 
@@ -32,7 +32,7 @@ make keys
 
 make keys2
 
-# raw update, no triggers
+# Raw update, no triggers
 make plain
 ```
 
@@ -44,15 +44,15 @@ make T=1000000
 
 # Results
 
-The benchmark shows that hstore and jsonb variants are of the same efficiency (running on MacPro 2013, 2.4 GHz Core i5, 4GB, SSD, 1 million transactions per test):
+The benchmark shows that hstore variant is the most efficient (running on MacPro 2013, 2.4 GHz Core i5, 4GB, SSD, 1 million transactions per test):
 
 |Mode    | TPS  | Statement latency (ms) |
 |--------|------|------------------------|
-| plain  | 3805 | 0.106                  |
-| hstore | 3061 | 0.165                  |
-| jsonb  | 3079 | 0.165                  |
-| jsonb2 | 3057 | 0.166                  |
-| keys   | 2606 | 0.209                  |
-| keys2  | 2610 | 0.216                  |
+| plain  | 3628 | 0.113                  |
+| hstore | 3015 | 0.168                  |
+| jsonb  | 1647 | 0.363                  |
+| jsonb2 | 1674 | 0.354                  |
+| keys   | 2355 | 0.219                  |
+| keys2  | 2542 | 0.210                  |
 
-_Logidze_ uses jsonb variant.
+_Logidze_ uses hstore variant.
