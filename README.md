@@ -5,20 +5,20 @@
 Logidze provides tools for logging DB records changes.
 **This is not [audited](https://github.com/collectiveidea/audited) or [paper_trail](https://github.com/airblade/paper_trail) alternative!**
 
-Logidze allows you to create DB-level log (using triggers) and gives you an API to browse this log.
-Log is stored with the record itself in JSONB column. No additional tables required.
+Logidze allows you to create a DB-level log (using triggers) and gives you an API to browse this log.
+The log is stored with the record itself in JSONB column. No additional tables required.
 Currently, only PostgreSQL 9.5+ is supported.
 
 Other requirements:
-- Ruby ~>2.3;
-- Rails ~>4.2;
+- Ruby ~> 2.3;
+- Rails ~> 4.2;
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
 
 ## Installation
 
-1. Add Logidze your application's Gemfile:
+1. Add Logidze to your application's Gemfile:
 
 ```ruby
 gem 'logidze'
@@ -48,7 +48,7 @@ rake db:migrate
 You can provide `limit` option to `generate` to limit the size of the log (by default it's unlimited):
 
 ```ruby
-rails generate logidze:mode Post --limit=10
+rails generate logidze:model Post --limit=10
 ```
 
 This also adds `has_logidze` line to your model, which adds methods for working with logs.
@@ -68,7 +68,7 @@ post.log_version #=> 3
 # Show log size (number of versions)
 post.log_size #=> 3
 
-# Get copy of a record at a given time 
+# Get copy of a record at a given time
 old_post = post.at(2.days.ago)
 
 # or revert the record itself to the previous state (without committing to DB)
@@ -134,12 +134,12 @@ The `log_data` column has the following format:
 ```js
 {
   "v": 2, // current record version,
-  "h": // list of changes 
+  "h": // list of changes
     [
       {
         "v": 1,  // change number
         "ts": 1460805759352, // change timestamp in milliseconds
-        "c": { 
+        "c": {
             "attr": "new value",  // updated fields with new values
             "attr2": "new value"
             }
@@ -148,7 +148,7 @@ The `log_data` column has the following format:
 }
 ```
 
-If you specified the limit in you trigger definition then log size would not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes get merged.
+If you specify the limit in you trigger definition then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
 
 ## Development
 
