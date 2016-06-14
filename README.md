@@ -148,7 +148,7 @@ The `log_data` column has the following format:
 }
 ```
 
-If you specify the limit in you trigger definition then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
+If you specify the limit in the trigger definition then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
 
 ## Development
 
@@ -161,9 +161,11 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/palkan
 
 ## TODO
 
-- Exclude columns from log
-- Enhance `update_all` to support mass-logging
-- Other DB adapters
+- Add "Responsible user" feature.
+- Exclude columns from the log.
+- Enhance update_all to support mass-logging.
+- Exclude "log_data" from "Select" statement unless it is required.
+- Other DB adapters.
 
 ## License
 
