@@ -65,45 +65,45 @@ When each record has 10 versions:
 
 ```
 PT records
-Total Allocated:        27.8 KB
-Total Retained:         16.59 KB
-Retained_memsize memory (per record):   2.14 KB
+Total Allocated:                 27.8 KB
+Total Retained:                  16.59 KB
+Retained memory (per record):    2.14 KB
 
 PT with versions
-Total Allocated:        228.01 KB
-Total Retained:         170.78 KB
-Retained_memsize memory (per record):   143.13 KB
+Total Allocated:                 228.01 KB
+Total Retained:                  170.78 KB
+Retained memory (per record):    143.13 KB
 
 Logidze records
-Total Allocated:        46.45 KB
-Total Retained:         34.73 KB
-Retained_memsize memory (per record):   4.11 KB
+Total Allocated:                 46.45 KB
+Total Retained:                  34.73 KB
+Retained memory (per record):    4.11 KB
 ```
 
 When each record has 100 versions:
 
 ```
 PT with versions
-Total Allocated:        1.92 MB
-Total Retained:         1.56 MB
-Retained_memsize memory (per record):   1.53 MB
+Total Allocated:                 1.92 MB
+Total Retained:                  1.56 MB
+Retained memory (per record):    1.53 MB
 
 Logidze records
-Total Allocated:        162.48 KB
-Total Retained:         150.76 KB
-Retained_memsize memory (per record):   15.4 KB
+Total Allocated:                 162.48 KB
+Total Retained:                  150.76 KB
+Retained memory (per record):    15.4 KB
 ```
 
 When each record has 1000 versions:
 
 ```
 PT with versions
-Total Allocated:        18.23 MB
-Total Retained:         14.86 MB
-Retained_memsize memory (per record):   14.83 MB
+Total Allocated:                 18.23 MB
+Total Retained:                  14.86 MB
+Retained memory (per record):    14.83 MB
 
 Logidze records
-Total Allocated:        1.32 MB
-Total Retained:         1.31 MB
-Retained_memsize memory (per record):   131.59 KB
+Total Allocated:                 1.32 MB
+Total Retained:                  1.31 MB
+Retained memory (per record):    131.59 KB
 ```
