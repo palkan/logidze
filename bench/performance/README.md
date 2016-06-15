@@ -51,9 +51,9 @@ PT (join) DIFF      3.193  (± 0.0%) i/s -     16.000  in   5.030155s
 And, finally, when each record has 1000 versions:
 
 ```
-      PT DIFF      0.270  (± 0.0%) i/s -     17.000  in  63.038374s
+       PT DIFF      0.270  (± 0.0%) i/s -     17.000  in  63.038374s
 PT (join) DIFF      0.235  (± 0.0%) i/s -     14.000  in  60.350886s
-   Logidze DIFF      2.022  (± 0.0%) i/s -    120.000  in  60.142965s
+  Logidze DIFF      2.022  (± 0.0%) i/s -    120.000  in  60.142965s
 ```
 
 ## Select memory usage ([source](memory_profile.rb))
