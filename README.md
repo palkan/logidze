@@ -2,8 +2,7 @@
 
 # Logidze
 
-Logidze provides tools for logging DB records changes.
-**This is not [audited](https://github.com/collectiveidea/audited) or [paper_trail](https://github.com/airblade/paper_trail) alternative!**
+Logidze provides tools for logging DB records changes. Just like [audited](https://github.com/collectiveidea/audited) and [paper_trail](https://github.com/airblade/paper_trail) do (but [faster](bench/performance)).
 
 Logidze allows you to create a DB-level log (using triggers) and gives you an API to browse this log.
 The log is stored with the record itself in JSONB column. No additional tables required.
@@ -161,10 +160,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/palkan
 
 ## TODO
 
-- Add "Responsible user" feature.
 - Exclude columns from the log.
 - Enhance update_all to support mass-logging.
-- Exclude "log_data" from "Select" statement unless it is required.
 - Other DB adapters.
 
 ## License
