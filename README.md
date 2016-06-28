@@ -8,6 +8,8 @@ Logidze allows you to create a DB-level log (using triggers) and gives you an AP
 The log is stored with the record itself in JSONB column. No additional tables required.
 Currently, only PostgreSQL 9.5+ is supported.
 
+[Read the story behind Logidze](https://evilmartians.com/chronicles/introducing-logidze)
+
 Other requirements:
 - Ruby ~> 2.3;
 - Rails ~> 4.2;
