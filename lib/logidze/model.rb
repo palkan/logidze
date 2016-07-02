@@ -4,10 +4,12 @@ require 'active_support'
 module Logidze
   # Extends model with methods to browse history
   module Model
+    require 'logidze/history/type'
+
     extend ActiveSupport::Concern
 
     included do
-      serialize :log_data, Logidze::History
+      attribute :log_data, Logidze::History::Type.new
 
       delegate :version, :size, to: :log_data, prefix: "log"
     end
