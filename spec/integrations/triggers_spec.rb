@@ -5,7 +5,7 @@ describe "Logidze triggers", :db do
   include_context "cleanup migrations"
 
   before(:all) do
-    Dir.chdir("spec/dummy") do
+    Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       successfully "rails generate logidze:install"
       successfully "rails generate logidze:model post --limit 4"
       successfully "rake db:migrate"
@@ -40,7 +40,11 @@ describe "Logidze triggers", :db do
 
     it "creates several versions", :aggregate_failures do
       post.update!(params)
+      expect(post.log_version).to eq 1
+
       post.update!(rating: 0)
+      expect(post.log_version).to eq 1
+
       expect(post.reload.log_version).to eq 3
 
       Post.where(id: post.id).update_all(active: true)

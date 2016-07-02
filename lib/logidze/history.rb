@@ -1,45 +1,13 @@
 # frozen_string_literal: true
 module Logidze
-  # Log data coder used for attribute serialization
+  # Log data wrapper
   class History
+    require 'logidze/history/version'
+
     # History key
     HISTORY = 'h'
     # Version key
     VERSION = 'v'
-
-    # Represents one log item
-    class Version
-      # Timestamp key
-      TS = 'ts'
-      # Changes key
-      CHANGES = 'c'
-
-      attr_reader :data
-
-      def initialize(data)
-        @data = data
-      end
-
-      def version
-        data.fetch(VERSION)
-      end
-
-      def changes
-        data.fetch(CHANGES)
-      end
-
-      def time
-        data.fetch(TS)
-      end
-    end
-
-    def self.dump(object)
-      ActiveSupport::JSON.encode(object)
-    end
-
-    def self.load(json)
-      new(json) unless json.nil?
-    end
 
     attr_reader :data
 
