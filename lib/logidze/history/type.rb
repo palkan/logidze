@@ -3,8 +3,6 @@ require 'active_model/type/value'
 
 module Logidze
   class History
-    class WriteError < StandardError; end
-
     # Type for converting JSONB to and from History
     class Type < ActiveModel::Type::Value
       def type

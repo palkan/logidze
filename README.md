@@ -12,7 +12,7 @@ Currently, only PostgreSQL 9.5+ is supported.
 
 Other requirements:
 - Ruby ~> 2.3;
-- Rails ~> 4.2;
+- Rails >= 4.2 (Yes, Rails 5 is supported!).
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>

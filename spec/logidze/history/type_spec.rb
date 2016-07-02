@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 require "spec_helper"
 
-describe Logidze::History::Type do
-  subject { described_class.new }
+describe "Logidze::History::Type", :rails5 do
+  subject { Logidze::History::Type.new }
 
   describe "#cast" do
     it "handles hash" do

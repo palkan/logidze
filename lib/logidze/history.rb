@@ -13,6 +13,17 @@ module Logidze
 
     delegate :size, to: :versions
 
+    ### Rails 4 ###
+    def self.dump(object)
+      ActiveSupport::JSON.encode(object)
+    end
+
+    def self.load(json)
+      new(json) unless json.nil?
+    end
+
+    ### Rails 4 ###
+
     def initialize(data)
       @data = data
     end
