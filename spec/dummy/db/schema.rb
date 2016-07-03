@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -27,9 +28,9 @@ ActiveRecord::Schema.define(version: 20160415194001) do
     t.string   "name"
     t.integer  "age"
     t.boolean  "active"
-    t.jsonb    "log_data",   default: "{}", null: false
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.jsonb    "log_data",   default: {}, null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
 end

@@ -14,7 +14,10 @@ describe "Logidze triggers", :db do
       # Close active connections to handle db variables
       ActiveRecord::Base.connection_pool.disconnect!
     end
+
     Post.reset_column_information
+    # For Rails 4
+    Post.instance_variable_set(:@attribute_names, nil)
   end
 
   after(:all) { @old_post.destroy! }

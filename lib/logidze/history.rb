@@ -22,8 +22,6 @@ module Logidze
       new(json) if json.present?
     end
 
-    ### Rails 4 ###
-
     def initialize(data)
       @data = data
     end
