@@ -30,6 +30,10 @@ describe Logidze::History do
     it "handles nil" do
       expect(subject.load(nil)).to be_nil
     end
+
+    it "handles empty object" do
+      expect(subject.load({})).to be_nil
+    end
   end
 
   describe ".dump" do

@@ -19,7 +19,7 @@ module Logidze
     end
 
     def self.load(json)
-      new(json) unless json.nil?
+      new(json) if json.present?
     end
 
     ### Rails 4 ###
