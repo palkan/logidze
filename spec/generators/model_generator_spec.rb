@@ -32,12 +32,13 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
       it "creates migration", :aggregate_failures do
         is_expected.to exist
-        is_expected.to contain "add_column :users, :log_data, :jsonb, default: '{}', null: false"
+        is_expected.to contain "add_column :users, :log_data, :jsonb"
         is_expected.to contain /create trigger logidze_on_users/i
         is_expected.to contain /before update or insert on users for each row/i
         is_expected.to contain /execute procedure logidze_logger\(\);/i
         is_expected.to contain /drop trigger if exists logidze_on_users on users/i
         is_expected.to contain "remove_column :users, :log_data"
+        is_expected.not_to contain(/update users/i)
 
         expect(file('app/models/user.rb')).to contain "has_logidze"
       end
@@ -47,7 +48,17 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
         it "creates trigger with limit" do
           is_expected.to exist
-          is_expected.to contain /execute procedure logidze_logger\(5\);/i
+          is_expected.to contain(/execute procedure logidze_logger\(5\);/i)
+        end
+      end
+
+      context "with backfill" do
+        let(:args) { ["user", "--backfill"] }
+
+        it "creates backfill query" do
+          is_expected.to exist
+          is_expected.to contain(/update users as t/i)
+          is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\)\);/i)
         end
       end
     end
@@ -72,7 +83,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
       it "creates migration", :aggregate_failures do
         is_expected.to exist
-        is_expected.to contain "add_column :user_guests, :log_data, :jsonb, default: '{}', null: false"
+        is_expected.to contain "add_column :user_guests, :log_data, :jsonb"
 
         expect(file('app/models/user/guest.rb')).to contain "has_logidze"
       end

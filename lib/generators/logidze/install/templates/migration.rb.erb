@@ -10,6 +10,51 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     SQL
 
     execute <<~SQL
+      CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb) RETURNS jsonb AS $body$
+        BEGIN
+          return json_build_object(
+            'v', 1,
+            'h', jsonb_build_array(
+                   jsonb_build_object(
+                     'ts',
+                     (extract(epoch from now()) * 1000)::bigint,
+                     'v',
+                     1,
+                     'c',
+                     item - 'log_data'
+                   )
+                 )
+            );
+        END;
+      $body$
+      LANGUAGE plpgsql;
+
+      CREATE OR REPLACE FUNCTION logidze_compact_history(log_data jsonb) RETURNS jsonb AS $body$
+        DECLARE
+          merged jsonb;
+        BEGIN
+          merged := jsonb_build_object(
+            'ts',
+            log_data#>'{h,1,ts}',
+            'v',
+            log_data#>'{h,1,v}',
+            'c',
+            (log_data#>'{h,0,c}') || (log_data#>'{h,1,c}')
+          );
+
+          return jsonb_set(
+            log_data,
+            '{h}',
+            jsonb_set(
+              log_data->'h',
+              '{1}',
+              merged 
+            ) - 0
+          );
+        END;
+      $body$
+      LANGUAGE plpgsql;
+
       CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         DECLARE
           changes jsonb;
@@ -22,34 +67,26 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
           iterator integer;
           item record;
         BEGIN
-          ts := (extract(epoch from now()) * 1000)::bigint;
 
           IF TG_OP = 'INSERT' THEN
-            changes := to_jsonb(NEW.*) - 'log_data';
-            new_v := 1;
 
-            NEW.log_data := json_build_object(
-              'v',
-              1,
-              'h',
-              jsonb_build_array(
-                jsonb_build_object(
-                  'ts',
-                  ts,
-                  'v',
-                  new_v,
-                  'c',
-                  changes
-                )
-              )
-            );
+            NEW.log_data := logidze_snapshot(to_jsonb(NEW.*));
+          
           ELSIF TG_OP = 'UPDATE' THEN
+          
+            IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
+              NEW.log_data := logidze_snapshot(to_jsonb(NEW.*));
+              RETURN NEW;
+            END IF;
+
             history_limit := TG_ARGV[0];
             current_version := (NEW.log_data->>'v')::int;
 
             IF NEW = OLD THEN
               RETURN NEW;
             END IF;
+
+            ts := (extract(epoch from now()) * 1000)::bigint;
 
             IF current_version < (NEW.log_data#>>'{h,-1,v}')::int THEN
               iterator := 0;
@@ -95,24 +132,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             );
 
             IF history_limit IS NOT NULL AND history_limit = size THEN
-              merged := jsonb_build_object(
-                'ts',
-                NEW.log_data#>'{h,1,ts}',
-                'v',
-                NEW.log_data#>'{h,1,v}',
-                'c',
-                (NEW.log_data#>'{h,0,c}') || (NEW.log_data#>'{h,1,c}')
-              );
-
-              NEW.log_data := jsonb_set(
-                NEW.log_data,
-                '{h}',
-                jsonb_set(
-                  NEW.log_data->'h',
-                  '{1}',
-                  merged 
-                ) - 0
-              );
+              NEW.log_data := logidze_compact_history(NEW.log_data);
             END IF;
           END IF;
 
@@ -125,6 +145,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
 
   def down
     execute <<~SQL
+      DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
+      DROP FUNCTION logidze_snapshot(jsonb) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
     SQL
   end

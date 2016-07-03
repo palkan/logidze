@@ -1,6 +1,6 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   def up
-    add_column :<%= table_name %>, :log_data, :jsonb, default: '{}', null: false
+    add_column :<%= table_name %>, :log_data, :jsonb, default: {}, null: false
 
     execute <<-SQL
       CREATE TRIGGER logidze_on_<%= table_name %>
@@ -8,6 +8,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       WHEN (current_setting('logidze.disabled') <> 'on')
       EXECUTE PROCEDURE logidze_logger(<%= limit || '' %>);
     SQL
+
+    <% if backfill %>
+    execute <<-SQL
+      UPDATE <%= table_name %> as t
+      SET log_data = logidze_snapshot(to_jsonb(t));
+    SQL
+    <% end %>
   end
 
   def down

@@ -5,17 +5,30 @@ describe "Logidze triggers", :db do
   include_context "cleanup migrations"
 
   before(:all) do
+    @old_post = Post.create!(title: 'First', rating: 100, active: true)
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       successfully "rails generate logidze:install"
-      successfully "rails generate logidze:model post --limit 4"
+      successfully "rails generate logidze:model post --limit 4 --backfill"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
       ActiveRecord::Base.connection_pool.disconnect!
     end
+    Post.reset_column_information
   end
 
+  after(:all) { @old_post.destroy! }
+
   let(:params) { { title: 'Triggers', rating: 10, active: false } }
+
+  describe "backfill" do
+    let(:post) { Post.find(@old_post.id) }
+
+    it "creates snaphost for existent records", :aggregate_failures do
+      expect(post.log_version).to eq 1
+      expect(post.log_size).to eq 1
+    end
+  end
 
   describe "insert" do
     let(:post) { Post.create!(params).reload }
@@ -23,6 +36,14 @@ describe "Logidze triggers", :db do
     it "creates initial version", :aggregate_failures do
       expect(post.log_version).to eq 1
       expect(post.log_size).to eq 1
+    end
+
+    context "when logging is disabled" do
+      let(:post) { Post.without_logging { Post.create!.reload } }
+
+      it "doesn't create initial version" do
+        expect(post.log_data).to be_nil
+      end
     end
   end
 
@@ -55,6 +76,21 @@ describe "Logidze triggers", :db do
       Post.where(id: post.id).update_all(rating: nil)
       expect(post.reload.log_version).to eq 1
       expect(post.log_size).to eq 1
+    end
+
+    context "log_data is empty" do
+      let(:post) { Post.without_logging { Post.create!(params).reload } }
+
+      it "creates several versions", :aggregate_failures do
+        post.update!(rating: 0)
+        post.update!(title: 'Updated')
+        expect(post.log_data).to be_nil
+
+        expect(post.reload.log_version).to eq 2
+
+        Post.where(id: post.id).update_all(active: true)
+        expect(post.reload.log_version).to eq 3
+      end
     end
   end
 

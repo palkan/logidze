@@ -9,6 +9,9 @@ module Logidze
 
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
+      class_option :backfill, type: :boolean, optional: true,
+                              desc: "Add query to backfill existing records history"
+
       def generate_migration
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
       end
@@ -30,6 +33,10 @@ module Logidze
 
         def limit
           options[:limit]
+        end
+
+        def backfill
+          options[:backfill]
         end
       end
 
