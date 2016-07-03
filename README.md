@@ -46,13 +46,19 @@ rails generate logidze:model Post
 rake db:migrate
 ```
 
+This also adds `has_logidze` line to your model, which adds methods for working with logs.
+
 You can provide `limit` option to `generate` to limit the size of the log (by default it's unlimited):
 
 ```ruby
 rails generate logidze:model Post --limit=10
 ```
 
-This also adds `has_logidze` line to your model, which adds methods for working with logs.
+To backfill table data (i.e. create initial snapshots) add `backfill` option:
+
+```ruby
+rails generate logidze:model Post --backfill
+```
 
 ## Usage
 
