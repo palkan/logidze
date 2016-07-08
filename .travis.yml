@@ -33,3 +33,7 @@ matrix:
       gemfile: gemfiles/rails5.gemfile
     - rvm: 2.3.1
       gemfile: gemfiles/rails42.gemfile
+    - rvm: 2.1.6
+      gemfile: gemfiles/rails42.gemfile
+    - rvm: 2.2.3
+      gemfile: gemfiles/rails42.gemfile

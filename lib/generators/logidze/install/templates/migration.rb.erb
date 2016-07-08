@@ -1,6 +1,6 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   def up
-    execute <<~SQL
+    execute <<-SQL
       DO $$
         BEGIN
         EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.disabled TO off';
@@ -9,7 +9,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       LANGUAGE plpgsql;
     SQL
 
-    execute <<~SQL
+    execute <<-SQL
       CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb) RETURNS jsonb AS $body$
         BEGIN
           return json_build_object(
@@ -144,7 +144,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   end
 
   def down
-    execute <<~SQL
+    execute <<-SQL
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
       DROP FUNCTION logidze_snapshot(jsonb) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
