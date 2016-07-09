@@ -1,6 +1,6 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   def up
-    execute <<~SQL
+    execute <<-SQL
       DO $$
         BEGIN
         EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.disabled TO off';
@@ -9,7 +9,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       LANGUAGE plpgsql;
     SQL
 
-    execute <<~SQL
+    execute <<-SQL
       CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb) RETURNS jsonb AS $body$
         BEGIN
           return json_build_object(
@@ -21,10 +21,25 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
                      'v',
                      1,
                      'c',
-                     item - 'log_data'
+                     logidze_exclude_keys(item,'log_data')
                    )
                  )
             );
+        END;
+      $body$
+      LANGUAGE plpgsql;
+
+      CREATE OR REPLACE FUNCTION logidze_exclude_keys(obj jsonb, VARIADIC keys text[]) RETURNS jsonb AS $body$
+        DECLARE
+          res jsonb;
+          key text;
+        BEGIN
+          res := obj;
+          FOREACH key IN ARRAY keys
+          LOOP 
+            res := res - key;
+          END LOOP;
+          RETURN res;
         END;
       $body$
       LANGUAGE plpgsql;
@@ -103,9 +118,12 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
               END LOOP;
             END IF;
 
-            changes := hstore_to_jsonb_loose(
-              hstore(NEW.*) - hstore(OLD.*)
-            ) - 'log_data';
+            changes := logidze_exclude_keys(
+              hstore_to_jsonb_loose(
+                hstore(NEW.*) - hstore(OLD.*)
+              ),
+              'log_data'
+            );
 
             new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
 
@@ -144,7 +162,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   end
 
   def down
-    execute <<~SQL
+    execute <<-SQL
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
       DROP FUNCTION logidze_snapshot(jsonb) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;

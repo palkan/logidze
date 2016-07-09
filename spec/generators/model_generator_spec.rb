@@ -22,10 +22,10 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       before do
         File.write(
           path,
-          <<~RAW
-            class User < ActiveRecord::Base
-            end
-            RAW
+          <<-RAW
+class User < ActiveRecord::Base
+end
+RAW
         )
         run_generator(args)
       end
@@ -71,12 +71,12 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       before do
         File.write(
           path,
-          <<~RAW
-            module User
-              class Guest < ActiveRecord::Base
-              end
-            end
-          RAW
+          <<-RAW
+module User
+  class Guest < ActiveRecord::Base
+  end
+end
+RAW
         )
         run_generator ["User/Guest"]
       end
