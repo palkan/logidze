@@ -1,6 +1,8 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   def up
+    <% unless only_trigger? %>
     add_column :<%= table_name %>, :log_data, :jsonb
+    <% end %>
 
     execute <<-SQL
       CREATE TRIGGER logidze_on_<%= table_name %>
@@ -9,7 +11,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       EXECUTE PROCEDURE logidze_logger(<%= limit || '' %>);
     SQL
 
-    <% if backfill %>
+    <% if backfill? %>
     execute <<-SQL
       UPDATE <%= table_name %> as t
       SET log_data = logidze_snapshot(to_jsonb(t));
@@ -20,6 +22,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   def down
     execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
 
+    <% unless only_trigger? %>
     remove_column :<%= table_name %>, :log_data
+    <% end %>
   end
 end

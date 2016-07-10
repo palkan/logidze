@@ -61,6 +61,20 @@ RAW
           is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\)\);/i)
         end
       end
+
+      context "with only trigger" do
+        let(:args) { ["user", "--only-trigger"] }
+
+        it "creates migration with trigger" do
+          is_expected.to exist
+          is_expected.not_to contain "add_column :users, :log_data, :jsonb"
+          is_expected.to contain /create trigger logidze_on_users/i
+          is_expected.to contain /before update or insert on users for each row/i
+          is_expected.to contain /execute procedure logidze_logger\(\);/i
+          is_expected.to contain /drop trigger if exists logidze_on_users on users/i
+          is_expected.not_to contain "remove_column :users, :log_data"
+        end
+      end
     end
 
     context "with namespace" do
