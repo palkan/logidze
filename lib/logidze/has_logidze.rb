@@ -10,7 +10,7 @@ module Logidze
       # Include methods to work with history.
       #
       # rubocop:disable Style/PredicateName
-      def has_logidze
+      def has_logidze(*_hargs)
         include Logidze::Model
       end
     end

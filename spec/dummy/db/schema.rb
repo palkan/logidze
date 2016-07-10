@@ -28,9 +28,9 @@ ActiveRecord::Schema.define(version: 20160415194001) do
     t.string   "name"
     t.integer  "age"
     t.boolean  "active"
-    t.jsonb    "log_data",   default: {}, null: false
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.jsonb    "log_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

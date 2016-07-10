@@ -1,6 +1,6 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   def up
-    add_column :<%= table_name %>, :log_data, :jsonb, default: {}, null: false
+    add_column :<%= table_name %>, :log_data, :jsonb
 
     execute <<-SQL
       CREATE TRIGGER logidze_on_<%= table_name %>
