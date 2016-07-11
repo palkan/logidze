@@ -2,13 +2,15 @@
 require "acceptance_helper"
 
 describe "Logidze migrations" do
-  include_context "cleanup migrations"
-
   describe "#install" do
+    include_context "cleanup migrations"
+
     it "creates migration" do
       successfully "rails generate logidze:install"
 
       successfully "rake db:migrate"
+
+      successfully "rake db:rollback"
 
       successfully "rake db:rollback"
     end
@@ -23,6 +25,7 @@ describe "Logidze migrations" do
   end
 
   describe "#model" do
+    include_context "cleanup migrations"
     include_context "cleanup models"
 
     before do

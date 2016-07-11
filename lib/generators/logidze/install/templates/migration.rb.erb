@@ -167,10 +167,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   end
 
   def down
+    <% unless update? %>
     execute <<-SQL
+      DROP FUNCTION logidze_version(bigint, jsonb) CASCADE;
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
       DROP FUNCTION logidze_snapshot(jsonb) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
     SQL
+    <% end %>
   end
 end
