@@ -46,6 +46,23 @@ describe "Logidze responsibility", :db do
 
         expect(subject.reload.whodunnit).to be_nil
       end
+
+      it "handles block" do
+        block = -> { subject }
+
+        Logidze.with_responsible(responsible.id, &block)
+
+        expect(subject.reload.whodunnit).to eq responsible
+      end
+
+      it "handles nil" do
+        block = -> { subject }
+
+        Logidze.with_responsible(nil, &block)
+
+        expect(subject.reload.whodunnit).to be_nil
+        expect(subject.log_data.current_version.data.keys).not_to include(Logidze::History::Version::RESPONSIBLE)
+      end
     end
 
     context "update" do

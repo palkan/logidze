@@ -1,6 +1,7 @@
 # 0.3.0
 - Add `--update` option to install migration generator
 - Add `--only-trigger` option to model migration generator
+- Add [Responsibility](https://github.com/palkan/logidze/issues/4) feature
 
 # 0.2.3
 - Support Ruby >= 2.1
