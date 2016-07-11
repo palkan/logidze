@@ -7,6 +7,9 @@ module Logidze
   require 'logidze/history'
   require 'logidze/model'
   require 'logidze/has_logidze'
+  require 'logidze/responsible'
+
+  extend Logidze::Responsible
 
   require 'logidze/engine' if defined?(Rails)
 

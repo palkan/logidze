@@ -114,12 +114,6 @@ module Logidze
       self.class.without_logging { save! }
     end
 
-    # Returns an ID associated with the current version
-    def responsible_id
-      return unless log_data.try(:current_version)
-      log_data.current_version.responsible_id
-    end
-
     protected
 
     def apply_diff(version, diff)

@@ -269,15 +269,15 @@ describe Logidze::Model, :db do
 
   describe "#responsible_id" do
     it "returns id for current version" do
-      expect(user.responsible_id).to eq 2
+      expect(user.log_data.responsible_id).to eq 2
     end
 
     it "returns nil if no information" do
-      expect(user.at(time(350)).responsible_id).to be_nil
+      expect(user.at(time(350)).log_data.responsible_id).to be_nil
     end
 
     it "returns id for previous version" do
-      expect(user.at(time(250)).responsible_id).to eq 1
+      expect(user.at(time(250)).log_data.responsible_id).to eq 1
     end
   end
 end

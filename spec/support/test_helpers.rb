@@ -8,5 +8,13 @@ module Logidze
     def time(shift = 0)
       (BASE_TIME + shift) * 1_000
     end
+
+    def ignore_exceptions
+      return unless block_given?
+      begin
+        yield
+      rescue
+      end
+    end
   end
 end
