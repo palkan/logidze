@@ -12,6 +12,7 @@ module Logidze
     attr_reader :data
 
     delegate :size, to: :versions
+    delegate :responsible_id, to: :current_version
 
     ### Rails 4 ###
     def self.dump(object)
@@ -103,6 +104,10 @@ module Logidze
     # Return nearest (from the bottom) version to the specified time
     def find_by_time(time)
       versions.reverse.find { |v| v.time <= time }
+    end
+
+    def dup
+      self.class.new(data.deep_dup)
     end
 
     def ==(other)

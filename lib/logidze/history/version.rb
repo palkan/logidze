@@ -7,6 +7,8 @@ module Logidze
       TS = 'ts'
       # Changes key
       CHANGES = 'c'
+      # Responsible ID
+      RESPONSIBLE = 'r'
 
       attr_reader :data
 
@@ -24,6 +26,10 @@ module Logidze
 
       def time
         data.fetch(TS)
+      end
+
+      def responsible_id
+        data[RESPONSIBLE]
       end
     end
   end

@@ -46,8 +46,10 @@ module Logidze
       return nil unless log_data.exists_ts?(ts)
       return self if log_data.current_ts?(ts)
 
+      version = log_data.find_by_time(ts).version
+
       object_at = dup
-      object_at.apply_diff(log_data.changes_to(time: ts))
+      object_at.apply_diff(version, log_data.changes_to(version: version))
     end
 
     # Revert record to the version at specified time (without saving to DB)
@@ -56,7 +58,9 @@ module Logidze
       return self if log_data.current_ts?(ts)
       return false unless log_data.exists_ts?(ts)
 
-      apply_diff(log_data.changes_to(time: ts))
+      version = log_data.find_by_time(ts).version
+
+      apply_diff(version, log_data.changes_to(version: version))
     end
 
     # Return a dirty copy of specified version of record
@@ -65,7 +69,7 @@ module Logidze
       return nil unless log_data.find_by_version(version)
 
       object_at = dup
-      object_at.apply_diff(log_data.changes_to(version: version))
+      object_at.apply_diff(version, log_data.changes_to(version: version))
     end
 
     # Revert record to the specified version (without saving to DB)
@@ -73,7 +77,7 @@ module Logidze
       return self if log_data.version == version
       return false unless log_data.find_by_version(version)
 
-      apply_diff(log_data.changes_to(version: version))
+      apply_diff(version, log_data.changes_to(version: version))
     end
 
     # Return diff object representing changes since specified time.
@@ -107,14 +111,14 @@ module Logidze
     # Return false if version is unknown.
     def switch_to!(version)
       return false unless at_version!(version)
-      log_data.version = version
       self.class.without_logging { save! }
     end
 
     protected
 
-    def apply_diff(diff)
+    def apply_diff(version, diff)
       diff.each { |k, v| send("#{k}=", v) }
+      log_data.version = version
       self
     end
 

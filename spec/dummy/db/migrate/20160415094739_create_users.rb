@@ -4,7 +4,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string :name
       t.integer :age
       t.boolean :active
-      t.jsonb :log_data, default: '{}', null: false
+      t.jsonb :log_data
       t.timestamps null: false
     end
   end

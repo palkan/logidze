@@ -81,6 +81,39 @@ describe "Logidze triggers", :db do
       expect(post.log_size).to eq 1
     end
 
+    context "logging is disabled" do
+      it "doesn't create new version" do
+        Logidze.without_logging do
+          post.update!(params)
+          expect(post.reload.log_version).to eq 1
+          expect(post.log_size).to eq 1
+        end
+
+        post.update!(rating: 12)
+        expect(post.reload.log_version).to eq 2
+        expect(post.log_size).to eq 2
+      end
+
+      it "handles failed transaction" do
+        post.errored = true
+        expect(post).not_to be_valid
+
+        ignore_exceptions do
+          Logidze.without_logging do
+            post.update!(params)
+          end
+        end
+
+        expect(post.reload.log_version).to eq 1
+        expect(post.log_size).to eq 1
+        expect(post).to be_valid
+
+        post.update!(rating: 12)
+        expect(post.reload.log_version).to eq 2
+        expect(post.log_size).to eq 2
+      end
+    end
+
     context "log_data is empty" do
       let(:post) { Post.without_logging { Post.create!(params).reload } }
 

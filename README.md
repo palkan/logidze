@@ -60,6 +60,16 @@ To backfill table data (i.e. create initial snapshots) add `backfill` option:
 rails generate logidze:model Post --backfill
 ```
 
+## Upgrade from previous versions
+
+We try to make upgrade process as simple as possible. For now, the only required action is to create and run a migration:
+
+```ruby
+rails generate logidze:install --update
+```
+
+This updates core `logdize_logger` DB function. No need to update tables or triggers.
+
 ## Usage
 
 Your model now has `log_data` column which stores changes log.
@@ -122,6 +132,49 @@ post.switch_to!(2)
 
 If you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no longer possible.
 
+## Track responsibility (aka _whodunnit_)
+
+You can store additional information in the version object, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
+
+To provide `responsible_id` you should wrap your code in a block:
+
+```ruby
+Logidze.with_responsible(user.id) do
+  post.save!
+end
+```
+
+And then to retrieve `responsible_id`:
+
+```ruby
+post.log_data.responsible_id
+```
+
+Logidze does not require `responsible_id` to be `SomeModel` ID. It can be anything. Thus Logidze does not provide methods for retrieving the corresponding object. However, you can easy write it yourself:
+
+```ruby
+class Post < ActiveRecord::Base
+  has_logidze
+
+  def whodunnit
+    id = log_data.responsible_id
+    User.find(id) if id.present?
+  end
+end
+```
+
+And in your controller:
+
+```ruby
+class ApplicationController < ActionController::Base
+  around_action :set_logidze_responsible, only: [:create, :update]
+
+  def set_logidze_responsible(&block)
+    Logidze.with_responsible(current_user&.id, &block)
+  end
+end
+```
+
 ## Disable logging temporary
 
 If you want to make update without logging (e.g. mass update), you can turn it off the following way:
@@ -150,7 +203,8 @@ The `log_data` column has the following format:
             "attr": "new value",  // updated fields with new values
             "attr2": "new value"
             }
-        }
+        },
+        "r": 42 // Resposibility ID (if provided)
     ]
 }
 ```

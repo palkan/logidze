@@ -13,9 +13,9 @@ describe Logidze::Model, :db do
           [
             { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } },
             { 'v' => 2, 'ts' => time(200), 'c' => { 'active' => true } },
-            { 'v' => 3, 'ts' => time(200), 'c' => { 'name' => 'test' } },
+            { 'v' => 3, 'ts' => time(200), 'r' => 1, 'c' => { 'name' => 'test' } },
             { 'v' => 4, 'ts' => time(300), 'c' => { 'age' => 0 } },
-            { 'v' => 5, 'ts' => time(400), 'c' => { 'age' => 10, 'active' => false } }
+            { 'v' => 5, 'ts' => time(400), 'r' => 2, 'c' => { 'age' => 10, 'active' => false } }
           ]
       }
     )
@@ -82,7 +82,7 @@ describe Logidze::Model, :db do
       expect(user.age).to eq 0
       expect(user.active).to eq true
 
-      expect(user.changes).to eq("age" => [10, 0], "active" => [false, true])
+      expect(user.changes).to include("age" => [10, 0], "active" => [false, true])
     end
   end
 
@@ -264,6 +264,20 @@ describe Logidze::Model, :db do
             "active" => { "old" => true, "new" => false }
           }
       )
+    end
+  end
+
+  describe "#responsible_id" do
+    it "returns id for current version" do
+      expect(user.log_data.responsible_id).to eq 2
+    end
+
+    it "returns nil if no information" do
+      expect(user.at(time(350)).log_data.responsible_id).to be_nil
+    end
+
+    it "returns id for previous version" do
+      expect(user.at(time(250)).log_data.responsible_id).to eq 1
     end
   end
 end

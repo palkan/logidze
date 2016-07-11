@@ -12,6 +12,9 @@ module Logidze
       class_option :backfill, type: :boolean, optional: true,
                               desc: "Add query to backfill existing records history"
 
+      class_option :only_trigger, type: :boolean, optional: true,
+                                  desc: "Create trigger-only migration"
+
       def generate_migration
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
       end
@@ -35,8 +38,12 @@ module Logidze
           options[:limit]
         end
 
-        def backfill
+        def backfill?
           options[:backfill]
+        end
+
+        def only_trigger?
+          options[:only_trigger]
         end
       end
 

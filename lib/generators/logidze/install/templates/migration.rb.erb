@@ -4,25 +4,39 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       DO $$
         BEGIN
         EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.disabled TO off';
+        EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.responsible TO off';
         END;
       $$
       LANGUAGE plpgsql;
     SQL
 
     execute <<-SQL
+      CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb) RETURNS jsonb AS $body$
+        DECLARE
+          buf jsonb;
+        BEGIN
+          buf := jsonb_build_object(
+                   'ts',
+                   (extract(epoch from now()) * 1000)::bigint,
+                   'v',
+                    v,
+                    'c',
+                    logidze_exclude_keys(data, 'log_data')
+                   );
+          IF current_setting('logidze.responsible') <> 'off' THEN
+            buf := jsonb_set(buf, ARRAY['r'], to_jsonb(current_setting('logidze.responsible')));
+          END IF;
+          RETURN buf;
+        END;
+      $body$
+      LANGUAGE plpgsql;
+
       CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb) RETURNS jsonb AS $body$
         BEGIN
           return json_build_object(
             'v', 1,
             'h', jsonb_build_array(
-                   jsonb_build_object(
-                     'ts',
-                     (extract(epoch from now()) * 1000)::bigint,
-                     'v',
-                     1,
-                     'c',
-                     logidze_exclude_keys(item,'log_data')
-                   )
+                   logidze_version(1, item)
                  )
             );
         END;
@@ -57,6 +71,10 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             (log_data#>'{h,0,c}') || (log_data#>'{h,1,c}')
           );
 
+          IF (log_data#>'{h,1}' ? 'r') THEN
+            merged := jsonb_set(merged, ARRAY['r'], log_data#>'{h,1,r}');
+          END IF;
+
           return jsonb_set(
             log_data,
             '{h}',
@@ -74,7 +92,6 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
         DECLARE
           changes jsonb;
           new_v integer;
-          ts bigint;
           size integer;
           history_limit integer;
           current_version integer;
@@ -101,8 +118,6 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
               RETURN NEW;
             END IF;
 
-            ts := (extract(epoch from now()) * 1000)::bigint;
-
             IF current_version < (NEW.log_data#>>'{h,-1,v}')::int THEN
               iterator := 0;
               FOR item in SELECT * FROM jsonb_array_elements(NEW.log_data->'h')
@@ -118,11 +133,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
               END LOOP;
             END IF;
 
-            changes := logidze_exclude_keys(
-              hstore_to_jsonb_loose(
-                hstore(NEW.*) - hstore(OLD.*)
-              ),
-              'log_data'
+            changes := hstore_to_jsonb_loose(
+              hstore(NEW.*) - hstore(OLD.*)
             );
 
             new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
@@ -132,14 +144,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             NEW.log_data := jsonb_set(
               NEW.log_data,
               ARRAY['h', size::text],
-              jsonb_build_object(
-                'ts',
-                ts,
-                'v',
-                new_v,
-                'c',
-                changes
-              ),
+              logidze_version(new_v, changes),
               true
             );
 
@@ -162,10 +167,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   end
 
   def down
+    <% unless update? %>
     execute <<-SQL
+      DROP FUNCTION logidze_version(bigint, jsonb) CASCADE;
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
       DROP FUNCTION logidze_snapshot(jsonb) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
     SQL
+    <% end %>
   end
 end
