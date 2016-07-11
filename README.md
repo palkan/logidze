@@ -60,6 +60,16 @@ To backfill table data (i.e. create initial snapshots) add `backfill` option:
 rails generate logidze:model Post --backfill
 ```
 
+## Upgrade from previous versions
+
+We try to make upgrade process as simple as possible. For now, the only required action is to create and run a migration:
+
+```ruby
+rails generate logidze:install --update
+```
+
+This updates core `logdize_logger` DB function. No need to update tables or triggers.
+
 ## Usage
 
 Your model now has `log_data` column which stores changes log.
