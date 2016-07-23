@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
+require "rails"
 require "logidze"
 
 require "pry"
