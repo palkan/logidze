@@ -3,8 +3,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     execute <<-SQL
       DO $$
         BEGIN
-        EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.disabled TO off';
-        EXECUTE 'ALTER DATABASE ' || current_database() || ' SET logidze.responsible TO off';
+        EXECUTE 'ALTER DATABASE "' || current_database() || '" SET logidze.disabled TO off';
+        EXECUTE 'ALTER DATABASE "' || current_database() || '" SET logidze.responsible TO off';
         END;
       $$
       LANGUAGE plpgsql;
