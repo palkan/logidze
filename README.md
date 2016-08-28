@@ -202,9 +202,9 @@ The `log_data` column has the following format:
         "c": {
             "attr": "new value",  // updated fields with new values
             "attr2": "new value"
-            }
-        },
+            },
         "r": 42 // Resposibility ID (if provided)
+      }
     ]
 }
 ```
