@@ -9,7 +9,7 @@ module Logidze # :nodoc:
           "SET LOCAL logidze.responsible = #{ActiveRecord::Base.connection.quote(responsible_id)};"
         )
         res = yield
-        ActiveRecord::Base.connection.execute "SET LOCAL logidze.responsible = DEFAULT;"
+        ActiveRecord::Base.connection.execute "SET LOCAL logidze.responsible TO DEFAULT;"
         res
       end
     end

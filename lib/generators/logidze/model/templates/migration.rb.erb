@@ -1,4 +1,7 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
+  require 'logidze/migration'
+  include Logidze::Migration
+ 
   def up
     <% unless only_trigger? %>
     add_column :<%= table_name %>, :log_data, :jsonb
@@ -7,7 +10,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     execute <<-SQL
       CREATE TRIGGER logidze_on_<%= table_name %>
       BEFORE UPDATE OR INSERT ON <%= table_name %> FOR EACH ROW
-      WHEN (current_setting('logidze.disabled') <> 'on')
+      WHEN (coalesce(#{current_setting('logidze.disabled')}, '') <> 'on')
       EXECUTE PROCEDURE logidze_logger(<%= limit || '' %>);
     SQL
 

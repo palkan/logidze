@@ -1,14 +1,19 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
+  require 'logidze/migration'
+  include Logidze::Migration
+
   def up
-    execute <<-SQL
-      DO $$
-        BEGIN
-        EXECUTE 'ALTER DATABASE "' || current_database() || '" SET logidze.disabled TO off';
-        EXECUTE 'ALTER DATABASE "' || current_database() || '" SET logidze.responsible TO off';
-        END;
-      $$
-      LANGUAGE plpgsql;
-    SQL
+    unless current_setting_missing_supported?
+      execute <<-SQL
+        DO $$
+          BEGIN
+          EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.disabled=' || quote_literal('');
+          EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.responsible=' || quote_literal('');
+          END;
+        $$
+        LANGUAGE plpgsql;
+      SQL
+    end
 
     execute <<-SQL
       CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb) RETURNS jsonb AS $body$
@@ -23,7 +28,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
                     'c',
                     logidze_exclude_keys(data, 'log_data')
                    );
-          IF current_setting('logidze.responsible') <> 'off' THEN
+          IF coalesce(#{current_setting('logidze.responsible')}, '') <> '' THEN
             buf := jsonb_set(buf, ARRAY['r'], to_jsonb(current_setting('logidze.responsible')));
           END IF;
           RETURN buf;

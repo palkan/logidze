@@ -19,9 +19,9 @@ module Logidze
   #   Logidze.without_logging { Post.update_all(active: true) }
   def self.without_logging
     ActiveRecord::Base.transaction do
-      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled = 'on';"
+      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO on;"
       res = yield
-      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled = DEFAULT;"
+      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO DEFAULT;"
       res
     end
   end
