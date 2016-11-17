@@ -60,6 +60,14 @@ To backfill table data (i.e. create initial snapshots) add `backfill` option:
 rails generate logidze:model Post --backfill
 ```
 
+## Troubleshooting
+
+The most common problem is `"permission denied to set parameter "logidze.xxx"` caused by `ALTER DATABASE ...` query.
+Logidze requires at least database owner privileges (which is not always possible).
+
+Here is a quick and straightforward [workaround](https://github.com/palkan/logidze/issues/11#issuecomment-260703464) by [@nobodyzzz](https://github.com/nobodyzzz).
+
+
 ## Upgrade from previous versions
 
 We try to make upgrade process as simple as possible. For now, the only required action is to create and run a migration:
