@@ -67,6 +67,10 @@ Logidze requires at least database owner privileges (which is not always possibl
 
 Here is a quick and straightforward [workaround](https://github.com/palkan/logidze/issues/11#issuecomment-260703464) by [@nobodyzzz](https://github.com/nobodyzzz).
 
+**NOTE**: if you're using PostgreSQL >= 9.6 you need neither the workaround nor owner privileges because Logidze (>= 0.3.1) can work without `ALTER DATABASE ...`.
+
+Nevertheless, you still need super-user privileges to enable `hstore` extension (or you can use [PostgreSQL Extension Whitelisting](https://github.com/dimitri/pgextwlist)).
+
 
 ## Upgrade from previous versions
 
