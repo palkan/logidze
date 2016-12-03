@@ -35,7 +35,7 @@ RAW
         is_expected.to contain "add_column :users, :log_data, :jsonb"
         is_expected.to contain /create trigger logidze_on_users/i
         is_expected.to contain /before update or insert on users for each row/i
-        is_expected.to contain /execute procedure logidze_logger\(\);/i
+        is_expected.to contain /execute procedure logidze_logger\(null,null,null\);/i
         is_expected.to contain /drop trigger if exists logidze_on_users on users/i
         is_expected.to contain "remove_column :users, :log_data"
         is_expected.not_to contain(/update users/i)
@@ -48,8 +48,62 @@ RAW
 
         it "creates trigger with limit" do
           is_expected.to exist
-          is_expected.to contain(/execute procedure logidze_logger\(5\);/i)
+          is_expected.to contain(/execute procedure logidze_logger\(5,null,null\);/i)
         end
+      end
+
+      context "with except" do
+          let(:args) { ["user", "--except='active,age'"] }
+
+          it "creates trigger with except" do
+              is_expected.to exist
+              is_expected.to contain(/execute procedure logidze_logger\(null,\'\'active,age\'\',null\);/i)
+          end
+      end
+
+      context "with only" do
+          let(:args) { ["user", "--only='active,age'"] }
+
+          it "creates trigger with only" do
+              is_expected.to exist
+              is_expected.to contain(/execute procedure logidze_logger\(null,null,\'\'active,age\'\'\);/i)
+          end
+      end
+
+      context "with limit and except" do
+          let(:args) { ["user", "--limit=5", "--except='active,age'"] }
+
+          it "creates trigger with limit and except" do
+              is_expected.to exist
+              is_expected.to contain(/execute procedure logidze_logger\(5,\'\'active,age\'\',null\);/i)
+          end
+      end
+
+      context "with limit and only" do
+          let(:args) { ["user", "--limit=5", "--only='active,age'"] }
+
+          it "creates trigger with limit and only" do
+              is_expected.to exist
+              is_expected.to contain(/execute procedure logidze_logger\(5,null,\'\'active,age\'\'\);/i)
+          end
+      end
+
+      context "with limit and except and only" do
+          let(:args) { ["user", "--limit=5", "--except='active,age'", "--only='active,age'"] }
+
+          it "creates trigger with limit and except and only" do
+              is_expected.to exist
+              is_expected.to contain(/execute procedure logidze_logger\(5,\'\'active,age\'\',\'\'active,age\'\'\);/i)
+          end
+      end
+
+      context "with except and only" do
+          let(:args) { ["user", "--except='active,age'", "--only='active,age'"] }
+
+          it "creates trigger with except and only" do
+              is_expected.to exist
+              is_expected.to contain(/execute procedure logidze_logger\(null,\'\'active,age\'\',\'\'active,age\'\'\);/i)
+          end
       end
 
       context "with backfill" do
@@ -58,7 +112,7 @@ RAW
         it "creates backfill query" do
           is_expected.to exist
           is_expected.to contain(/update users as t/i)
-          is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\)\);/i)
+          is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\),null,null\);/i)
         end
       end
 
@@ -70,7 +124,7 @@ RAW
           is_expected.not_to contain "add_column :users, :log_data, :jsonb"
           is_expected.to contain /create trigger logidze_on_users/i
           is_expected.to contain /before update or insert on users for each row/i
-          is_expected.to contain /execute procedure logidze_logger\(\);/i
+          is_expected.to contain /execute procedure logidze_logger\(null,null,null\);/i
           is_expected.to contain /drop trigger if exists logidze_on_users on users/i
           is_expected.not_to contain "remove_column :users, :log_data"
         end

@@ -15,6 +15,10 @@ module Logidze
       class_option :only_trigger, type: :boolean, optional: true,
                                   desc: "Create trigger-only migration"
 
+      class_option :only, type: :string, optional: true, desc: "Add whitelist of columns"
+
+      class_option :except, type: :string, optional: true, desc: "Add blacklist of columns"
+
       def generate_migration
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
       end
@@ -44,6 +48,14 @@ module Logidze
 
         def only_trigger?
           options[:only_trigger]
+        end
+
+        def only
+          options[:only]
+        end
+
+        def except
+          options[:except]
         end
       end
 
