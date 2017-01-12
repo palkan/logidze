@@ -11,13 +11,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       CREATE TRIGGER logidze_on_<%= table_name %>
       BEFORE UPDATE OR INSERT ON <%= table_name %> FOR EACH ROW
       WHEN (coalesce(#{current_setting('logidze.disabled')}, '') <> 'on')
-      EXECUTE PROCEDURE logidze_logger(<%= limit || '' %>);
+      EXECUTE PROCEDURE logidze_logger(<%= logidze_logger_parameters %>);
     SQL
 
     <% if backfill? %>
     execute <<-SQL
       UPDATE <%= table_name %> as t
-      SET log_data = logidze_snapshot(to_jsonb(t));
+      SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
     SQL
     <% end %>
   end

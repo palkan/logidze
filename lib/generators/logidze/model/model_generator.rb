@@ -15,7 +15,14 @@ module Logidze
       class_option :only_trigger, type: :boolean, optional: true,
                                   desc: "Create trigger-only migration"
 
+      class_option :blacklist, type: :array, optional: true
+      class_option :whitelist, type: :array, optional: true
+
       def generate_migration
+        if options[:blacklist] && options[:whitelist]
+          $stderr.puts "Use only one: --whitelist or --blacklist"
+          exit(1)
+        end
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
       end
 
@@ -44,6 +51,38 @@ module Logidze
 
         def only_trigger?
           options[:only_trigger]
+        end
+
+        def columns_blacklist
+          array = if !options[:whitelist]
+                    options[:blacklist]
+                  else 
+                    class_name.constantize.column_names - options[:whitelist]
+                  end
+
+          array || []
+        end
+
+        def logidze_logger_parameters
+          if limit.nil? && columns_blacklist.empty?
+            ''
+          elsif !limit.nil? && columns_blacklist.empty?
+            limit
+          elsif !limit.nil? && !columns_blacklist.empty?
+            "#{limit}, #{format_pgsql_array(columns_blacklist)}"
+          elsif limit.nil? && !columns_blacklist.empty?
+            "null, #{format_pgsql_array(columns_blacklist)}"
+          end
+        end
+
+        def logidze_snapshot_parameters
+          return 'to_jsonb(t)' if columns_blacklist.empty?
+
+          "to_jsonb(t), #{format_pgsql_array(columns_blacklist)}"
+        end
+
+        def format_pgsql_array(ruby_array)
+          "'{" + ruby_array.join(', ') + "}'"
         end
       end
 
