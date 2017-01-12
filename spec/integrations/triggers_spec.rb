@@ -9,7 +9,7 @@ describe "Logidze triggers", :db do
     end
   end
 
-  context 'without blacklisting'do
+  context 'without blacklisting' do
     include_context "cleanup migrations"
 
     before(:all) do
@@ -223,14 +223,14 @@ describe "Logidze triggers", :db do
         post.update!(rating: nil)
         expect(post.reload.log_version).to eq 5
         expect(post.log_size).to eq 4
-        expect(post.log_data.versions.first.changes)
-          .to include("title" => "Triggers", "rating" => 10, "active" => true)
+        expect(post.log_data.versions.first.changes).
+          to include("title" => "Triggers", "rating" => 10, "active" => true)
 
         post.update!(rating: 20)
         expect(post.reload.log_version).to eq 6
         expect(post.log_size).to eq 4
-        expect(post.log_data.versions.first.changes)
-          .to include("title" => "Triggers", "rating" => 22, "active" => true)
+        expect(post.log_data.versions.first.changes).
+          to include("title" => "Triggers", "rating" => 22, "active" => true)
       end
     end
   end
@@ -239,7 +239,7 @@ describe "Logidze triggers", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      @blacklist = ["created_at", "active"]
+      @blacklist = %w(created_at active)
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
@@ -285,7 +285,7 @@ describe "Logidze triggers", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      @whitelist = ["title", "rating"]
+      @whitelist = %w(title rating)
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
@@ -325,6 +325,5 @@ describe "Logidze triggers", :db do
         expect(changes.keys).to match_array @whitelist
       end
     end
-
   end
 end

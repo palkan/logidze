@@ -56,7 +56,7 @@ module Logidze
         def columns_blacklist
           array = if !options[:whitelist]
                     options[:blacklist]
-                  else 
+                  else
                     class_name.constantize.column_names - options[:whitelist]
                   end
 

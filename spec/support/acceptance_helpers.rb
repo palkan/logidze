@@ -7,8 +7,8 @@ module Logidze
     end
 
     def unsuccessfully(command)
-      expect(system("RAILS_ENV=test #{command}"))
-        .to eq(false), "'#{command}' was successful"
+      expect(system("RAILS_ENV=test #{command}")).
+        to eq(false), "'#{command}' was successful"
     end
 
     def verify_file_contains(path, statement)
