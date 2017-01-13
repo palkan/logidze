@@ -52,6 +52,17 @@ RAW
         end
       end
 
+      context "with columns blacklist" do
+        let(:args) { ["user", "--blacklist", "age", "active"] }
+
+        it "creates trigger with columns blacklist" do
+          is_expected.to exist
+          is_expected.to contain(
+            /execute procedure logidze_logger\(null, '\{age, active\}'\);/i
+          )
+        end
+      end
+
       context "with backfill" do
         let(:args) { ["user", "--backfill"] }
 
