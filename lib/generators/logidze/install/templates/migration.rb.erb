@@ -15,6 +15,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       SQL
     end
 
+    <% if update? %>
+    execute <<-SQL
+      DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb);
+      DROP FUNCTION IF EXISTS logidze_snapshot(jsonb);
+    SQL
+    <% end %>
+
     execute <<-SQL
       CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb, blacklist text[] DEFAULT '{}') RETURNS jsonb AS $body$
         DECLARE
