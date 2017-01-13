@@ -7,7 +7,7 @@ describe "Logidze responsibility", :db do
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       successfully "rails generate logidze:install"
-      successfully "rails generate logidze:model user --only-trigger --limit=5"
+      successfully "rails generate logidze:model user --only-trigger --limit=5 --except='name'"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables

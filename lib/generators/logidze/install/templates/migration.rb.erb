@@ -16,17 +16,26 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     end
 
     execute <<-SQL
-      CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb) RETURNS jsonb AS $body$
+      CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb, blacklist text DEFAULT '', whitelist text DEFAULT '') RETURNS jsonb AS $body$
         DECLARE
           buf jsonb;
+          filtered_data jsonb;
+          filtered_array jsonb;
         BEGIN
+          IF blacklist <> 'null' THEN
+            filtered_array := logidze_exclude_keys(data, array['log_data']::text[] || string_to_array(blacklist, ','));
+          ELSIF blacklist = 'null' AND whitelist <> 'null' THEN
+            filtered_array := logidze_include_keys(data, string_to_array(whitelist, ','));
+          ELSE
+            filtered_array := logidze_exclude_keys(data, array['log_data']::text[]);
+          END IF;
           buf := jsonb_build_object(
                    'ts',
                    (extract(epoch from now()) * 1000)::bigint,
                    'v',
                     v,
                     'c',
-                    logidze_exclude_keys(data, 'log_data')
+                    filtered_array
                    );
           IF coalesce(#{current_setting('logidze.responsible')}, '') <> '' THEN
             buf := jsonb_set(buf, ARRAY['r'], to_jsonb(current_setting('logidze.responsible')));
@@ -36,27 +45,46 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
       $body$
       LANGUAGE plpgsql;
 
-      CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb) RETURNS jsonb AS $body$
+      CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, blacklist text DEFAULT '', whitelist text DEFAULT '') RETURNS jsonb AS $body$
         BEGIN
           return json_build_object(
             'v', 1,
             'h', jsonb_build_array(
-                   logidze_version(1, item)
+                   logidze_version(1, item, blacklist, whitelist)
                  )
             );
         END;
       $body$
       LANGUAGE plpgsql;
 
-      CREATE OR REPLACE FUNCTION logidze_exclude_keys(obj jsonb, VARIADIC keys text[]) RETURNS jsonb AS $body$
+      CREATE OR REPLACE FUNCTION logidze_exclude_keys(obj jsonb, keys text[]) RETURNS jsonb AS $body$
         DECLARE
           res jsonb;
           key text;
         BEGIN
           res := obj;
           FOREACH key IN ARRAY keys
-          LOOP 
+          LOOP
             res := res - key;
+          END LOOP;
+          RETURN res;
+        END;
+      $body$
+      LANGUAGE plpgsql;
+
+      CREATE OR REPLACE FUNCTION logidze_include_keys(obj jsonb, keys text[]) RETURNS jsonb AS $body$
+        DECLARE
+          res jsonb;
+          key text;
+          keys_arr text[];
+        BEGIN
+          res := obj;
+          keys_arr :=  array(select * from jsonb_object_keys(obj));
+          FOREACH key IN ARRAY keys_arr
+          LOOP
+            IF NOT keys && array[key]::text[] THEN
+              res := res - key;
+            END IF;
           END LOOP;
           RETURN res;
         END;
@@ -86,7 +114,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             jsonb_set(
               log_data->'h',
               '{1}',
-              merged 
+              merged
             ) - 0
           );
         END;
@@ -104,19 +132,21 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
           iterator integer;
           item record;
         BEGIN
-
           IF TG_OP = 'INSERT' THEN
 
-            NEW.log_data := logidze_snapshot(to_jsonb(NEW.*));
-          
+            NEW.log_data := logidze_snapshot(to_jsonb(NEW.*), TG_ARGV[1], TG_ARGV[2]);
+
           ELSIF TG_OP = 'UPDATE' THEN
-          
+
             IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
-              NEW.log_data := logidze_snapshot(to_jsonb(NEW.*));
+              NEW.log_data := logidze_snapshot(to_jsonb(NEW.*), TG_ARGV[1], TG_ARGV[2]);
               RETURN NEW;
             END IF;
 
-            history_limit := TG_ARGV[0];
+            IF TG_ARGV[0] <> 'null' THEN
+              history_limit := TG_ARGV[0];
+            END IF;
+
             current_version := (NEW.log_data->>'v')::int;
 
             IF NEW = OLD THEN
@@ -149,7 +179,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             NEW.log_data := jsonb_set(
               NEW.log_data,
               ARRAY['h', size::text],
-              logidze_version(new_v, changes),
+              logidze_version(new_v, changes, TG_ARGV[1], TG_ARGV[2]),
               true
             );
 
@@ -174,9 +204,9 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   def down
     <% unless update? %>
     execute <<-SQL
-      DROP FUNCTION logidze_version(bigint, jsonb) CASCADE;
+      DROP FUNCTION logidze_version(bigint, jsonb, text, text) CASCADE;
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
-      DROP FUNCTION logidze_snapshot(jsonb) CASCADE;
+      DROP FUNCTION logidze_snapshot(jsonb, text, text) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
     SQL
     <% end %>
