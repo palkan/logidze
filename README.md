@@ -60,6 +60,15 @@ To backfill table data (i.e. create initial snapshots) add `backfill` option:
 rails generate logidze:model Post --backfill
 ```
 
+You can log only particular columns changes. There are mutually exclusive `blacklist` and `whitelist` options for this:
+
+```ruby
+# track all columns, except `created_at` and `active`
+rails generate logidze:model Post --blacklist=created_at active
+# track only `title` and `body` columns
+rails generate logidze:model Post --whitelist=title body
+```
+
 ## Troubleshooting
 
 The most common problem is `"permission denied to set parameter "logidze.xxx"` caused by `ALTER DATABASE ...` query.
@@ -234,7 +243,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/palkan
 
 ## TODO
 
-- Exclude columns from the log.
 - Enhance update_all to support mass-logging.
 - Other DB adapters.
 
