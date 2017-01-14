@@ -1,5 +1,7 @@
 # master
 
+- Add `--blacklist` and `--whitelist` options to model migration generator. ([@charlie-wasp][])
+
 # 0.3.0
 
 - Add `--update` option to install migration generator. ([@palkan][])
@@ -27,3 +29,4 @@
 - Rails 5 support. ([@palkan][])
 
 [@palkan]: https://github.com/palkan
+[@charlie-wasp]: https://github.com/charlie-wasp
