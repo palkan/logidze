@@ -1,8 +1,12 @@
-# master
+# Change log
+
+## master
+
+## 0.4.0 (2017-01-14)
 
 - Add `--blacklist` and `--whitelist` options to model migration generator. ([@charlie-wasp][])
 
-# 0.3.0
+## 0.3.0
 
 - Add `--update` option to install migration generator. ([@palkan][])
 
@@ -10,21 +14,21 @@
 
 - Add [Responsibility](https://github.com/palkan/logidze/issues/4) feature. ([@palkan][])
 
-# 0.2.3
+## 0.2.3
 
 - Support Ruby >= 2.1. ([@palkan][])
 
-# 0.2.2
+## 0.2.2
 
 - Add `--backfill` option to model migration. ([@palkan][])
 
 - Handle legacy data (that doesn't have log data). ([@palkan][])
 
-# 0.2.1
+## 0.2.1
 
 - Support both Rails 4 and 5. ([@palkan][])
 
-# 0.2.0 (**Incompatible with 0.1.0**)
+## 0.2.0 (**Incompatible with 0.1.0**)
 
 - Rails 5 support. ([@palkan][])
 
