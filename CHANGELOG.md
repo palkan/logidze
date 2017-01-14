@@ -1,7 +1,5 @@
 # master
 
-#0.4.0
-
 - Add `--blacklist` and `--whitelist` options to model migration generator. ([@charlie-wasp][])
 
 # 0.3.0
