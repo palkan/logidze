@@ -5,6 +5,8 @@ class Post < ActiveRecord::Base
 
   has_logidze
 
+  has_many :comments
+
   def reload
     self.errored = nil
     super

@@ -285,4 +285,48 @@ describe Logidze::Model, :db do
       expect(user.at(time(250)).log_data.responsible_id).to eq 1
     end
   end
+
+  describe "associations" do
+    let(:post) do
+      Post.create(
+        title: 'Post',
+        rating: 5,
+        active: true,
+        log_data: {
+          'v' => 3,
+          'h' =>
+            [
+              { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool post', 'active' => false } },
+              { 'v' => 2, 'ts' => time(200), 'c' => { 'rating' => 5 } },
+              { 'v' => 3, 'ts' => time(300), 'c' => { 'title' => 'Post' } },
+            ]
+        }
+      )
+    end
+    let(:comment) do
+      post.comments.create(
+        content: 'New comment',
+        log_data: {
+          'v' => 2,
+          'h' =>
+            [
+              { 'v' => 1, 'ts' => time(250), 'c' => { 'content' => 'My comment' } },
+              { 'v' => 1, 'ts' => time(250), 'c' => { 'content' => 'New comment' } },
+            ]
+        }
+      )
+    end
+
+    it "works" do
+      # смотрим пост до обновления комментария (первый случай)
+      old_post = post.at(time(100))
+
+      # сам пост в этот момент не менялся, но у нас есть ассоциация, которая поменялась
+      old_post.comments.first #=> 'My comment'
+
+      # для более старой версии комментариев не было (второй случай)
+      very_old_post = post.at('2017-01-20')
+      very_old_post.comments.size #=> 0
+    end
+  end
 end
