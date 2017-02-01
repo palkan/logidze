@@ -286,7 +286,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "associations" do
+  describe "associations", focus: true do
     let(:post) do
       Post.create(
         title: 'Post',
@@ -303,14 +303,14 @@ describe Logidze::Model, :db do
         }
       )
     end
-    let(:comment) do
+    before(:each) do
       post.comments.create(
         content: 'New comment',
         log_data: {
           'v' => 2,
           'h' =>
             [
-              { 'v' => 1, 'ts' => time(250), 'c' => { 'content' => 'My comment' } },
+              { 'v' => 1, 'ts' => time(150), 'c' => { 'content' => 'My comment' } },
               { 'v' => 1, 'ts' => time(250), 'c' => { 'content' => 'New comment' } },
             ]
         }
@@ -319,14 +319,14 @@ describe Logidze::Model, :db do
 
     it "works" do
       # смотрим пост до обновления комментария (первый случай)
-      old_post = post.at(time(100))
+      old_post = post.at(time(200))
 
       # сам пост в этот момент не менялся, но у нас есть ассоциация, которая поменялась
-      old_post.comments.first #=> 'My comment'
+      expect(old_post.comments.first.content).to eql('My comment')
 
       # для более старой версии комментариев не было (второй случай)
-      very_old_post = post.at('2017-01-20')
-      very_old_post.comments.size #=> 0
+      very_old_post = post.at(time(100))
+      expect(very_old_post.comments.size).to eql(0) #=> 0
     end
   end
 end
