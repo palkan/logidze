@@ -15,6 +15,8 @@ module Logidze
       class_option :only_trigger, type: :boolean, optional: true,
                                   desc: "Create trigger-only migration"
 
+      class_option :path, type: :string, optional: true, desc: "Specify path to the model file"
+
       class_option :blacklist, type: :array, optional: true
       class_option :whitelist, type: :array, optional: true
 
@@ -89,7 +91,7 @@ module Logidze
       private
 
       def model_file_path
-        File.join("app", "models", "#{file_path}.rb")
+        options[:path] || File.join("app", "models", "#{file_path}.rb")
       end
     end
   end

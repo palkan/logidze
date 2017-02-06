@@ -1,6 +1,8 @@
 # Change log
 
-## master
+## 0.4.1 (2017-02-06)
+
+- Add `--path` option to model migration generator. ([@palkan][])
 
 ## 0.4.0 (2017-01-14)
 

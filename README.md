@@ -69,6 +69,12 @@ rails generate logidze:model Post --blacklist=created_at active
 rails generate logidze:model Post --whitelist=title body
 ```
 
+By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case you should specify the path explicitly:
+
+```ruby
+rails generate logidze:model Post --path "app/models/custom/post.rb"
+```
+
 ## Troubleshooting
 
 The most common problem is `"permission denied to set parameter "logidze.xxx"` caused by `ALTER DATABASE ...` query.
