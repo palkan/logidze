@@ -113,5 +113,31 @@ RAW
         expect(file('app/models/user/guest.rb')).to contain "has_logidze"
       end
     end
+
+    context "with custom path" do
+      subject { migration_file('db/migrate/add_logidze_to_data_sets.rb') }
+
+      let(:path) { File.join(destination_root, "app", "models", "custom", "data", "set.rb") }
+
+      before do
+        File.write(
+          path,
+          <<-RAW
+module Data
+  class Set < ActiveRecord::Base
+  end
+end
+RAW
+        )
+        run_generator ["data/set", "--path", "app/models/custom/data/set.rb"]
+      end
+
+      it "creates migration", :aggregate_failures do
+        is_expected.to exist
+        is_expected.to contain "add_column :data_sets, :log_data, :jsonb"
+
+        expect(file('app/models/custom/data/set.rb')).to contain "has_logidze"
+      end
+    end
   end
 end
