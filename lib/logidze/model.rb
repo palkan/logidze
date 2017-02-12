@@ -123,6 +123,30 @@ module Logidze
       end
     end
 
+    def association(name)
+      association = super
+
+      owner = self
+
+      association.reload
+      target = association.target
+
+      if target.is_a? Array
+        association.target = target.map do |object|
+          object unless object.class.included_modules.include? Logidze::Model
+
+          time = owner.log_data.current_version.time
+          object.at(time)
+        end
+      elsif target.class.included_modules.include? Logidze::Model
+      else
+        return association
+      end
+
+      # p target.class, log_version
+      association
+    end
+
     protected
 
     def apply_diff(version, diff)

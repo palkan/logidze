@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 20170127153105) do
 
   create_table "comments", force: :cascade do |t|
     t.text     "content"
+    t.jsonb    "log_data"
     t.integer  "post_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
