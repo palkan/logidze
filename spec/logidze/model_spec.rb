@@ -286,12 +286,30 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "associations", focus: true do
+  describe "Versioned associations" do
+    let(:user) do
+      User.create(
+        name: 'John Doe',
+        age: 35,
+        active: true,
+        log_data: {
+          'v' => 3,
+          'h' =>
+            [
+              { 'v' => 1, 'ts' => time(50), 'c' => { 'name' => 'John Harris', 'active' => false, 'age' => 45 } },
+              { 'v' => 2, 'ts' => time(150), 'c' => { 'active' => true, 'age' => 35 } },
+              { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe' } },
+            ]
+        }
+      )
+    end
+
     let(:post) do
       Post.create(
         title: 'Post',
         rating: 5,
         active: true,
+        user: user,
         log_data: {
           'v' => 3,
           'h' =>
@@ -303,30 +321,40 @@ describe Logidze::Model, :db do
         }
       )
     end
-    before(:each) do
-      post.comments.create(
-        content: 'New comment',
-        log_data: {
-          'v' => 2,
-          'h' =>
-            [
-              { 'v' => 1, 'ts' => time(150), 'c' => { 'content' => 'My comment' } },
-              { 'v' => 2, 'ts' => time(250), 'c' => { 'content' => 'New comment' } },
-            ]
-        }
-      )
+
+    context "with belongs to" do
+      it "returns association version, according to the owner" do
+        post.user
+        old_post = post.at(time(200))
+        expect(old_post.user.name).to eql('John Harris')
+
+        very_old_post = post.at(time(100))
+        expect(very_old_post.user.age).to eql(45)
+      end
     end
 
-    it "works" do
-      # смотрим пост до обновления комментария (первый случай)
-      old_post = post.at(time(200))
-      # binding.pry 
-      # сам пост в этот момент не менялся, но у нас есть ассоциация, которая поменялась
-      expect(old_post.comments.first.content).to eql('My comment')
+    context "with has many" do
+      before(:each) do
+        post.comments.create(
+          content: 'New comment',
+          log_data: {
+            'v' => 2,
+            'h' =>
+              [
+                { 'v' => 1, 'ts' => time(150), 'c' => { 'content' => 'My comment' } },
+                { 'v' => 2, 'ts' => time(250), 'c' => { 'content' => 'New comment' } },
+              ]
+          }
+        )
+      end
 
-      # для более старой версии комментариев не было (второй случай)
-      very_old_post = post.at(time(100))
-      # expect(very_old_post.comments.size).to eql(0) #=> 0
+      it "returns association version, according to the owner" do
+        old_post = post.at(time(200))
+        expect(old_post.comments.first.content).to eql('My comment')
+
+        very_old_post = post.at(time(100))
+        expect(very_old_post.comments.length).to eql(0)
+      end
     end
   end
 end

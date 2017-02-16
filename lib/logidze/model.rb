@@ -126,24 +126,10 @@ module Logidze
     def association(name)
       association = super
 
-      owner = self
-
-      association.reload
-      target = association.target
-
-      if target.is_a? Array
-        association.target = target.map do |object|
-          object unless object.class.included_modules.include? Logidze::Model
-
-          time = owner.log_data.current_version.time
-          object.at(time)
-        end
-      elsif target.class.included_modules.include? Logidze::Model
-      else
-        return association
+      if in_the_past?
+        association.singleton_class.prepend Logidze::VersionedAssociation
       end
 
-      # p target.class, log_version
       association
     end
 
@@ -153,6 +139,14 @@ module Logidze
       diff.each { |k, v| send("#{k}=", v) }
       log_data.version = version
       self
+    end
+
+    def in_the_past?
+      return false unless log_data
+
+      time = log_data.current_version.time
+
+      time < Time.now.to_i * TIME_FACTOR
     end
 
     def parse_time(ts)

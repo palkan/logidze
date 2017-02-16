@@ -6,6 +6,7 @@ require "logidze/version"
 module Logidze
   require 'logidze/history'
   require 'logidze/model'
+  require 'logidze/versioned_association'
   require 'logidze/has_logidze'
   require 'logidze/responsible'
 
