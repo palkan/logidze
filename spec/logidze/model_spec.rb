@@ -45,6 +45,11 @@ describe Logidze::Model, :db do
       expect(user.age).to eq 10
     end
 
+    it "retains original object's id" do
+      user_old = user.at(time(100))
+      expect(user_old.id).to be_equal(user.id)
+    end
+
     it "handles time as string", :aggregate_failures do
       user_old = user.at("2016-04-12 12:05:50")
       expect(user_old.name).to eq 'test'
