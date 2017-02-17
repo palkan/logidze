@@ -50,6 +50,9 @@ module Logidze
 
       object_at = dup
       object_at.apply_diff(version, log_data.changes_to(version: version))
+      object_at.id = id
+
+      object_at
     end
 
     # Revert record to the version at specified time (without saving to DB)
