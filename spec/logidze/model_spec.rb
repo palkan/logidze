@@ -304,8 +304,8 @@ describe Logidze::Model, :db do
       )
     end
 
-    let(:post) do
-      Post.create(
+    let(:article) do
+      Article.create(
         title: 'Post',
         rating: 5,
         active: true,
@@ -314,7 +314,7 @@ describe Logidze::Model, :db do
           'v' => 3,
           'h' =>
             [
-              { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool post', 'active' => false } },
+              { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false } },
               { 'v' => 2, 'ts' => time(200), 'c' => { 'rating' => 5 } },
               { 'v' => 3, 'ts' => time(300), 'c' => { 'title' => 'Post' } },
             ]
@@ -324,18 +324,18 @@ describe Logidze::Model, :db do
 
     context "with belongs to" do
       it "returns association version, according to the owner" do
-        post.user
-        old_post = post.at(time(200))
+        article.user
+        old_post = article.at(time(200))
         expect(old_post.user.name).to eql('John Harris')
 
-        very_old_post = post.at(time(100))
+        very_old_post = article.at(time(100))
         expect(very_old_post.user.age).to eql(45)
       end
     end
 
     context "with has many" do
       before(:each) do
-        post.comments.create(
+        article.comments.create(
           content: 'New comment',
           log_data: {
             'v' => 2,
@@ -349,10 +349,10 @@ describe Logidze::Model, :db do
       end
 
       it "returns association version, according to the owner" do
-        old_post = post.at(time(200))
+        old_post = article.at(time(200))
         expect(old_post.comments.first.content).to eql('My comment')
 
-        very_old_post = post.at(time(100))
+        very_old_post = article.at(time(100))
         expect(very_old_post.comments.length).to eql(0)
       end
     end

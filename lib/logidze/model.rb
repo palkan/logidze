@@ -126,7 +126,7 @@ module Logidze
     def association(name)
       association = super
 
-      if in_the_past?
+      if logidze_past?
         association.singleton_class.prepend Logidze::VersionedAssociation
       end
 
@@ -141,7 +141,7 @@ module Logidze
       self
     end
 
-    def in_the_past?
+    def logidze_past?
       return false unless log_data
 
       time = log_data.current_version.time

@@ -4,8 +4,6 @@ class CreatePosts < ActiveRecord::Migration
       t.string :title
       t.integer :rating
       t.boolean :active
-      t.jsonb :log_data
-      t.references :user, foreign_key: true
 
       t.timestamps null: false
     end

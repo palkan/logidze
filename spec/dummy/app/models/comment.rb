@@ -1,4 +1,4 @@
 class Comment < ActiveRecord::Base
   has_logidze
-  belongs_to :post
+  belongs_to :article
 end
