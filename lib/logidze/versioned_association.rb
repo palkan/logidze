@@ -6,7 +6,7 @@ module Logidze
 
       return target if inversed
 
-      time = owner.log_data.current_version.time
+      time = owner.logidze_requested_ts
 
       if target.is_a? Array
         target.map! do |object|

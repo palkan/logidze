@@ -297,8 +297,8 @@ describe Logidze::Model, :db do
           'h' =>
             [
               { 'v' => 1, 'ts' => time(50), 'c' => { 'name' => 'John Harris', 'active' => false, 'age' => 45 } },
-              { 'v' => 2, 'ts' => time(150), 'c' => { 'active' => true, 'age' => 35 } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe' } },
+              { 'v' => 2, 'ts' => time(150), 'c' => { 'active' => true, 'age' => 34 } },
+              { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe', 'age' => 35 } },
             ]
         }
       )
@@ -311,12 +311,11 @@ describe Logidze::Model, :db do
         active: true,
         user: user,
         log_data: {
-          'v' => 3,
+          'v' => 2,
           'h' =>
             [
               { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false } },
-              { 'v' => 2, 'ts' => time(200), 'c' => { 'rating' => 5 } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'title' => 'Post' } },
+              { 'v' => 2, 'ts' => time(200), 'c' => { 'rating' => 5, 'title' => 'Post' } },
             ]
         }
       )
@@ -324,12 +323,19 @@ describe Logidze::Model, :db do
 
     context "with belongs to" do
       it "returns association version, according to the owner" do
-        article.user
-        old_post = article.at(time(200))
-        expect(old_post.user.name).to eql('John Harris')
+        old_article = article.at(time(200))
+        expect(old_article.user.name).to eql('John Harris')
 
-        very_old_post = article.at(time(100))
-        expect(very_old_post.user.age).to eql(45)
+        very_old_article = article.at(time(100))
+        expect(very_old_article.user.age).to eql(45)
+      end
+
+      context 'when owner was not changed at the given time' do
+        it "still returns association version" do
+          # this returns the same article object due to implementation
+          old_article = article.at(time(250))
+          expect(old_article.user.age).to eql(34)
+        end
       end
     end
 
@@ -349,11 +355,11 @@ describe Logidze::Model, :db do
       end
 
       it "returns association version, according to the owner" do
-        old_post = article.at(time(200))
-        expect(old_post.comments.first.content).to eql('My comment')
+        old_article = article.at(time(200))
+        expect(old_article.comments.first.content).to eql('My comment')
 
-        very_old_post = article.at(time(100))
-        expect(very_old_post.comments.length).to eql(0)
+        very_old_article = article.at(time(100))
+        expect(very_old_article.comments.length).to eql(0)
       end
     end
   end
