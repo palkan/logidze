@@ -13,6 +13,10 @@ module Logidze
       def has_logidze
         include Logidze::Model
       end
+
+      def has_logidze?
+        included_modules.include? Logidze::Model
+      end
     end
   end
 end

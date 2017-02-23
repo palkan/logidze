@@ -10,19 +10,15 @@ module Logidze
 
       if target.is_a? Array
         target.map! do |object|
-          object unless has_logidze? object
+          object unless object.class.has_logidze?
 
           object.at(time)
         end.compact!
-      elsif has_logidze? target
+      elsif target.class.has_logidze?
         target.at!(time)
       end
 
       target
-    end
-
-    def has_logidze?(object)
-      object.class.included_modules.include? Logidze::Model
     end
   end
 end

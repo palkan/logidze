@@ -286,7 +286,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "Versioned associations" do
+  describe "Versioned associations", focus: true do
     let(:user) do
       User.create(
         name: 'John Doe',
@@ -359,7 +359,7 @@ describe Logidze::Model, :db do
         expect(old_article.comments.first.content).to eql('My comment')
 
         very_old_article = article.at(time(100))
-        expect(very_old_article.comments.length).to eql(0)
+        expect(very_old_article.comments.size).to eql(0)
       end
     end
   end
