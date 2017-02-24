@@ -286,7 +286,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "Versioned associations", focus: true do
+  describe "Versioned associations" do
     let(:user) do
       User.create(
         name: 'John Doe',
@@ -311,11 +311,12 @@ describe Logidze::Model, :db do
         active: true,
         user: user,
         log_data: {
-          'v' => 2,
+          'v' => 3,
           'h' =>
             [
               { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false } },
-              { 'v' => 2, 'ts' => time(200), 'c' => { 'rating' => 5, 'title' => 'Post' } },
+              { 'v' => 2, 'ts' => time(200), 'c' => { 'title' => 'Article' } },
+              { 'v' => 3, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } },
             ]
         }
       )
@@ -360,6 +361,13 @@ describe Logidze::Model, :db do
 
         very_old_article = article.at(time(100))
         expect(very_old_article.comments.size).to eql(0)
+      end
+
+      it "sets inversed association properly" do
+        old_article = article.at(time(200))
+        old_comment = old_article.comments.first
+
+        expect(old_comment.article.title).to eql('Article')
       end
     end
   end
