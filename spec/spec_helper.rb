@@ -4,6 +4,7 @@ ENV["RAILS_ENV"] = "test"
 require "pry-byebug"
 require "ammeter"
 require "database_cleaner"
+require "timecop"
 
 if ENV['COVER']
   require 'simplecov'

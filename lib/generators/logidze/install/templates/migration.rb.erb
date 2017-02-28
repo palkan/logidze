@@ -23,13 +23,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     <% end %>
 
     execute <<-SQL
-      CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb, blacklist text[] DEFAULT '{}') RETURNS jsonb AS $body$
+      CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb, ts timestamp with time zone, blacklist text[] DEFAULT '{}') RETURNS jsonb AS $body$
         DECLARE
           buf jsonb;
         BEGIN
           buf := jsonb_build_object(
                    'ts',
-                   (extract(epoch from now()) * 1000)::bigint,
+                   (extract(epoch from ts) * 1000)::bigint,
                    'v',
                     v,
                     'c',
@@ -48,7 +48,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
           return json_build_object(
             'v', 1,
             'h', jsonb_build_array(
-                   logidze_version(1, item, blacklist)
+                   logidze_version(1, item, coalesce((item->>'updated_at')::timestamp with time zone, now()), blacklist)
                  )
             );
         END;
@@ -62,7 +62,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
         BEGIN
           res := obj;
           FOREACH key IN ARRAY keys
-          LOOP 
+          LOOP
             res := res - key;
           END LOOP;
           RETURN res;
@@ -93,7 +93,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             jsonb_set(
               log_data->'h',
               '{1}',
-              merged 
+              merged
             ) - 0
           );
         END;
@@ -111,15 +111,16 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
           iterator integer;
           item record;
           columns_blacklist text[];
+          ts timestamp with time zone;
         BEGIN
           columns_blacklist := TG_ARGV[1];
 
           IF TG_OP = 'INSERT' THEN
 
             NEW.log_data := logidze_snapshot(to_jsonb(NEW.*), columns_blacklist);
-          
+
           ELSIF TG_OP = 'UPDATE' THEN
-          
+
             IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
               NEW.log_data := logidze_snapshot(to_jsonb(NEW.*), columns_blacklist);
               RETURN NEW;
@@ -127,6 +128,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
 
             history_limit := NULLIF(TG_ARGV[0], 'null');
             current_version := (NEW.log_data->>'v')::int;
+            ts := coalesce(NEW.updated_at::timestamp with time zone, now());
 
             IF NEW = OLD THEN
               RETURN NEW;
@@ -158,7 +160,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
             NEW.log_data := jsonb_set(
               NEW.log_data,
               ARRAY['h', size::text],
-              logidze_version(new_v, changes, columns_blacklist),
+              logidze_version(new_v, changes, ts, columns_blacklist),
               true
             );
 
@@ -183,7 +185,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
   def down
     <% unless update? %>
     execute <<-SQL
-      DROP FUNCTION logidze_version(bigint, jsonb, text[]) CASCADE;
+      DROP FUNCTION logidze_version(bigint, jsonb, timestamp with time zone, text[]) CASCADE;
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
       DROP FUNCTION logidze_snapshot(jsonb, text[]) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
