@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170228152140) do
+ActiveRecord::Schema.define(version: 20160415194001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "hstore"
 
   create_table "posts", force: :cascade do |t|
     t.string   "title"
@@ -29,8 +28,7 @@ ActiveRecord::Schema.define(version: 20170228152140) do
     t.integer  "age"
     t.boolean  "active"
     t.jsonb    "log_data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "time"
   end
 
 end

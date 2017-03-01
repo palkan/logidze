@@ -75,6 +75,17 @@ By default, Logidze tries to infer the path to the model file from the model nam
 rails generate logidze:model Post --path "app/models/custom/post.rb"
 ```
 
+By default, Logidze tries to get a timestamp for a version from record's `updated_at` field whenever appropriate. If
+your model does not have that column, Logidze will gracefully fall back to `statement_timestamp()`.
+To change the column name or disable this feature completely, you can use the `timestamp_column` option:
+
+```ruby
+# will try to get the timestamp value from `time` column
+rails generate logidze:model Post --timestamp_column time
+# will always set version timestamp to `statement_timestamp()`
+rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
+```
+
 ## Troubleshooting
 
 The most common problem is `"permission denied to set parameter "logidze.xxx"` caused by `ALTER DATABASE ...` query.

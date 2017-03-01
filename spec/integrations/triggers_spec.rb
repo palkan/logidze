@@ -2,7 +2,7 @@
 require "acceptance_helper"
 
 describe "Logidze triggers", :db do
-  it 'cannot be used with both whitelist and blacklist options' do
+  it 'cannot be used with bot whitelist and blacklist options' do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post "\
                      "--whitelist=title --blacklist=created_at"
@@ -17,7 +17,6 @@ describe "Logidze triggers", :db do
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post --limit 4 --backfill"
-        successfully "rails generate logidze:model user --limit 4 --backfill --only-trigger"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -31,8 +30,7 @@ describe "Logidze triggers", :db do
 
     after(:all) { @old_post.destroy! }
 
-    let(:post_params) { { title: 'Triggers', rating: 10, active: false } }
-    let(:user_params) { { name: 'Triggers',  age: 20,    active: false } }
+    let(:params) { { title: 'Triggers', rating: 10, active: false } }
 
     describe "backfill" do
       let(:post) { Post.find(@old_post.id) }
@@ -44,17 +42,11 @@ describe "Logidze triggers", :db do
     end
 
     describe "insert" do
-      let(:post) { Post.create!(post_params).reload }
-      let(:user) { User.create!(user_params).reload }
+      let(:post) { Post.create!(params).reload }
 
       it "creates initial version", :aggregate_failures do
         expect(post.log_version).to eq 1
         expect(post.log_size).to eq 1
-      end
-
-      it "sets version timestamp to now()", :aggregate_failures do
-        expect(post.log_data.current_version.time / 1000).to eq(Time.current.to_i)
-        expect(user.log_data.current_version.time / 1000).to eq(Time.current.to_i)
       end
 
       context "when logging is disabled" do
@@ -67,27 +59,19 @@ describe "Logidze triggers", :db do
     end
 
     describe "update" do
-      before(:all) do
-        @post = Post.create!
-        @user = User.create!
-      end
-
-      after(:all) do
-        @post.destroy!
-        @user.destroy!
-      end
+      before(:all) { @post = Post.create! }
+      after(:all) { @post.destroy! }
 
       let(:post) { @post.reload }
-      let(:user) { @user.reload }
 
       it "creates new version", :aggregate_failures do
-        post.update!(post_params)
+        post.update!(params)
         expect(post.reload.log_version).to eq 2
         expect(post.log_size).to eq 2
       end
 
       it "creates several versions", :aggregate_failures do
-        post.update!(post_params)
+        post.update!(params)
         expect(post.log_version).to eq 1
 
         post.update!(rating: 0)
@@ -105,20 +89,10 @@ describe "Logidze triggers", :db do
         expect(post.log_size).to eq 1
       end
 
-      it "sets version timestamp to now() when updated_at column does not exist" do
-        user.update!(user_params)
-        expect(user.reload.log_data.current_version.time / 1000).to eq(Time.current.to_i)
-      end
-
-      it "sets version timestamp to updated_at when updated_at column exists" do
-        Timecop.freeze(Time.at(0)) { post.update!(post_params) }
-        expect(post.reload.log_data.current_version.time / 1000).to eq(Time.at(0).to_i)
-      end
-
       context "logging is disabled" do
         it "doesn't create new version" do
           Logidze.without_logging do
-            post.update!(post_params)
+            post.update!(params)
             expect(post.reload.log_version).to eq 1
             expect(post.log_size).to eq 1
           end
@@ -134,7 +108,7 @@ describe "Logidze triggers", :db do
 
           ignore_exceptions do
             Logidze.without_logging do
-              post.update!(post_params)
+              post.update!(params)
             end
           end
 
@@ -149,7 +123,7 @@ describe "Logidze triggers", :db do
       end
 
       context "log_data is empty" do
-        let(:post) { Post.without_logging { Post.create!(post_params).reload } }
+        let(:post) { Post.without_logging { Post.create!(params).reload } }
 
         it "creates several versions", :aggregate_failures do
           post.update!(rating: 0)
@@ -249,14 +223,14 @@ describe "Logidze triggers", :db do
         post.update!(rating: nil)
         expect(post.reload.log_version).to eq 5
         expect(post.log_size).to eq 4
-        expect(post.log_data.versions.first.changes).
-          to include("title" => "Triggers", "rating" => 10, "active" => true)
+        expect(post.log_data.versions.first.changes)
+          .to include("title" => "Triggers", "rating" => 10, "active" => true)
 
         post.update!(rating: 20)
         expect(post.reload.log_version).to eq 6
         expect(post.log_size).to eq 4
-        expect(post.log_data.versions.first.changes).
-          to include("title" => "Triggers", "rating" => 22, "active" => true)
+        expect(post.log_data.versions.first.changes)
+          .to include("title" => "Triggers", "rating" => 22, "active" => true)
       end
     end
   end
@@ -282,10 +256,10 @@ describe "Logidze triggers", :db do
       Post.instance_variable_set(:@attribute_names, nil)
     end
 
-    let(:post_params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:params) { { title: 'Triggers', rating: 10, active: false } }
 
     describe "insert" do
-      let(:post) { Post.create!(post_params).reload }
+      let(:post) { Post.create!(params).reload }
 
       it "does not log blacklisted columns", :aggregate_failures do
         changes = post.log_data.current_version.changes
@@ -300,7 +274,7 @@ describe "Logidze triggers", :db do
       let(:post) { @post.reload }
 
       it "does not log blacklisted columns", :aggregate_failures do
-        post.update!(post_params)
+        post.update!(params)
         changes = post.log_data.current_version.changes
         expect(changes.keys).to match_array Post.column_names - @blacklist - ['log_data']
       end
@@ -328,10 +302,10 @@ describe "Logidze triggers", :db do
       Post.instance_variable_set(:@attribute_names, nil)
     end
 
-    let(:post_params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:params) { { title: 'Triggers', rating: 10, active: false } }
 
     describe "insert" do
-      let(:post) { Post.create!(post_params).reload }
+      let(:post) { Post.create!(params).reload }
 
       it "logs only whitelisted columns", :aggregate_failures do
         changes = post.log_data.current_version.changes
@@ -346,7 +320,7 @@ describe "Logidze triggers", :db do
       let(:post) { @post.reload }
 
       it "logs only whitelisted columns", :aggregate_failures do
-        post.update!(post_params)
+        post.update!(params)
         changes = post.log_data.current_version.changes
         expect(changes.keys).to match_array @whitelist
       end

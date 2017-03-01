@@ -5,7 +5,7 @@ class CreateUsers < ActiveRecord::Migration
       t.integer :age
       t.boolean :active
       t.jsonb :log_data
-      t.timestamps null: true
+      t.timestamp :time
     end
   end
 end

@@ -1,7 +1,7 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration
   require 'logidze/migration'
   include Logidze::Migration
- 
+
   def up
     <% unless only_trigger? %>
     add_column :<%= table_name %>, :log_data, :jsonb
