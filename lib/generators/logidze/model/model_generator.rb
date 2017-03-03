@@ -70,7 +70,7 @@ module Logidze
         end
 
         def timestamp_column
-          value = options.fetch(:timestamp_column, 'updated_at')
+          value = options[:timestamp_column] || 'updated_at'
           return if %w(nil null false).include?(value)
           escape_pgsql_string(value)
         end
