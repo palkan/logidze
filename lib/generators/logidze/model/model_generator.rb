@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/BlockLength
 # frozen_string_literal: true
 require "rails/generators"
 require "rails/generators/active_record/migration/migration_generator"
@@ -19,6 +20,9 @@ module Logidze
 
       class_option :blacklist, type: :array, optional: true
       class_option :whitelist, type: :array, optional: true
+
+      class_option :timestamp_column, type: :string, optional: true,
+                                      desc: "Specify timestamp column"
 
       def generate_migration
         if options[:blacklist] && options[:whitelist]
@@ -62,29 +66,45 @@ module Logidze
                     class_name.constantize.column_names - options[:whitelist]
                   end
 
-          array || []
+          format_pgsql_array(array)
+        end
+
+        def timestamp_column
+          value = options.fetch(:timestamp_column, 'updated_at')
+          return if %w(nil null false).include?(value)
+          escape_pgsql_string(value)
         end
 
         def logidze_logger_parameters
-          if limit.nil? && columns_blacklist.empty?
-            ''
-          elsif !limit.nil? && columns_blacklist.empty?
-            limit
-          elsif !limit.nil? && !columns_blacklist.empty?
-            "#{limit}, #{format_pgsql_array(columns_blacklist)}"
-          elsif limit.nil? && !columns_blacklist.empty?
-            "null, #{format_pgsql_array(columns_blacklist)}"
-          end
+          format_pgsql_args(limit, timestamp_column, columns_blacklist)
         end
 
         def logidze_snapshot_parameters
-          return 'to_jsonb(t)' if columns_blacklist.empty?
-
-          "to_jsonb(t), #{format_pgsql_array(columns_blacklist)}"
+          format_pgsql_args('to_jsonb(t)', timestamp_column, columns_blacklist)
         end
 
         def format_pgsql_array(ruby_array)
+          return if ruby_array.blank?
           "'{" + ruby_array.join(', ') + "}'"
+        end
+
+        def escape_pgsql_string(string)
+          return if string.blank?
+          "'#{string}'"
+        end
+
+        # Convenience method for formatting pg arguments.
+        # Some examples:
+        # format_pgsql_args('a', 'b', nil) #=> "a, b"
+        # format_pgsql_args(nil, '', 'c')  #=> "null, null, c"
+        # format_pgsql_args('a', '', [])   #=> "a"
+        def format_pgsql_args(*values)
+          args = []
+          values.reverse_each do |value|
+            formatted_value = value.presence || (args.any? && 'null')
+            args << formatted_value if formatted_value
+          end
+          args.compact.reverse.join(', ')
         end
       end
 

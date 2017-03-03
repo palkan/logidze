@@ -1,5 +1,11 @@
 # Change log
 
+## master
+
+- Add `--timestamp_column` option to model migration generator. ([@akxcv][])
+
+- Default version timestamp to timestamp column. ([@akxcv][])
+
 ## 0.4.1 (2017-02-06)
 
 - Add `--path` option to model migration generator. ([@palkan][])

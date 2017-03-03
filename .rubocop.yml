@@ -23,7 +23,7 @@ Style/Documentation:
   Exclude:
     - 'spec/**/*.rb'
 
-Style/StringLiterals: 
+Style/StringLiterals:
   Enabled: false
 
 Style/SpaceInsideStringInterpolation:
@@ -50,3 +50,14 @@ Rails/Date:
 
 Rails/TimeZone:
   Enabled: false
+
+Style/NumericLiteralPrefix:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*.rb'
+
+Style/DotPosition:
+  EnforcedStyle: leading

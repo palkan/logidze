@@ -223,14 +223,14 @@ describe "Logidze triggers", :db do
         post.update!(rating: nil)
         expect(post.reload.log_version).to eq 5
         expect(post.log_size).to eq 4
-        expect(post.log_data.versions.first.changes).
-          to include("title" => "Triggers", "rating" => 10, "active" => true)
+        expect(post.log_data.versions.first.changes)
+          .to include("title" => "Triggers", "rating" => 10, "active" => true)
 
         post.update!(rating: 20)
         expect(post.reload.log_version).to eq 6
         expect(post.log_size).to eq 4
-        expect(post.log_data.versions.first.changes).
-          to include("title" => "Triggers", "rating" => 22, "active" => true)
+        expect(post.log_data.versions.first.changes)
+          .to include("title" => "Triggers", "rating" => 22, "active" => true)
       end
     end
   end

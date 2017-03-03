@@ -35,7 +35,7 @@ RAW
         is_expected.to contain "add_column :users, :log_data, :jsonb"
         is_expected.to contain /create trigger logidze_on_users/i
         is_expected.to contain /before update or insert on users for each row/i
-        is_expected.to contain /execute procedure logidze_logger\(\);/i
+        is_expected.to contain /execute procedure logidze_logger\(null, 'updated_at'\);/i
         is_expected.to contain /drop trigger if exists logidze_on_users on users/i
         is_expected.to contain "remove_column :users, :log_data"
         is_expected.not_to contain(/update users/i)
@@ -48,7 +48,7 @@ RAW
 
         it "creates trigger with limit" do
           is_expected.to exist
-          is_expected.to contain(/execute procedure logidze_logger\(5\);/i)
+          is_expected.to contain(/execute procedure logidze_logger\(5, 'updated_at'\);/i)
         end
       end
 
@@ -58,7 +58,7 @@ RAW
         it "creates trigger with columns blacklist" do
           is_expected.to exist
           is_expected.to contain(
-            /execute procedure logidze_logger\(null, '\{age, active\}'\);/i
+            /execute procedure logidze_logger\(null, 'updated_at', '\{age, active\}'\);/i
           )
         end
       end
@@ -69,7 +69,7 @@ RAW
         it "creates backfill query" do
           is_expected.to exist
           is_expected.to contain(/update users as t/i)
-          is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\)\);/i)
+          is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\), 'updated_at'\);/i)
         end
       end
 
@@ -81,9 +81,33 @@ RAW
           is_expected.not_to contain "add_column :users, :log_data, :jsonb"
           is_expected.to contain /create trigger logidze_on_users/i
           is_expected.to contain /before update or insert on users for each row/i
-          is_expected.to contain /execute procedure logidze_logger\(\);/i
+          is_expected.to contain /execute procedure logidze_logger\(null, 'updated_at'\);/i
           is_expected.to contain /drop trigger if exists logidze_on_users on users/i
           is_expected.not_to contain "remove_column :users, :log_data"
+        end
+      end
+
+      context "with timestamp_column" do
+        context "custom column name" do
+          let(:args) { ["user", "--timestamp_column", "time"] }
+
+          it "creates trigger with 'time' timestamp column" do
+            is_expected.to exist
+            is_expected.to contain(
+              /execute procedure logidze_logger\(null, 'time'\);/i
+            )
+          end
+        end
+
+        context "nil" do
+          let(:args) { ["user", "--timestamp_column", "nil"] }
+
+          it "creates trigger without timestamp column" do
+            is_expected.to exist
+            is_expected.to contain(
+              /execute procedure logidze_logger\(\);/i
+            )
+          end
         end
       end
     end
