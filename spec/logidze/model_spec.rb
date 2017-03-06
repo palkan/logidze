@@ -293,12 +293,13 @@ describe Logidze::Model, :db do
         age: 35,
         active: true,
         log_data: {
-          'v' => 3,
+          'v' => 4,
           'h' =>
             [
               { 'v' => 1, 'ts' => time(50), 'c' => { 'name' => 'John Harris', 'active' => false, 'age' => 45 } },
               { 'v' => 2, 'ts' => time(150), 'c' => { 'active' => true, 'age' => 34 } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe', 'age' => 35 } },
+              { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe Jr.', 'age' => 35 } },
+              { 'v' => 4, 'ts' => time(350), 'c' => { 'name' => 'John Doe' } },
             ]
         }
       )
@@ -334,8 +335,8 @@ describe Logidze::Model, :db do
       context 'when owner was not changed at the given time' do
         it "still returns association version" do
           # this returns the same article object due to implementation
-          old_article = article.at(time(250))
-          expect(old_article.user.age).to eql(34)
+          old_article = article.at(time(330))
+          expect(old_article.user.name).to eql('John Doe Jr.')
         end
       end
     end
@@ -360,7 +361,7 @@ describe Logidze::Model, :db do
         expect(old_article.comments.first.content).to eql('My comment')
 
         very_old_article = article.at(time(100))
-        expect(very_old_article.comments.size).to eql(0)
+        expect(very_old_article.comments.length).to eql(0)
       end
 
       it "sets inversed association properly" do

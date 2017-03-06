@@ -20,5 +20,21 @@ module Logidze
 
       target
     end
+
+    def stale_target?
+      logidze_stale? || super
+    end
+
+    def logidze_stale?
+      return false if !loaded? || inversed
+
+      unless target.is_a?(Array)
+        return owner.logidze_requested_ts != target.logidze_requested_ts
+      end
+
+      return false if target.empty?
+
+      owner.logidze_requested_ts != target.first.logidze_requested_ts
+    end
   end
 end

@@ -23,7 +23,6 @@ ActiveRecord::Schema.define(version: 20170220153105) do
     t.jsonb    "log_data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_articles_on_user_id", using: :btree
   end
 
   create_table "comments", force: :cascade do |t|
@@ -32,7 +31,6 @@ ActiveRecord::Schema.define(version: 20170220153105) do
     t.integer  "article_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["article_id"], name: "index_comments_on_article_id", using: :btree
   end
 
   create_table "posts", force: :cascade do |t|

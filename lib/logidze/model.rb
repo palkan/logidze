@@ -38,23 +38,27 @@ module Logidze
     # Use this to convert Ruby time to milliseconds
     TIME_FACTOR = 1_000
 
-    attr_reader :logidze_requested_ts
+    attr_accessor :logidze_requested_ts
 
     # Return a dirty copy of record at specified time
     # If time is less then the first version, then return nil.
     # If time is greater then the last version, then return self.
     def at(ts)
       ts = parse_time(ts)
-      @logidze_requested_ts = ts
 
       return nil unless log_data.exists_ts?(ts)
-      return self if log_data.current_ts?(ts)
+
+      if log_data.current_ts?(ts)
+        self.logidze_requested_ts = ts
+        return self
+      end
 
       version = log_data.find_by_time(ts).version
 
       object_at = dup
       object_at.apply_diff(version, log_data.changes_to(version: version))
       object_at.id = id
+      object_at.logidze_requested_ts = ts
 
       object_at
     end
@@ -133,8 +137,6 @@ module Logidze
       if logidze_past?
         association.singleton_class.prepend Logidze::VersionedAssociation
       end
-
-      association.reload if @logidze_requested_ts
 
       association
     end
