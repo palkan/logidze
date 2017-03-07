@@ -13,6 +13,8 @@ module Logidze
 
   require 'logidze/engine' if defined?(Rails)
 
+  mattr_accessor :preserve_future
+
   # Temporary disable DB triggers.
   #
   # @example

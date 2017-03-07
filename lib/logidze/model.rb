@@ -96,10 +96,10 @@ module Logidze
 
     # Restore record to the previous version.
     # Return false if no previous version found, otherwise return updated record.
-    def undo!
+    def undo!(as_new: nil)
       version = log_data.previous_version
       return false if version.nil?
-      switch_to!(version.version)
+      switch_to!(version.version, as_new: as_new)
     end
 
     # Restore record to the _future_ version (if `undo!` was applied)
@@ -112,9 +112,16 @@ module Logidze
 
     # Restore record to the specified version.
     # Return false if version is unknown.
-    def switch_to!(version)
-      return false unless at_version!(version)
-      self.class.without_logging { save! }
+    def switch_to!(version, as_new: nil)
+      return false unless at_version(version)
+      as_new = Logidze.preserve_future if as_new.nil?
+
+      if as_new && version < log_version
+        update!(log_data.changes_to(version: version))
+      else
+        at_version!(version)
+        self.class.without_logging { save! }
+      end
     end
 
     protected

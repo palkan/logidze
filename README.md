@@ -168,7 +168,21 @@ post.redo!
 post.switch_to!(2)
 ```
 
-If you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no longer possible.
+Normally, if you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no
+longer possible. However, you can provide an `as_new: true` option to `#undo!` or `#switch_to!`, which will
+create a new version with old data. Caveat: when switching to a newer version, `as_new` will have no effect.
+
+```ruby
+post = Post.create!(title: 'first post') # v1
+post.update!(title: 'new title')         # v2
+post.undo!(as_new: true)                 # v3 (with same attributes as v1)
+```
+
+Alternatively, you can configure Logidze to always default to `as_new: true`.
+
+```ruby
+Logidze.preserve_future = true
+```
 
 ## Track responsibility (aka _whodunnit_)
 
