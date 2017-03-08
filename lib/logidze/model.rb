@@ -134,8 +134,14 @@ module Logidze
     def association(name)
       association = super
 
-      if logidze_past?
-        association.singleton_class.prepend Logidze::VersionedAssociation
+      return association unless logidze_past?
+
+      association.singleton_class.prepend Logidze::VersionedAssociation
+
+      if association.is_a? ActiveRecord::Associations::CollectionAssociation
+        association.singleton_class.prepend(
+          Logidze::VersionedAssociation::CollectionAssociation
+        )
       end
 
       association

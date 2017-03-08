@@ -36,5 +36,12 @@ module Logidze
 
       owner.logidze_requested_ts != target.first.logidze_requested_ts
     end
+
+    module CollectionAssociation
+      def empty?
+        reload
+        super
+      end
+    end
   end
 end

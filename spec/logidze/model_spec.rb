@@ -286,7 +286,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "Versioned associations" do
+  describe "Versioned associations", focus: true do
     let(:user) do
       User.create(
         name: 'John Doe',
@@ -323,20 +323,20 @@ describe Logidze::Model, :db do
       )
     end
 
+    let(:old_article) { article.at(time(200)) }
+    let(:very_old_article) { article.at(time(100)) }
+
     context "with belongs to" do
       it "returns association version, according to the owner" do
-        old_article = article.at(time(200))
         expect(old_article.user.name).to eql('John Harris')
-
-        very_old_article = article.at(time(100))
         expect(very_old_article.user.age).to eql(45)
       end
 
       context 'when owner was not changed at the given time' do
         it "still returns association version" do
           # this returns the same article object due to implementation
-          old_article = article.at(time(330))
-          expect(old_article.user.name).to eql('John Doe Jr.')
+          not_changed_article = article.at(time(330))
+          expect(not_changed_article.user.name).to eql('John Doe Jr.')
         end
       end
     end
@@ -357,17 +357,37 @@ describe Logidze::Model, :db do
       end
 
       it "returns association version, according to the owner" do
-        old_article = article.at(time(200))
         expect(old_article.comments.first.content).to eql('My comment')
 
-        very_old_article = article.at(time(100))
-        expect(very_old_article.comments.length).to eql(0)
+        # TODO: write a separate spec for length/size usage
+        # very_old_article = article.at(time(100))
+        # expect(very_old_article.comments.length).to eql(0)
+      end
+
+      describe "Presence-like methods" do
+        it "responds to #empty? correctly" do
+          expect(old_article.comments.empty?).to be false
+          expect(very_old_article.comments.empty?).to be true
+        end
+
+        it "responds to #any? correctly" do
+          expect(old_article.comments.any?).to be true
+          expect(very_old_article.comments.any?).to be false
+        end
+
+        it "responds to #many? correctly" do
+          expect(old_article.comments.any?).to be true
+          expect(very_old_article.comments.any?).to be false
+        end
+
+        it "responds to #blank? correctly" do
+          expect(old_article.comments.blank?).to be false
+          expect(very_old_article.comments.blank?).to be true
+        end
       end
 
       it "sets inversed association properly" do
-        old_article = article.at(time(200))
         old_comment = old_article.comments.first
-
         expect(old_comment.article.title).to eql('Article')
       end
     end
