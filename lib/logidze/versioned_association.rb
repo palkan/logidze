@@ -38,6 +38,11 @@ module Logidze
     end
 
     module CollectionAssociation
+      def ids_reader
+        reload
+        super
+      end
+
       def empty?
         reload
         super

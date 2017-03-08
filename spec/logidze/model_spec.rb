@@ -354,6 +354,16 @@ describe Logidze::Model, :db do
               ]
           }
         )
+        article.comments.create(
+          content: 'New comment 2',
+          log_data: {
+            'v' => 1,
+            'h' =>
+              [
+                { 'v' => 1, 'ts' => time(230), 'c' => { 'content' => 'New comment 2' } },
+              ]
+          }
+        )
       end
 
       it "returns association version, according to the owner" do
@@ -362,6 +372,11 @@ describe Logidze::Model, :db do
         # TODO: write a separate spec for length/size usage
         # very_old_article = article.at(time(100))
         # expect(very_old_article.comments.length).to eql(0)
+      end
+
+      it "it responds to #item_ids correctly" do
+        id = article.comments.first.id
+        expect(old_article.comment_ids).to match_array([id])
       end
 
       describe "Presence-like methods" do
