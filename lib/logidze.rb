@@ -13,7 +13,10 @@ module Logidze
 
   require 'logidze/engine' if defined?(Rails)
 
-  mattr_accessor :preserve_future
+  # Determines if Logidze should append a version to the log after updating an old version.
+  class << self
+    attr_accessor :append_on_undo
+  end
 
   # Temporary disable DB triggers.
   #
