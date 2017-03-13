@@ -2,6 +2,8 @@
 
 ## master
 
+- Add an option to preserve future versions. ([@akxcv][])
+
 - Add `--timestamp_column` option to model migration generator. ([@akxcv][])
 
 - Default version timestamp to timestamp column. ([@akxcv][])

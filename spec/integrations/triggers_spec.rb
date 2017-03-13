@@ -195,6 +195,15 @@ describe "Logidze triggers", :db do
         expect(post.title).to eq "Triggers"
       end
 
+      it "creates a new version when append: true" do
+        post.update!(rating: 5)
+        post.reload.undo!(append: true)
+
+        expect(post.reload.log_version).to eq 3
+        expect(post.log_size).to eq 3
+        expect(post.rating).to eq 10
+      end
+
       it "there and back again" do
         post.update!(rating: 5)
 
@@ -203,6 +212,69 @@ describe "Logidze triggers", :db do
         post.undo!
         post.redo!
         expect(post.reload).to eq post_was
+      end
+    end
+
+    describe "switch_to!" do
+      before(:all) { @post = Post.create!(title: 'Triggers', rating: 10) }
+      after(:all) { @post.destroy! }
+
+      let(:post) { @post.reload }
+
+      it "revers to specified version", :aggregate_failures do
+        post.update!(rating: 5)
+        post.reload.switch_to!(1)
+        post.reload
+
+        expect(post.log_version).to eq 1
+        expect(post.log_size).to eq 2
+      end
+
+      it "creates a new version when append: true", :aggregate_failures do
+        post.update!(rating: 5)
+        post.reload.switch_to!(1, append: true)
+        post.reload
+
+        expect(post.log_version).to eq 3
+        expect(post.log_size).to eq 3
+        expect(post.rating).to eq 10
+      end
+
+      it "reverts to specified version if it's newer than current version", :aggregate_failures do
+        post.update!(rating: 5)
+        post.reload.undo!
+        post.reload
+
+        expect(post.log_version).to eq 1
+        expect(post.log_size).to eq 2
+
+        post.switch_to!(2, append: true)
+        post.reload
+
+        expect(post.log_version).to eq 2
+        expect(post.log_size).to eq 2
+      end
+
+      context "append is disabled globally" do
+        before(:all) { Logidze.append_on_undo = true }
+        after(:all) { Logidze.append_on_undo = nil }
+
+        it "creates a new version", :aggregate_failures do
+          post.update!(rating: 5)
+          post.reload.switch_to!(1)
+          post.reload
+          expect(post.log_version).to eq 3
+          expect(post.log_size).to eq 3
+          expect(post.rating).to eq 10
+        end
+
+        it "reverts to specified version when append: false", :aggregate_failures do
+          post.update!(rating: 5)
+          post.reload.switch_to!(1, append: false)
+          post.reload
+          expect(post.log_version).to eq 1
+          expect(post.log_size).to eq 2
+        end
       end
     end
 
