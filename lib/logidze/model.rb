@@ -33,6 +33,10 @@ module Logidze
       def without_logging(&block)
         Logidze.without_logging(&block)
       end
+
+      def has_logidze?
+        true
+      end
     end
 
     # Use this to convert Ruby time to milliseconds
@@ -134,7 +138,9 @@ module Logidze
     def association(name)
       association = super
 
-      return association unless logidze_past?
+      unless logidze_past? && association.klass.respond_to?(:has_logidze?)
+        return association
+      end
 
       association.singleton_class.prepend Logidze::VersionedAssociation
 
@@ -156,9 +162,9 @@ module Logidze
     end
 
     def logidze_past?
-      return false unless log_data
+      return false unless @logidze_requested_ts
 
-      time = log_data.current_version.time
+      time = @logidze_requested_ts
 
       time < Time.now.to_i * TIME_FACTOR
     end

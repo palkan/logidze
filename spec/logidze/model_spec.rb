@@ -286,7 +286,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "Versioned associations", focus: true do
+  describe "Versioned associations" do
     let(:user) do
       User.create(
         name: 'John Doe',

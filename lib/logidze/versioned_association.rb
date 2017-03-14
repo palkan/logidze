@@ -10,11 +10,9 @@ module Logidze
 
       if target.is_a? Array
         target.map! do |object|
-          object unless object.class.has_logidze?
-
           object.at(time)
         end.compact!
-      elsif target.class.has_logidze?
+      else
         target.at!(time)
       end
 
