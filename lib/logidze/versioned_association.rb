@@ -32,17 +32,19 @@ module Logidze
 
       return false if target.empty?
 
-      owner.logidze_requested_ts != target.first.logidze_requested_ts
+      target.any? do |object|
+        owner.logidze_requested_ts != object.logidze_requested_ts
+      end
     end
 
     module CollectionAssociation
       def ids_reader
-        reload
+        reload unless loaded?
         super
       end
 
       def empty?
-        reload
+        reload unless loaded?
         super
       end
     end

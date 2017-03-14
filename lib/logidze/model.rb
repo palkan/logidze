@@ -138,9 +138,12 @@ module Logidze
     def association(name)
       association = super
 
-      unless logidze_past? && association.klass.respond_to?(:has_logidze?)
-        return association
-      end
+      should_appply_logidze =
+        logidze_past? &&
+        association.klass.respond_to?(:has_logidze?) &&
+        !association.singleton_class.include?(Logidze::VersionedAssociation)
+
+      return association unless should_appply_logidze
 
       association.singleton_class.prepend Logidze::VersionedAssociation
 
@@ -164,9 +167,7 @@ module Logidze
     def logidze_past?
       return false unless @logidze_requested_ts
 
-      time = @logidze_requested_ts
-
-      time < Time.now.to_i * TIME_FACTOR
+      @logidze_requested_ts < Time.now.to_i * TIME_FACTOR
     end
 
     def parse_time(ts)
