@@ -17,6 +17,11 @@ module Logidze
   class << self
     # Determines if Logidze should append a version to the log after updating an old version.
     attr_accessor :append_on_undo
+    attr_writer :associations_versioning
+
+    def associations_versioning
+      @associations_versioning || false
+    end
   end
 
   # Temporary disable DB triggers.

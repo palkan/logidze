@@ -138,6 +138,8 @@ module Logidze
     def association(name)
       association = super
 
+      return association unless Logidze.associations_versioning
+
       should_appply_logidze =
         logidze_past? &&
         association.klass.respond_to?(:has_logidze?) &&
