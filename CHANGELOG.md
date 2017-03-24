@@ -8,6 +8,8 @@
 
 - Default version timestamp to timestamp column. ([@akxcv][])
 
+- Associations versioning. ([@charlie-wasp][])
+
 ## 0.4.1 (2017-02-06)
 
 - Add `--path` option to model migration generator. ([@palkan][])
