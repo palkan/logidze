@@ -86,6 +86,9 @@ rails generate logidze:model Post --timestamp_column time
 rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
 ```
 
+Logidze also supports associations versioning. It is experimental feature, and disabled by default. You can learn more
+in the [wiki](https://github.com/palkan/logidze/wiki/Associations-versioning).
+
 ## Troubleshooting
 
 The most common problem is `"permission denied to set parameter "logidze.xxx"` caused by `ALTER DATABASE ...` query.

@@ -10,10 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160415194001) do
+ActiveRecord::Schema.define(version: 20170220153105) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "articles", force: :cascade do |t|
+    t.string   "title"
+    t.integer  "rating"
+    t.boolean  "active"
+    t.integer  "user_id"
+    t.jsonb    "log_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text     "content"
+    t.jsonb    "log_data"
+    t.integer  "article_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "posts", force: :cascade do |t|
     t.string   "title"
@@ -31,4 +49,6 @@ ActiveRecord::Schema.define(version: 20160415194001) do
     t.datetime "time"
   end
 
+  add_foreign_key "articles", "users"
+  add_foreign_key "comments", "articles"
 end

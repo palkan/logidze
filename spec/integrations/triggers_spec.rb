@@ -2,7 +2,7 @@
 require "acceptance_helper"
 
 describe "Logidze triggers", :db do
-  it 'cannot be used with bot whitelist and blacklist options' do
+  it 'cannot be used with both whitelist and blacklist options' do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post "\
                      "--whitelist=title --blacklist=created_at"

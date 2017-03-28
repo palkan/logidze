@@ -33,24 +33,36 @@ module Logidze
       def without_logging(&block)
         Logidze.without_logging(&block)
       end
+
+      def has_logidze?
+        true
+      end
     end
 
     # Use this to convert Ruby time to milliseconds
     TIME_FACTOR = 1_000
+
+    attr_accessor :logidze_requested_ts
 
     # Return a dirty copy of record at specified time
     # If time is less then the first version, then return nil.
     # If time is greater then the last version, then return self.
     def at(ts)
       ts = parse_time(ts)
+
       return nil unless log_data.exists_ts?(ts)
-      return self if log_data.current_ts?(ts)
+
+      if log_data.current_ts?(ts)
+        self.logidze_requested_ts = ts
+        return self
+      end
 
       version = log_data.find_by_time(ts).version
 
       object_at = dup
       object_at.apply_diff(version, log_data.changes_to(version: version))
       object_at.id = id
+      object_at.logidze_requested_ts = ts
 
       object_at
     end
@@ -123,12 +135,41 @@ module Logidze
       end
     end
 
+    def association(name)
+      association = super
+
+      return association unless Logidze.associations_versioning
+
+      should_appply_logidze =
+        logidze_past? &&
+        association.klass.respond_to?(:has_logidze?) &&
+        !association.singleton_class.include?(Logidze::VersionedAssociation)
+
+      return association unless should_appply_logidze
+
+      association.singleton_class.prepend Logidze::VersionedAssociation
+
+      if association.is_a? ActiveRecord::Associations::CollectionAssociation
+        association.singleton_class.prepend(
+          Logidze::VersionedAssociation::CollectionAssociation
+        )
+      end
+
+      association
+    end
+
     protected
 
     def apply_diff(version, diff)
       diff.each { |k, v| send("#{k}=", v) }
       log_data.version = version
       self
+    end
+
+    def logidze_past?
+      return false unless @logidze_requested_ts
+
+      @logidze_requested_ts < Time.now.to_i * TIME_FACTOR
     end
 
     def parse_time(ts)
