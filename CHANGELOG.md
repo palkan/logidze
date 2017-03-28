@@ -1,6 +1,6 @@
 # Change log
 
-## master
+## 0.5.0 (2017-03-28)
 
 - Add an option to preserve future versions. ([@akxcv][])
 
