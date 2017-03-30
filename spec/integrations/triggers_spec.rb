@@ -30,7 +30,7 @@ describe "Logidze triggers", :db do
 
     after(:all) { @old_post.destroy! }
 
-    let(:params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:params) { { title: 'Triggers', rating: 10, active: false, meta: { tags: ['some','tag'] } } }
 
     describe "backfill" do
       let(:post) { Post.find(@old_post.id) }
@@ -55,6 +55,21 @@ describe "Logidze triggers", :db do
         it "doesn't create initial version" do
           expect(post.log_data).to be_nil
         end
+      end
+    end
+
+     describe "diff" do
+      let(:post) { Post.create!(params).reload }
+
+      it "generates the correct diff", :aggregate_failures do
+        post.update!(meta:{tags:['other']})
+        diff = post.reload.log_data.diff_from version: (post.reload.log_version-1)
+        expected_diff_meta = {
+            "old"=>{"tags"=>["some", "tag"]},
+            "new"=>{"tags" => ["other"]}
+        }
+        expect(diff["meta"]["old"].class).to eq diff["meta"]["new"].class
+        expect(diff["meta"]).to eq expected_diff_meta
       end
     end
 
