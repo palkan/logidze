@@ -205,6 +205,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration
     <% unless update? %>
     execute <<-SQL
       DROP FUNCTION logidze_version(bigint, jsonb, timestamp with time zone, text[]) CASCADE;
+      DROP FUNCTION logidze_exclude_keys(jsonb, text[]) CASCADE;
       DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
       DROP FUNCTION logidze_snapshot(jsonb, text, text[]) CASCADE;
       DROP FUNCTION logidze_logger() CASCADE;
