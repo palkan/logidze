@@ -1,5 +1,9 @@
 # Change log
 
+## 0.5.2 (2017-06-19)
+
+- Use versioned migrations in Rails 5+. ([@palkan][])
+
 ## 0.5.1 (2017-06-15)
 
 - _(Fix)_ Drop *all* created functions upon rolling back (https://github.com/palkan/logidze/commit/b8e150cc18b3316a8cf0c78f7117339481fb49c6). ([@vassilevsky][])

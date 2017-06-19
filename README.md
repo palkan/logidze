@@ -11,8 +11,8 @@ Currently, only PostgreSQL 9.5+ is supported (for PostgreSQL 9.4 try [jsonbx](ht
 [Read the story behind Logidze](https://evilmartians.com/chronicles/introducing-logidze?utm_source=logidze)
 
 Other requirements:
-- Ruby ~> 2.1;
-- Rails >= 4.2 (Yes, Rails 5 is supported!).
+- Ruby ~> 2.1
+- Rails >= 4.2
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
