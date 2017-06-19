@@ -7,6 +7,14 @@ require "action_mailer/railtie"
 require "action_view/railtie"
 require "rails/test_unit/railtie"
 
+unless ActiveRecord::Migration.respond_to?(:[])
+  class ActiveRecord::Migration
+    def self.[](*args)
+      self
+    end
+  end
+end
+
 Bundler.require(*Rails.groups)
 require "logidze"
 
