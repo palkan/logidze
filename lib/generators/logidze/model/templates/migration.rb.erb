@@ -3,7 +3,9 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
   include Logidze::Migration
 
   def up
-    <% unless only_trigger? %>
+    <% if update? %>
+    execute "DROP TRIGGER logidze_on_<%= table_name %> on <%= table_name %>;"
+    <% elsif !only_trigger? %>
     add_column :<%= table_name %>, :log_data, :jsonb
     <% end %>
 
@@ -23,10 +25,19 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
   end
 
   def down
+    <% if update? %>
+    # NOTE: We have no idea on how to revert the migration
+    # ('cause we don't know the previous trigger params),
+    # but you can do that on your own.
+    # 
+    # Uncomment this line if you want to raise an error.
+    # raise ActiveRecord::IrreversibleMigration
+    <% else %>
     execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
 
-    <% unless only_trigger? %>
+    <% if !only_trigger? %>
     remove_column :<%= table_name %>, :log_data
+    <% end %>
     <% end %>
   end
 end

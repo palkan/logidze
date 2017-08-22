@@ -24,6 +24,9 @@ module Logidze
       class_option :timestamp_column, type: :string, optional: true,
                                       desc: "Specify timestamp column"
 
+      class_option :update, type: :boolean, optional: true,
+                            desc: "Define whether this is an update migration"
+
       def generate_migration
         if options[:blacklist] && options[:whitelist]
           $stderr.puts "Use only one: --whitelist or --blacklist"
@@ -33,6 +36,7 @@ module Logidze
       end
 
       def inject_logidze_to_model
+        return if update?
         indents = "  " * (class_name.scan("::").count + 1)
 
         inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze\n")
@@ -40,7 +44,11 @@ module Logidze
 
       no_tasks do
         def migration_name
-          "add_logidze_to_#{plural_table_name}"
+          if update?
+            "update_logidze_for_#{plural_table_name}"
+          else
+            "add_logidze_to_#{plural_table_name}"
+          end
         end
 
         def migration_file_name
@@ -57,6 +65,10 @@ module Logidze
 
         def only_trigger?
           options[:only_trigger]
+        end
+
+        def update?
+          options[:update]
         end
 
         def columns_blacklist

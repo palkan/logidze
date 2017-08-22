@@ -87,6 +87,22 @@ RAW
         end
       end
 
+      context "when update" do
+        subject { migration_file('db/migrate/update_logidze_for_users.rb') }
+
+        let(:args) { ["user", "--update"] }
+
+        it "creates migration with drop and create trigger" do
+          is_expected.to exist
+          is_expected.not_to contain "add_column :users, :log_data, :jsonb"
+          is_expected.to contain /drop trigger logidze_on_users/i
+          is_expected.to contain /before update or insert on users for each row/i
+          is_expected.to contain "raise ActiveRecord::IrreversibleMigration"
+          is_expected.not_to contain /drop trigger if exists logidze_on_users on users/i
+          is_expected.not_to contain "remove_column :users, :log_data"
+        end
+      end
+
       context "with timestamp_column" do
         context "custom column name" do
           let(:args) { ["user", "--timestamp_column", "time"] }

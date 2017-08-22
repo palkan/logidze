@@ -398,4 +398,49 @@ describe "Logidze triggers", :db do
       end
     end
   end
+
+  context "updating trigger params" do
+    include_context "cleanup migrations"
+
+    before(:all) do
+      @whitelist = %w(title rating)
+
+      Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
+        successfully "rails generate logidze:install"
+        successfully "rails generate logidze:model post "\
+                     "--whitelist=#{@whitelist.join(' ')}"
+        successfully "rake db:migrate"
+
+        # Close active connections to handle db variables
+        ActiveRecord::Base.connection_pool.disconnect!
+      end
+
+      Post.reset_column_information
+      # For Rails 4
+      Post.instance_variable_set(:@attribute_names, nil)
+    end
+
+    let(:params) { { title: 'Triggers', rating: 10, active: false } }
+
+    it "logs with new params", :aggregate_failures do
+      post = Post.create!(params).reload
+
+      changes = post.log_data.current_version.changes
+      expect(changes.keys).to match_array @whitelist
+
+      ActiveRecord::Base.connection_pool.disconnect!
+
+      Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
+        successfully "rails generate logidze:model post --blacklist=updated_at --update"
+        successfully "rake db:migrate"
+
+        ActiveRecord::Base.connection_pool.disconnect!
+      end
+
+      post2 = Post.create!(params).reload
+
+      changes2 = post2.log_data.current_version.changes
+      expect(changes2.keys).to match_array Post.column_names - %w(updated_at log_data)
+    end
+  end
 end
