@@ -1,6 +1,8 @@
 # Change log
 
-## master (2017-08-22)
+## master
+
+## 0.5.3 (2017-08-22)
 
 - Add `--update` flag to model migration. ([@palkan][])
 
