@@ -1,5 +1,9 @@
 # Change log
 
+## master (2017-08-22)
+
+- Add `--update` flag to model migration. ([@palkan][])
+
 ## 0.5.2 (2017-06-19)
 
 - Use versioned migrations in Rails 5+. ([@palkan][])

@@ -6,3 +6,8 @@ Examples:
 
     This will generate the migration to add log column and trigger.
     This will also add `has_logidze` to model.
+
+  rails generate logidze:model User --update --whitelist=name,age
+
+    This will generate the migration to update existing trigger (drop and create).
+

@@ -87,6 +87,12 @@ rails generate logidze:model Post --timestamp_column time
 rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
 ```
 
+If you want to update Logidze settings for the model, run migration with `--update` flag:
+
+```ruby
+rails generate logidze:model Post --update --whitelist=title body rating
+```
+
 Logidze also supports associations versioning. It is experimental feature, and disabled by default. You can learn more
 in the [wiki](https://github.com/palkan/logidze/wiki/Associations-versioning).
 
