@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20170220153105) do
     t.string   "title"
     t.integer  "rating"
     t.boolean  "active"
+    t.jsonb    "meta"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
