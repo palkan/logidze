@@ -4,6 +4,8 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :name
       t.integer :age
       t.boolean :active
+      t.jsonb :extra
+      t.string :settings, array: true
       t.jsonb :log_data
       t.timestamp :time
     end

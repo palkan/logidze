@@ -191,9 +191,33 @@ module Logidze
     protected
 
     def apply_diff(version, diff)
-      diff.each { |k, v| send("#{k}=", v) }
+      diff.each do |k, v|
+        apply_column_diff(k, v)
+      end
+
       log_data.version = version
       self
+    end
+
+    def apply_column_diff(column, value)
+      write_attribute column, deserialize_value(column, value)
+    end
+
+    if Rails::VERSION::MAJOR < 5
+      def deserialize_value(column, value)
+        @attributes[column].type.type_cast_from_database(value)
+      end
+    else
+      def deserialize_value(column, value)
+        @attributes[column].type.deserialize(value)
+      end
+    end
+
+    def deserialize_changes!(diff)
+      diff.each do |k, v|
+        v["old"] = deserialize_value(k, v["old"])
+        v["new"] = deserialize_value(k, v["new"])
+      end
     end
 
     def logidze_past?
