@@ -7,9 +7,11 @@ shared_context "cleanup migrations" do
       version = path.match(%r{\/(\d+)\_[^\.]+\.rb$})[1]
       if all_versions.include?(version.to_i)
         Dir.chdir("#{File.dirname(__FILE__)}/../../dummy") do
-          system <<-CMD
-            VERSION=#{version} rake db:migrate:down
-          CMD
+          suppress_output do
+            system <<-CMD
+              VERSION=#{version} rake db:migrate:down
+            CMD
+          end
         end
       end
       FileUtils.rm(path)
