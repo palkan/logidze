@@ -301,7 +301,7 @@ describe Logidze::Model, :db do
               { 'v' => 1, 'ts' => time(50), 'c' => { 'name' => 'John Harris', 'active' => false, 'age' => 45 } },
               { 'v' => 2, 'ts' => time(150), 'c' => { 'active' => true, 'age' => 34 } },
               { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe Jr.', 'age' => 35 } },
-              { 'v' => 4, 'ts' => time(350), 'c' => { 'name' => 'John Doe' } },
+              { 'v' => 4, 'ts' => time(350), 'c' => { 'name' => 'John Doe' } }
             ]
         }
       )
@@ -319,7 +319,7 @@ describe Logidze::Model, :db do
             [
               { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false } },
               { 'v' => 2, 'ts' => time(200), 'c' => { 'title' => 'Article' } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } },
+              { 'v' => 3, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } }
             ]
         }
       )
@@ -330,7 +330,7 @@ describe Logidze::Model, :db do
           'h' =>
         [
           { 'v' => 1, 'ts' => time(150), 'c' => { 'content' => 'My comment' } },
-          { 'v' => 2, 'ts' => time(250), 'c' => { 'content' => 'New comment' } },
+          { 'v' => 2, 'ts' => time(250), 'c' => { 'content' => 'New comment' } }
         ]
         }
       )
@@ -340,7 +340,7 @@ describe Logidze::Model, :db do
           'v' => 1,
           'h' =>
         [
-          { 'v' => 1, 'ts' => time(230), 'c' => { 'content' => 'New comment 2' } },
+          { 'v' => 1, 'ts' => time(230), 'c' => { 'content' => 'New comment 2' } }
         ]
         }
       )
@@ -440,7 +440,7 @@ describe Logidze::Model, :db do
       User.create!(
         name: 'test',
         extra: { gender: 'X', social: { fb: [1, 2], vk: false } },
-        settings: [:sms, :mail],
+        settings: %i[sms mail],
         log_data: {
           'v' => 5,
           'h' =>
@@ -454,7 +454,7 @@ describe Logidze::Model, :db do
         }
       )
     end
-  
+
     describe "#at" do
       it "returns version at specified time", :aggregate_failures do
         user_old = user.at(time: time(350))
@@ -477,7 +477,7 @@ describe Logidze::Model, :db do
             "changes" =>
               {
                 "extra" => { "old" => { "gender" => "M", "social" => { "fb" => [1] } }, "new" => { "gender" => "X", "social" => { "fb" => [1, 2], "vk" => false } } },
-                "settings" => { "old" => ['mail'], "new" => ['sms', 'mail'] }
+                "settings" => { "old" => ['mail'], "new" => %w[sms mail] }
               }
           )
       end

@@ -29,7 +29,7 @@ module Logidze
 
       def generate_migration
         if options[:blacklist] && options[:whitelist]
-          $stderr.puts "Use only one: --whitelist or --blacklist"
+          warn "Use only one: --whitelist or --blacklist"
           exit(1)
         end
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
