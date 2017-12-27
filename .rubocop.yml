@@ -9,11 +9,14 @@ AllCops:
     - 'spec/dummy/**/*'
     - 'tmp/**/*'
     - 'bench/**/*'
+    - 'Rakefile'
+    - 'Gemfile'
+    - '*.gemspec'
   DisplayCopNames: true
   StyleGuideCopsOnly: false
   TargetRubyVersion: 2.3
 
-Style/AccessorMethodName:
+Naming/AccessorMethodName:
   Enabled: false
 
 Style/TrivialAccessors:
@@ -26,17 +29,27 @@ Style/Documentation:
 Style/StringLiterals:
   Enabled: false
 
-Style/SpaceInsideStringInterpolation:
+Layout/SpaceInsideStringInterpolation:
   EnforcedStyle: no_space
 
 Style/BlockDelimiters:
   Exclude:
     - 'spec/**/*.rb'
 
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
 Lint/AmbiguousRegexpLiteral:
   Enabled: false
 
+Lint/MissingCopEnableDirective:
+  Enabled: false
+
 Metrics/MethodLength:
+  Exclude:
+    - 'spec/**/*.rb'
+
+Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
 
@@ -59,5 +72,11 @@ Lint/HandleExceptions:
   Exclude:
     - 'spec/**/*.rb'
 
-Style/DotPosition:
+Layout/DotPosition:
   EnforcedStyle: leading
+
+Layout/IndentHeredoc:
+  Enabled: false
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: false

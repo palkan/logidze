@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Logidze
   module AcceptanceHelpers #:nodoc:
     def successfully(command)
@@ -38,6 +39,6 @@ module Logidze
       retval
     end
 
-    extend self
+    extend self # rubocop: disable all
   end
 end

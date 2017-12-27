@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-module Logidze
+module Logidze # :nodoc: all
   module VersionedAssociation
+    # rubocop: disable Metrics/MethodLength, Metrics/AbcSize
     def load_target
       target = super
 
@@ -26,9 +27,7 @@ module Logidze
     def logidze_stale?
       return false if !loaded? || inversed
 
-      unless target.is_a?(Array)
-        return owner.logidze_requested_ts != target.logidze_requested_ts
-      end
+      return owner.logidze_requested_ts != target.logidze_requested_ts unless target.is_a?(Array)
 
       return false if target.empty?
 

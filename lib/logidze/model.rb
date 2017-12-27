@@ -12,6 +12,7 @@ module Logidze
   end
 
   # Extends model with methods to browse history
+  # rubocop: disable Metrics/ModuleLength
   module Model
     require 'logidze/history/type' if Rails::VERSION::MAJOR >= 5
 
@@ -47,9 +48,11 @@ module Logidze
         Logidze.without_logging(&block)
       end
 
+      # rubocop: disable Naming/PredicateName
       def has_logidze?
         true
       end
+      # rubocop: enable Naming/PredicateName
     end
 
     # Use this to convert Ruby time to milliseconds
@@ -60,6 +63,7 @@ module Logidze
     # Return a dirty copy of record at specified time
     # If time/version is less then the first version, then return nil.
     # If time/version is greater then the last version, then return self.
+    # rubocop: disable Metrics/AbcSize, Metrics/MethodLength
     def at(ts = nil, time: nil, version: nil)
       Deprecations.show_ts_deprecation_for("#at") if ts
 
@@ -84,6 +88,7 @@ module Logidze
 
       object_at
     end
+    # rubocop: enable Metrics/AbcSize, Metrics/MethodLength
 
     # Revert record to the version at specified time (without saving to DB)
     def at!(ts = nil, time: nil, version: nil)
@@ -165,6 +170,7 @@ module Logidze
       end
     end
 
+    # rubocop: disable Metrics/MethodLength
     def association(name)
       association = super
 
@@ -187,6 +193,7 @@ module Logidze
 
       association
     end
+    # rubocop: enable Metrics/MethodLength
 
     protected
 

@@ -9,7 +9,7 @@ module Logidze
     module ClassMethods # :nodoc:
       # Include methods to work with history.
       #
-      # rubocop:disable Style/PredicateName
+      # rubocop:disable Naming/PredicateName, Style/MixinUsage
       def has_logidze
         include Logidze::Model
       end

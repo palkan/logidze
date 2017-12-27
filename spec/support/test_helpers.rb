@@ -13,7 +13,7 @@ module Logidze
       return unless block_given?
       begin
         yield
-      rescue
+      rescue StandardError
       end
     end
   end
