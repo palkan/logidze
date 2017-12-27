@@ -2,6 +2,15 @@
 
 ## master
 
+## 0.6.0 (2017-12-27)
+
+- Use positional arguments in `at`/`diff_from` methods and allow passing version. ([@palkan][])
+
+  Now you can write `post.diff_from(time: ts)`, `post.diff_from(version: x)`, Post.at(time: 1.day.ago)`, etc.
+
+  NOTE: the previous behaviour is still supported (but gonna be deprecated),
+  i.e. you still can use `post.diff_from(ts)` if you don't mind the deprecation warning.
+
 ## 0.5.3 (2017-08-22)
 
 - Add `--update` flag to model migration. ([@palkan][])

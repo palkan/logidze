@@ -10,10 +10,10 @@ module Logidze
 
       if target.is_a? Array
         target.map! do |object|
-          object.at(time)
+          object.at(time: time)
         end.compact!
       else
-        target.at!(time)
+        target.at!(time: time)
       end
 
       target
