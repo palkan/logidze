@@ -58,12 +58,13 @@ describe "Logidze triggers", :db do
       end
     end
 
+    # See https://github.com/palkan/logidze/pull/30
     describe "diff" do
       let(:post) { Post.create!(params).reload }
 
       it "generates the correct diff", :aggregate_failures do
         post.update!(meta: { tags: ['other'] })
-        diff = post.reload.log_data.diff_from version: (post.reload.log_version - 1)
+        diff = post.reload.diff_from(version: (post.reload.log_version - 1))["changes"]
         expected_diff_meta = {
           "old" => { "tags" => %w(some tag) },
           "new" => { "tags" => %w(other) }

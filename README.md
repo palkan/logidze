@@ -134,35 +134,35 @@ post.log_version #=> 3
 post.log_size #=> 3
 
 # Get copy of a record at a given time
-old_post = post.at(2.days.ago)
+old_post = post.at(time: 2.days.ago)
 
 # or revert the record itself to the previous state (without committing to DB)
-post.at!('201-04-15 12:00:00')
+post.at!(time: '201-04-15 12:00:00')
 
 # If no version found
-post.at('1945-05-09 09:00:00') #=> nil
+post.at(time: '1945-05-09 09:00:00') #=> nil
 ```
 
 You can also get revision by version number:
 
 ```ruby
-post.at_version(2)
+post.at(version: 2)
 ```
 
 It is also possible to get version for relations:
 
 ```ruby
-Post.where(active: true).at(1.month.ago)
+Post.where(active: true).at(time: 1.month.ago)
 ```
 
 You can also get diff from specified time:
 
 ```ruby
-post.diff_from(1.hour.ago)
+post.diff_from(time: 1.hour.ago)
 #=> { "id" => 27, "changes" => { "title" => { "old" => "Logidze sucks!", "new" => "Logidze rulz!" } } }
 
 # the same for relations
-Post.where(created_at: Time.zone.today.all_day).diff_from(1.hour.ago)
+Post.where(created_at: Time.zone.today.all_day).diff_from(time: 1.hour.ago)
 ```
 
 There are also `#undo!` and `#redo!` options (and more general `#switch_to!`):

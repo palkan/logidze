@@ -2,6 +2,15 @@
 require 'active_support'
 
 module Logidze
+  module Deprecations # :nodoc:
+    def self.show_ts_deprecation_for(meth)
+      warn(
+        "[Deprecation] Usage of #{meth}(time) will be removed in the future releases, "\
+        "use #{meth}(time: ts) instead"
+      )
+    end
+  end
+
   # Extends model with methods to browse history
   module Model
     require 'logidze/history/type' if Rails::VERSION::MAJOR >= 5
@@ -20,13 +29,17 @@ module Logidze
 
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
-      def at(ts)
-        all.map { |record| record.at(ts) }.compact
+      def at(ts = nil, time: nil, version: nil)
+        Deprecations.show_ts_deprecation_for(".at") if ts
+        time ||= ts
+        all.map { |record| record.at(time: time, version: version) }.compact
       end
 
       # Return changes made to records since specified time
-      def diff_from(ts)
-        all.map { |record| record.diff_from(ts) }
+      def diff_from(ts = nil, time: nil, version: nil)
+        Deprecations.show_ts_deprecation_for(".diff_from") if ts
+        time ||= ts
+        all.map { |record| record.diff_from(time: time, version: version) }
       end
 
       # Alias for Logidze.without_logging
@@ -45,35 +58,46 @@ module Logidze
     attr_accessor :logidze_requested_ts
 
     # Return a dirty copy of record at specified time
-    # If time is less then the first version, then return nil.
-    # If time is greater then the last version, then return self.
-    def at(ts)
-      ts = parse_time(ts)
+    # If time/version is less then the first version, then return nil.
+    # If time/version is greater then the last version, then return self.
+    def at(ts = nil, time: nil, version: nil)
+      Deprecations.show_ts_deprecation_for("#at") if ts
 
-      return nil unless log_data.exists_ts?(ts)
+      return at_version(version) if version
 
-      if log_data.current_ts?(ts)
-        self.logidze_requested_ts = ts
+      time ||= ts
+      time = parse_time(time)
+
+      return nil unless log_data.exists_ts?(time)
+
+      if log_data.current_ts?(time)
+        self.logidze_requested_ts = time
         return self
       end
 
-      version = log_data.find_by_time(ts).version
+      version = log_data.find_by_time(time).version
 
       object_at = dup
       object_at.apply_diff(version, log_data.changes_to(version: version))
       object_at.id = id
-      object_at.logidze_requested_ts = ts
+      object_at.logidze_requested_ts = time
 
       object_at
     end
 
     # Revert record to the version at specified time (without saving to DB)
-    def at!(ts)
-      ts = parse_time(ts)
-      return self if log_data.current_ts?(ts)
-      return false unless log_data.exists_ts?(ts)
+    def at!(ts = nil, time: nil, version: nil)
+      Deprecations.show_ts_deprecation_for("#at!") if ts
 
-      version = log_data.find_by_time(ts).version
+      return at_version!(version) if version
+
+      time ||= ts
+      time = parse_time(time)
+
+      return self if log_data.current_ts?(time)
+      return false unless log_data.exists_ts?(time)
+
+      version = log_data.find_by_time(time).version
 
       apply_diff(version, log_data.changes_to(version: version))
     end
@@ -99,11 +123,17 @@ module Logidze
     #
     # @example
     #
-    #   post.diff_from(2.days.ago)
+    #   post.diff_from(time: 2.days.ago) # or post.diff_from(version: 2)
     #   #=> { "id" => 1, "changes" => { "title" => { "old" => "Hello!", "new" => "World" } } }
-    def diff_from(ts)
-      ts = parse_time(ts)
-      { "id" => id, "changes" => log_data.diff_from(time: ts) }
+    def diff_from(ts = nil, version: nil, time: nil)
+      Deprecations.show_ts_deprecation_for("#diff_from") if ts
+      time ||= ts
+      time = parse_time(time) if time
+      changes = log_data.diff_from(time: time, version: version).tap do |v|
+        deserialize_changes!(v)
+      end
+
+      { "id" => id, "changes" => changes }
     end
 
     # Restore record to the previous version.

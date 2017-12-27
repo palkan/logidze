@@ -124,8 +124,8 @@ module Logidze
     private
 
     def build_changes(a, b)
-      b.each_with_object({}) do |kv, acc|
-        acc[kv.first] = { "old" => a[kv.first], "new" => kv.last } unless kv.last == a[kv.first]
+      b.each_with_object({}) do |(k, v), acc|
+        acc[k] = { "old" => a[k], "new" => v } unless v == a[k]
       end
     end
 
