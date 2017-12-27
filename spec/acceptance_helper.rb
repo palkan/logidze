@@ -13,9 +13,12 @@ RSpec.configure do |config|
   config.after(:suite) do
     Dir.chdir("#{File.dirname(__FILE__)}/dummy") do
       ActiveRecord::Base.connection_pool.disconnect!
-      system <<-CMD
-        rake db:drop db:create db:migrate
-      CMD
+
+      Logidze::AcceptanceHelpers.suppress_output do
+        system <<-CMD
+          rake db:drop db:create db:migrate
+        CMD
+      end
     end
   end
 end
