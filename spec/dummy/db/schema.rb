@@ -47,6 +47,8 @@ ActiveRecord::Schema.define(version: 20170220153105) do
     t.string   "name"
     t.integer  "age"
     t.boolean  "active"
+    t.jsonb    "extra"
+    t.string   "settings", array: true
     t.jsonb    "log_data"
     t.datetime "time"
   end

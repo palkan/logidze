@@ -4,6 +4,10 @@
 
 ## 0.6.0 (2017-12-27)
 
+- [Fixes [#33](https://github.com/palkan/logidze/issues/33)] Support attributes types. ([@palkan][])
+
+  Added deserialization of complex types (such as `jsonb`, arrays, whatever).
+
 - Use positional arguments in `at`/`diff_from` methods and allow passing version. ([@palkan][])
 
   Now you can write `post.diff_from(time: ts)`, `post.diff_from(version: x)`, Post.at(time: 1.day.ago)`, etc.
