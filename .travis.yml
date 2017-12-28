@@ -13,6 +13,7 @@ env:
     - LOGIDZE_DB_NAME=logidze
 
 before_script:
+  - gem update --system
   - bundle exec rake dummy:db:create
   - psql -U postgres -d logidze -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
   - bundle exec rake dummy:db:test:prepare
@@ -21,6 +22,8 @@ matrix:
   include:
     - rvm: ruby-head
       gemfile: gemfiles/railsmaster.gemfile
+    - rvm: 2.5.0
+      gemfile: gemfiles/rails5.gemfile
     - rvm: 2.4.1
       gemfile: gemfiles/rails5.gemfile
     - rvm: 2.3.1
