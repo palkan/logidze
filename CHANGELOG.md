@@ -2,6 +2,10 @@
 
 ## master
 
+## 0.6.1 (2018-01-06)
+
+- [Fixes [#54](https://github.com/palkan/logidze/issues/54)] Fix loading of `ActiveModel::Type::Value` for Rails 5.2. ([@palkan][])
+
 ## 0.6.0 (2017-12-27)
 
 - [Fixes [#33](https://github.com/palkan/logidze/issues/33)] Support attributes types. ([@palkan][])
