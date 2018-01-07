@@ -112,6 +112,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
       CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         DECLARE
           changes jsonb;
+          version jsonb;
+          snapshot jsonb;
           new_v integer;
           size integer;
           history_limit integer;
@@ -127,13 +129,19 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
           columns_blacklist := TG_ARGV[2];
 
           IF TG_OP = 'INSERT' THEN
+            snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
 
-            NEW.log_data := logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
+            IF snapshot#>>'{h, -1, c}' != '{}' THEN
+              NEW.log_data := snapshot;
+            END IF;
 
           ELSIF TG_OP = 'UPDATE' THEN
 
             IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
-              NEW.log_data := logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
+              snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
+              IF snapshot#>>'{h, -1, c}' != '{}' THEN
+                NEW.log_data := snapshot;
+              END IF;
               RETURN NEW;
             END IF;
 
@@ -175,11 +183,16 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
             new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
 
             size := jsonb_array_length(NEW.log_data->'h');
+            version := logidze_version(new_v, changes, ts, columns_blacklist);
+
+            IF version->>'c' = '{}' THEN
+              RETURN NEW;
+            END IF;
 
             NEW.log_data := jsonb_set(
               NEW.log_data,
               ARRAY['h', size::text],
-              logidze_version(new_v, changes, ts, columns_blacklist),
+              version,
               true
             );
 

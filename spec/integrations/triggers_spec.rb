@@ -327,7 +327,7 @@ describe "Logidze triggers", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      @blacklist = %w(created_at active)
+      @blacklist = %w(updated_at created_at active)
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
@@ -345,6 +345,7 @@ describe "Logidze triggers", :db do
     end
 
     let(:params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:updated_columns) { params.keys.map(&:to_s) }
 
     describe "insert" do
       let(:post) { Post.create!(params).reload }
@@ -363,8 +364,20 @@ describe "Logidze triggers", :db do
 
       it "does not log blacklisted columns", :aggregate_failures do
         post.update!(params)
-        changes = post.log_data.current_version.changes
-        expect(changes.keys).to match_array Post.column_names - @blacklist - ['log_data']
+        changes = post.reload.log_data.current_version.changes
+        expect(changes.keys).to match_array(updated_columns - @blacklist)
+      end
+
+      context "when only blacklisted columns are updated" do
+        let(:params) { { active: false } }
+
+        it "does not create new log entry", :aggregate_failures do
+          old_log_size = post.log_data.size
+
+          post.update!(params)
+
+          expect(post.reload.log_data.size).to eq(old_log_size)
+        end
       end
     end
   end
