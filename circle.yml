@@ -1,6 +1,6 @@
 machine:
   ruby:
-    version: 2.3.0
+    version: 2.5.0
 
   environment:
     DATABASE_URL: postgres://postgres@127.0.0.1:5432/test_database

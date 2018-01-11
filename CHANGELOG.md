@@ -1,6 +1,8 @@
 # Change log
 
-## master
+## 0.6.2 (2018-01-11)
+
+- [Fixes [#53](https://github.com/palkan/logidze/issues/53)] Fix storing empty log entries with blacklisting. ([@charlie-wasp][])
 
 ## 0.6.1 (2018-01-06)
 
