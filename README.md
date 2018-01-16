@@ -20,15 +20,15 @@ Other requirements:
 
 ## Installation
 
-1. Add Logidze to your application's Gemfile:
+Add Logidze to your application's Gemfile:
 
 ```ruby
 gem 'logidze'
 ```
 
-2. Install required DB extensions and create trigger function:
+Install required DB extensions and create trigger function:
 
-```ruby
+```sh
 rails generate logidze:install
 ```
 
@@ -36,13 +36,13 @@ This creates migration for adding trigger function and enabling hstore extension
 
 Run migrations:
 
-```ruby
+```sh
 rake db:migrate
 ```
 
 3. Add log column and triggers to the model:
 
-```ruby
+```sh
 rails generate logidze:model Post
 rake db:migrate
 ```
@@ -51,19 +51,19 @@ This also adds `has_logidze` line to your model, which adds methods for working 
 
 You can provide `limit` option to `generate` to limit the size of the log (by default it's unlimited):
 
-```ruby
+```sh
 rails generate logidze:model Post --limit=10
 ```
 
 To backfill table data (i.e. create initial snapshots) add `backfill` option:
 
-```ruby
+```sh
 rails generate logidze:model Post --backfill
 ```
 
 You can log only particular columns changes. There are mutually exclusive `blacklist` and `whitelist` options for this:
 
-```ruby
+```sh
 # track all columns, except `created_at` and `active`
 rails generate logidze:model Post --blacklist=created_at active
 # track only `title` and `body` columns
@@ -72,7 +72,7 @@ rails generate logidze:model Post --whitelist=title body
 
 By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case you should specify the path explicitly:
 
-```ruby
+```sh
 rails generate logidze:model Post --path "app/models/custom/post.rb"
 ```
 
@@ -80,7 +80,7 @@ By default, Logidze tries to get a timestamp for a version from record's `update
 your model does not have that column, Logidze will gracefully fall back to `statement_timestamp()`.
 To change the column name or disable this feature completely, you can use the `timestamp_column` option:
 
-```ruby
+```sh
 # will try to get the timestamp value from `time` column
 rails generate logidze:model Post --timestamp_column time
 # will always set version timestamp to `statement_timestamp()`
@@ -89,7 +89,7 @@ rails generate logidze:model Post --timestamp_column nil # "null" and "false" wi
 
 If you want to update Logidze settings for the model, run migration with `--update` flag:
 
-```ruby
+```sh
 rails generate logidze:model Post --update --whitelist=title body rating
 ```
 
@@ -112,7 +112,7 @@ Nevertheless, you still need super-user privileges to enable `hstore` extension 
 
 We try to make upgrade process as simple as possible. For now, the only required action is to create and run a migration:
 
-```ruby
+```sh
 rails generate logidze:install --update
 ```
 
@@ -232,7 +232,7 @@ And in your controller:
 
 ```ruby
 class ApplicationController < ActionController::Base
-  around_action :set_logidze_responsible, only: [:create, :update]
+  around_action :set_logidze_responsible, only: %i[create update]
 
   def set_logidze_responsible(&block)
     Logidze.with_responsible(current_user&.id, &block)

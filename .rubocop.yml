@@ -1,3 +1,6 @@
+require:
+  - rubocop-md
+
 AllCops:
   # Include gemspec and Rakefile
   Include:
@@ -44,6 +47,10 @@ Lint/AmbiguousRegexpLiteral:
 
 Lint/MissingCopEnableDirective:
   Enabled: false
+
+Lint/UselessAssignment:
+  Exclude:
+    - '**/*.md'
 
 Metrics/MethodLength:
   Exclude:
