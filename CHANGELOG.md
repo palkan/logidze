@@ -1,5 +1,9 @@
 # Change log
 
+## master
+
+- Add [`rubocop-md`](https://github.com/palkan/rubocop-md)
+
 ## 0.6.2 (2018-01-11)
 
 - [Fixes [#53](https://github.com/palkan/logidze/issues/53)] Fix storing empty log entries with blacklisting. ([@charlie-wasp][])

@@ -10,6 +10,7 @@ AllCops:
   Exclude:
     - 'bin/**/*'
     - 'spec/dummy/**/*'
+    - 'vendor/**/*'
     - 'tmp/**/*'
     - 'bench/**/*'
     - 'Rakefile'
