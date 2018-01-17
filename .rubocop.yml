@@ -11,6 +11,7 @@ AllCops:
     - 'bin/**/*'
     - 'spec/dummy/**/*'
     - 'vendor/**/*'
+    - 'gemfiles/**/*'
     - 'tmp/**/*'
     - 'bench/**/*'
     - 'Rakefile'
