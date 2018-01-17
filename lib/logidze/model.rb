@@ -63,7 +63,7 @@ module Logidze
     # Return a dirty copy of record at specified time
     # If time/version is less then the first version, then return nil.
     # If time/version is greater then the last version, then return self.
-    # rubocop: disable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop: disable Metrics/MethodLength
     def at(ts = nil, time: nil, version: nil)
       Deprecations.show_ts_deprecation_for("#at") if ts
 
@@ -79,16 +79,11 @@ module Logidze
         return self
       end
 
-      version = log_data.find_by_time(time).version
+      log_entry = log_data.find_by_time(time)
 
-      object_at = dup
-      object_at.apply_diff(version, log_data.changes_to(version: version))
-      object_at.id = id
-      object_at.logidze_requested_ts = time
-
-      object_at
+      build_dup(log_entry, time)
     end
-    # rubocop: enable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop: enable Metrics/MethodLength
 
     # Revert record to the version at specified time (without saving to DB)
     def at!(ts = nil, time: nil, version: nil)
@@ -110,10 +105,11 @@ module Logidze
     # Return a dirty copy of specified version of record
     def at_version(version)
       return self if log_data.version == version
-      return nil unless log_data.find_by_version(version)
 
-      object_at = dup
-      object_at.apply_diff(version, log_data.changes_to(version: version))
+      log_entry = log_data.find_by_version(version)
+      return nil unless log_entry
+
+      build_dup(log_entry)
     end
 
     # Revert record to the specified version (without saving to DB)
@@ -176,12 +172,12 @@ module Logidze
 
       return association unless Logidze.associations_versioning
 
-      should_appply_logidze =
+      should_apply_logidze =
         logidze_past? &&
         association.klass.respond_to?(:has_logidze?) &&
         !association.singleton_class.include?(Logidze::VersionedAssociation)
 
-      return association unless should_appply_logidze
+      return association unless should_apply_logidze
 
       association.singleton_class.prepend Logidze::VersionedAssociation
 
@@ -208,6 +204,15 @@ module Logidze
 
     def apply_column_diff(column, value)
       write_attribute column, deserialize_value(column, value)
+    end
+
+    def build_dup(log_entry, requested_ts = log_entry.time)
+      object_at = dup
+      object_at.apply_diff(log_entry.version, log_data.changes_to(version: log_entry.version))
+      object_at.id = id
+      object_at.logidze_requested_ts = requested_ts
+
+      object_at
     end
 
     if Rails::VERSION::MAJOR < 5

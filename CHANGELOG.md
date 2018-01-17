@@ -2,6 +2,8 @@
 
 ## master
 
+- [Fixes [#57](https://github.com/palkan/logidze/issues/57)] Support associations versioning for `at(version:)`. ([@palkan][])
+
 - Add [`rubocop-md`](https://github.com/palkan/rubocop-md)
 
 ## 0.6.2 (2018-01-11)

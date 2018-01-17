@@ -378,6 +378,12 @@ describe Logidze::Model, :db do
           expect(very_old_article.user.age).to eql(45)
         end
 
+        context "#at(version)" do
+          let(:old_article) { article.at(version: 2) }
+
+          specify { expect(old_article.user.name).to eql('John Harris') }
+        end
+
         context 'when owner was not changed at the given time' do
           it "still returns association version" do
             # this returns the same article object due to implementation
@@ -403,6 +409,12 @@ describe Logidze::Model, :db do
         it "it responds to #item_ids correctly" do
           id = article.comments.first.id
           expect(old_article.comment_ids).to match_array([id])
+        end
+
+        context "#at(version)" do
+          let(:old_article) { article.at(version: 2) }
+
+          specify { expect(old_article.comments.first.content).to eql('My comment') }
         end
 
         describe "Presence-like methods" do
