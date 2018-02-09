@@ -1,5 +1,6 @@
 [![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Build Status](https://travis-ci.org/palkan/logidze.svg?branch=master)](https://travis-ci.org/palkan/logidze) [![Circle CI](https://circleci.com/gh/palkan/logidze/tree/master.svg?style=svg)](https://circleci.com/gh/palkan/logidze/tree/master)
 [![Dependency Status](https://dependencyci.com/github/palkan/logidze/badge)](https://dependencyci.com/github/palkan/logidze)
+[![Open Source Helpers](https://www.codetriage.com/palkan/logidze/badges/users.svg)](https://www.codetriage.com/palkan/logidze)
 
 # Logidze
 
