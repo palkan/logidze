@@ -7,7 +7,7 @@ module Logidze
     class InstallGenerator < ::Rails::Generators::Base # :nodoc:
       include Rails::Generators::Migration
 
-      source_root File.expand_path('../templates', __FILE__)
+      source_root File.expand_path('templates', __dir__)
 
       class_option :update, type: :boolean, optional: true,
                             desc: "Define whether this is an update migration"

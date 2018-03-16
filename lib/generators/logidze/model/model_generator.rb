@@ -6,7 +6,7 @@ require "rails/generators/active_record/migration/migration_generator"
 module Logidze
   module Generators
     class ModelGenerator < ::ActiveRecord::Generators::Base # :nodoc:
-      source_root File.expand_path('../templates', __FILE__)
+      source_root File.expand_path('templates', __dir__)
 
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 

@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'generators/logidze/install/install_generator'
 
 describe Logidze::Generators::InstallGenerator, type: :generator do
-  destination File.expand_path("../../../tmp", __FILE__)
+  destination File.expand_path('../../tmp', __dir__)
 
   let(:args) { [] }
 

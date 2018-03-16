@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'generators/logidze/model/model_generator'
 
 describe Logidze::Generators::ModelGenerator, type: :generator do
-  destination File.expand_path("../../../tmp", __FILE__)
+  destination File.expand_path('../../tmp', __dir__)
 
   before do
     prepare_destination
