@@ -1,5 +1,5 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VERSION::MAJOR < 5 ? '' : '[5.0]' %>
-	def change
-		enable_extension :hstore
-	end
+  def change
+    enable_extension :hstore
+  end
 end
