@@ -13,7 +13,7 @@ if ENV['COVER']
   SimpleCov.start
 end
 
-require File.expand_path("../dummy/config/environment", __FILE__)
+require File.expand_path('dummy/config/environment', __dir__)
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 

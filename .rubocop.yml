@@ -24,6 +24,9 @@ AllCops:
 Naming/AccessorMethodName:
   Enabled: false
 
+Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
 Style/TrivialAccessors:
   Enabled: false
 
