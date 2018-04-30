@@ -134,6 +134,8 @@ module Logidze
         deserialize_changes!(v)
       end
 
+      changes.delete_if { |k, _v| deleted_column?(k) }
+
       { "id" => id, "changes" => changes }
     end
 
@@ -203,6 +205,7 @@ module Logidze
     end
 
     def apply_column_diff(column, value)
+      return if deleted_column?(column)
       write_attribute column, deserialize_value(column, value)
     end
 
@@ -223,6 +226,10 @@ module Logidze
       def deserialize_value(column, value)
         @attributes[column].type.deserialize(value)
       end
+    end
+
+    def deleted_column?(column)
+      !@attributes.key?(column)
     end
 
     def deserialize_changes!(diff)
