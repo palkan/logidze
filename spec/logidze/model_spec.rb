@@ -286,7 +286,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "Versioned associations" do
+  context "Versioned associations" do
     before(:all) { Logidze.associations_versioning = true }
 
     let(:user) do
@@ -447,7 +447,7 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe "Serialized types" do
+  context "Serialized types" do
     let(:user) do
       User.create!(
         name: 'test',
@@ -490,6 +490,45 @@ describe Logidze::Model, :db do
               {
                 "extra" => { "old" => { "gender" => "M", "social" => { "fb" => [1] } }, "new" => { "gender" => "X", "social" => { "fb" => [1, 2], "vk" => false } } },
                 "settings" => { "old" => ['mail'], "new" => %w[sms mail] }
+              }
+          )
+      end
+    end
+  end
+
+  context "Schema changes" do
+    let(:user) do
+      User.create!(
+        name: 'test',
+        log_data: {
+          'v' => 3,
+          'h' =>
+            [
+              { 'v' => 1, 'ts' => time(100), 'c' => { 'age' => nil } },
+              { 'v' => 2, 'ts' => time(120), 'c' => { 'age' => 1, 'last_name' => 'Harry' } },
+              { 'v' => 3, 'ts' => time(200), 'c' => { 'name' => 'Harry', 'age' => 10 } }
+            ]
+        }
+      )
+    end
+
+    describe "#at" do
+      it "returns version at specified time", :aggregate_failures do
+        user_old = user.at(time: time(150))
+        expect(user_old.name).to eq 'test'
+        expect(user_old.age).to eq 1
+      end
+    end
+
+    describe "#diff_from" do
+      it "returns diff from specified time" do
+        expect(user.diff_from(version: 1))
+          .to eq(
+            "id" => user.id,
+            "changes" =>
+              {
+                "age" => { "old" => nil, "new" => 10 },
+                "name" => { "old" => nil, "new" => "Harry" }
               }
           )
       end

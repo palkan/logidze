@@ -2,6 +2,10 @@
 
 ## master
 
+- [Fixes [#70](https://github.com/palkan/logidze/issues/70)] Ignore missing (e.g. removed) columns in diffs and past versions. ([@palkan][])
+
+This is a quick fix for a more general problem (see [#59](https://github.com/palkan/logidze/issues/59)).
+
 ## 0.6.3 (2018-01-17)
 
 - [Fixes [#57](https://github.com/palkan/logidze/issues/57)] Support associations versioning for `at(version:)`. ([@palkan][])
