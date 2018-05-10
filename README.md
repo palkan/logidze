@@ -41,6 +41,13 @@ Run migrations:
 rake db:migrate
 ```
 
+**NOTE:** you **must** use SQL schema format since Logidze uses DB functions and triggers:
+
+```ruby
+# application.rb
+config.active_record.schema_format = :sql
+```
+
 3. Add log column and triggers to the model:
 
 ```sh
