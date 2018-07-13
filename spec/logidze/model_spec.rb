@@ -314,12 +314,13 @@ describe Logidze::Model, :db do
         active: true,
         user: user,
         log_data: {
-          'v' => 3,
+          'v' => 4,
           'h' =>
             [
-              { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false } },
-              { 'v' => 2, 'ts' => time(200), 'c' => { 'title' => 'Article' } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } }
+              { 'v' => 1, 'ts' => time(25), 'c' => { 'title' => 'Anonymous inactive', 'active' => false, user_id: nil } },
+              { 'v' => 2, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false, user_id: user.id } },
+              { 'v' => 3, 'ts' => time(200), 'c' => { 'title' => 'Article', 'active' => true } },
+              { 'v' => 4, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } }
             ]
         }
       )
@@ -379,7 +380,7 @@ describe Logidze::Model, :db do
         end
 
         context "#at(version)" do
-          let(:old_article) { article.at(version: 2) }
+          let(:old_article) { article.at(version: 3) }
 
           specify { expect(old_article.user.name).to eql('John Harris') }
         end
@@ -412,7 +413,7 @@ describe Logidze::Model, :db do
         end
 
         context "#at(version)" do
-          let(:old_article) { article.at(version: 2) }
+          let(:old_article) { article.at(version: 3) }
 
           specify { expect(old_article.comments.first.content).to eql('My comment') }
         end
