@@ -15,7 +15,7 @@ module Logidze # :nodoc: all
     # rubocop: disable Metrics/MethodLength, Metrics/AbcSize
     def load_target
       target = super
-
+      return unless target
       return target if inversed
 
       time = owner.logidze_requested_ts
