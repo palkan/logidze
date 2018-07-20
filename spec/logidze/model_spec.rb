@@ -373,10 +373,15 @@ describe Logidze::Model, :db do
       before(:all) { Logidze.associations_versioning = true }
       after(:all) { Logidze.associations_versioning = false }
 
-      describe "belongs_to" do
-        it "returns nil if past record does not exist" do
-          expect(article.at(version: 1).user).to be_nil
+      context "belongs_to" do
+        context "when the association wasn't set in the past version" do
+          let(:first_article_revision) { article.at(version: 1) }
+
+          it "returns nil" do
+            expect(first_article_revision.user).to be_nil
+          end
         end
+
         it "returns association version, according to the owner" do
           expect(old_article.user.name).to eql('John Harris')
           expect(very_old_article.user.age).to eql(45)
