@@ -2,6 +2,10 @@
 
 ## master
 
+## 0.6.5 (2018-08-08)
+
+- Make compatible with Rails 5.2.1 ([@palkan][])
+
 ## 0.6.4 (2018-04-30)
 
 - [Fixes [#70](https://github.com/palkan/logidze/issues/70)] Ignore missing (e.g. removed) columns in diffs and past versions. ([@palkan][])
