@@ -25,7 +25,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
           <<-RAW
 class User < ActiveRecord::Base
 end
-RAW
+          RAW
         )
         run_generator(args)
       end
@@ -141,7 +141,7 @@ module User
   class Guest < ActiveRecord::Base
   end
 end
-RAW
+          RAW
         )
         run_generator ["User/Guest"]
       end
@@ -167,7 +167,7 @@ module Data
   class Set < ActiveRecord::Base
   end
 end
-RAW
+          RAW
         )
         run_generator ["data/set", "--path", "app/models/custom/data/set.rb"]
       end
