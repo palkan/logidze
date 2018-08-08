@@ -1,4 +1,15 @@
 # frozen_string_literal: true
+
+# `inversed` attr_accessor has been removed in Rails 5.2.1
+# See https://github.com/rails/rails/commit/39e57daffb9ff24726b1e86dfacf76836dd0637b#diff-c47e1c26ae8a3d486119e0cc91f40a30
+unless ::ActiveRecord::Associations::Association.instance_methods.include?(:inveresed)
+  using(Module.new do
+    refine ::ActiveRecord::Associations::Association do
+      attr_reader :inversed
+    end
+  end)
+end
+
 module Logidze # :nodoc: all
   module VersionedAssociation
     # rubocop: disable Metrics/MethodLength, Metrics/AbcSize
