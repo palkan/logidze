@@ -14,7 +14,7 @@ module Logidze
     attr_reader :data
 
     delegate :size, to: :versions
-    delegate :responsible_id, to: :current_version
+    delegate :responsible_id, :meta, to: :current_version
 
     ### Rails 4 ###
     def self.dump(object)

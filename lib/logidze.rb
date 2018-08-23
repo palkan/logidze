@@ -8,9 +8,9 @@ module Logidze
   require 'logidze/model'
   require 'logidze/versioned_association'
   require 'logidze/has_logidze'
-  require 'logidze/responsible'
+  require 'logidze/meta'
 
-  extend Logidze::Responsible
+  extend Logidze::Meta
 
   require 'logidze/engine' if defined?(Rails)
 

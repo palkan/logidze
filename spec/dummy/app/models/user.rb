@@ -1,8 +1,9 @@
 class User < ActiveRecord::Base
   has_logidze
 
+  delegate :responsible_id, :meta, to: :log_data
+
   def whodunnit
-    id = log_data.responsible_id
-    User.find(id) if id.present?
+    User.find(responsible_id) if responsible_id.present?
   end
 end

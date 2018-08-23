@@ -207,9 +207,21 @@ Logidze.append_on_undo = true
 ```
 
 
+## Track meta information
+
+You can store any meta information you want inside your version (it could be IP address, user agent etc). In order to add it you should wrap your code with a block:
+
+```ruby
+Logidze.with_meta(ip: request.ip) do
+  post.save!
+end
+```
+
+Meta expects a hash to be passed so you won't need to encode and decode JSON manually.
+
 ## Track responsibility (aka _whodunnit_)
 
-You can store additional information in the version object, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
+A special application of meta information is storing the author of the change, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
 
 To provide `responsible_id` you should wrap your code in a block:
 
