@@ -2,6 +2,8 @@
 
 ## master
 
+- [Fixes [#75](https://github.com/palkan/logidze/issues/70)] Fix association versioning with an optional belongs to ([@ankursethi-uscis][])
+
 ## 0.6.5 (2018-08-08)
 
 - Make compatible with Rails 5.2.1 ([@palkan][])
@@ -99,3 +101,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@charlie-wasp]: https://github.com/charlie-wasp
 [@akxcv]: https://github.com/akxcv
 [@vassilevsky]: https://github.com/vassilevsky
+[@ankursethi-uscis]: https://github.com/ankursethi-uscis

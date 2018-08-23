@@ -314,12 +314,13 @@ describe Logidze::Model, :db do
         active: true,
         user: user,
         log_data: {
-          'v' => 3,
+          'v' => 4,
           'h' =>
             [
-              { 'v' => 1, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false } },
-              { 'v' => 2, 'ts' => time(200), 'c' => { 'title' => 'Article' } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } }
+              { 'v' => 1, 'ts' => time(25), 'c' => { 'title' => 'Anonymous inactive', 'active' => false, user_id: nil } },
+              { 'v' => 2, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false, user_id: user.id } },
+              { 'v' => 3, 'ts' => time(200), 'c' => { 'title' => 'Article', 'active' => true } },
+              { 'v' => 4, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } }
             ]
         }
       )
@@ -372,14 +373,22 @@ describe Logidze::Model, :db do
       before(:all) { Logidze.associations_versioning = true }
       after(:all) { Logidze.associations_versioning = false }
 
-      describe "belongs_to" do
+      context "belongs_to" do
+        context "when the association wasn't set in the past version" do
+          let(:first_article_revision) { article.at(version: 1) }
+
+          it "returns nil" do
+            expect(first_article_revision.user).to be_nil
+          end
+        end
+
         it "returns association version, according to the owner" do
           expect(old_article.user.name).to eql('John Harris')
           expect(very_old_article.user.age).to eql(45)
         end
 
         context "#at(version)" do
-          let(:old_article) { article.at(version: 2) }
+          let(:old_article) { article.at(version: 3) }
 
           specify { expect(old_article.user.name).to eql('John Harris') }
         end
@@ -412,7 +421,7 @@ describe Logidze::Model, :db do
         end
 
         context "#at(version)" do
-          let(:old_article) { article.at(version: 2) }
+          let(:old_article) { article.at(version: 3) }
 
           specify { expect(old_article.comments.first.content).to eql('My comment') }
         end
