@@ -1,6 +1,4 @@
-[![Cult Of Martians](http://cultofmartians.com/assets/badges/badge.svg)](http://cultofmartians.com)
-[![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Build Status](https://travis-ci.org/palkan/logidze.svg?branch=master)](https://travis-ci.org/palkan/logidze) 
-[![Open Source Helpers](https://www.codetriage.com/palkan/logidze/badges/users.svg)](https://www.codetriage.com/palkan/logidze)
+[![Cult Of Martians](http://cultofmartians.com/assets/badges/badge.svg)](http://cultofmartians.com) [![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze) [![Build Status](https://travis-ci.org/palkan/logidze.svg?branch=master)](https://travis-ci.org/palkan/logidze) [![Open Source Helpers](https://www.codetriage.com/palkan/logidze/badges/users.svg)](https://www.codetriage.com/palkan/logidze)
 
 # Logidze
 
