@@ -16,7 +16,6 @@ AllCops:
     - 'bench/**/*'
     - 'Rakefile'
     - 'Gemfile'
-    - 'CHANGELOG.md'
     - '*.gemspec'
   DisplayCopNames: true
   StyleGuideCopsOnly: false
