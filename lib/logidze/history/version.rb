@@ -9,6 +9,10 @@ module Logidze
       CHANGES = 'c'
       # Responsible ID
       RESPONSIBLE = 'r'
+      # Meta Responsible ID
+      META_RESPONSIBLE = '_r'
+      # Meta key
+      META = 'm'
 
       attr_reader :data
 
@@ -29,7 +33,11 @@ module Logidze
       end
 
       def responsible_id
-        data[RESPONSIBLE]
+        meta && meta[META_RESPONSIBLE] || data[RESPONSIBLE]
+      end
+
+      def meta
+        data[META]
       end
     end
   end

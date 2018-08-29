@@ -3,6 +3,25 @@
 ## master
 
 - [Fixes [#75](https://github.com/palkan/logidze/issues/70)] Fix association versioning with an optional belongs to ([@ankursethi-uscis][])
+- [PR [#79](https://github.com/palkan/logidze/pull/13)] Allow adding meta information to versions using `with_meta` (addressed [Issue [#60]](https://github.com/palkan/logidze/issues/60)). ([@DmitryTsepelev][])
+
+  Usage:
+
+  ```ruby
+  Logidze.with_meta(ip: request.ip) { post.save }
+  puts post.meta # => { 'ip' => '95.66.157.226' }
+  ```
+
+  Upgrading:
+
+  Please run `rails generate logidze:install --update` to regenerate stored functions.
+
+  This feature replaces the implementation of `with_responsible`, now `responsible_id` is stored inside of the meta hash with the key `_r`.
+  There is fallback to the old data structure (`{ 'r' => 42 }` opposed to `{ 'm' => { '_r' => 42 } }` in the current implementation), so
+  `responsible_id` should work as usual for the existing data.
+
+  If you've accessed the value manually (e.g. `post.log_data.current_version.data['r']`), you'll have to add the fallback too.
+
 
 ## 0.6.5 (2018-08-08)
 
@@ -102,3 +121,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@akxcv]: https://github.com/akxcv
 [@vassilevsky]: https://github.com/vassilevsky
 [@ankursethi-uscis]: https://github.com/ankursethi-uscis
+[@DmitryTsepelev]: https://github.com/DmitryTsepelev

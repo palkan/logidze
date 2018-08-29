@@ -8,7 +8,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
         DO $$
           BEGIN
           EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.disabled=' || quote_literal('');
-          EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.responsible=' || quote_literal('');
+          EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.meta=' || quote_literal('');
           END;
         $$
         LANGUAGE plpgsql;
@@ -37,8 +37,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
                     'c',
                     logidze_exclude_keys(data, VARIADIC array_append(blacklist, 'log_data'))
                    );
-          IF coalesce(#{current_setting('logidze.responsible')}, '') <> '' THEN
-            buf := jsonb_set(buf, ARRAY['r'], to_jsonb(current_setting('logidze.responsible')));
+          IF coalesce(#{current_setting('logidze.meta')}, '') <> '' THEN
+            buf := jsonb_set(buf, ARRAY['m'], current_setting('logidze.meta')::jsonb);
           END IF;
           RETURN buf;
         END;
@@ -92,8 +92,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
             (log_data#>'{h,0,c}') || (log_data#>'{h,1,c}')
           );
 
-          IF (log_data#>'{h,1}' ? 'r') THEN
-            merged := jsonb_set(merged, ARRAY['r'], log_data#>'{h,1,r}');
+          IF (log_data#>'{h,1}' ? 'm') THEN
+            merged := jsonb_set(merged, ARRAY['m'], log_data#>'{h,1,m}');
           END IF;
 
           return jsonb_set(
