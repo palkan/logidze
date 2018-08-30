@@ -288,7 +288,11 @@ The `log_data` column has the following format:
             "attr": "new value",  // updated fields with new values
             "attr2": "new value"
             },
-        "r": 42 // Resposibility ID (if provided)
+        "r": 42, // Resposibility ID (if provided), not in use since 0.7.0
+        "m": {
+          "_r": 42 // Resposibility ID (if provided), in use since 0.7.0
+          // any other meta information provided, please see Track meta information section for the details
+        }
       }
     ]
 }
