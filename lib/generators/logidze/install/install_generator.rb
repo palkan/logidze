@@ -18,6 +18,7 @@ module Logidze
 
       def generate_hstore_migration
         return if update?
+
         migration_template "hstore.rb.erb", "db/migrate/enable_hstore.rb"
       end
 

@@ -9,6 +9,7 @@ module Logidze # :nodoc:
 
     def with_responsible(responsible_id, &block)
       return yield if responsible_id.nil?
+
       meta = { Logidze::History::Version::META_RESPONSIBLE => responsible_id }
       with_meta(meta, &block)
     end
@@ -30,6 +31,7 @@ module Logidze # :nodoc:
       def perform
         return if block.nil?
         return block.call if meta.nil?
+
         ActiveRecord::Base.transaction { call_block_in_meta_context }
       end
 

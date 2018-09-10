@@ -59,10 +59,12 @@ module Logidze
     # Optional `data` paramater can be used as initial diff state.
     def changes_to(time: nil, version: nil, data: {}, from: 0)
       raise ArgumentError, "Time or version must be specified" if time.nil? && version.nil?
+
       filter = time.nil? ? method(:version_filter) : method(:time_filter)
       versions.each_with_object(data.dup) do |v, acc|
         next if v.version < from
         break acc if filter.call(v, version, time)
+
         acc.merge!(v.changes)
       end
     end
@@ -114,6 +116,7 @@ module Logidze
 
     def ==(other)
       return super unless other.is_a?(self.class)
+
       data == other.data
     end
 

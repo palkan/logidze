@@ -11,6 +11,7 @@ module Logidze
 
     def ignore_exceptions
       return unless block_given?
+
       begin
         yield
       rescue StandardError

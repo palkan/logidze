@@ -37,6 +37,7 @@ module Logidze
 
       def inject_logidze_to_model
         return if update?
+
         indents = "  " * (class_name.scan("::").count + 1)
 
         inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze\n")
@@ -84,6 +85,7 @@ module Logidze
         def timestamp_column
           value = options[:timestamp_column] || 'updated_at'
           return if %w(nil null false).include?(value)
+
           escape_pgsql_string(value)
         end
 
@@ -97,11 +99,13 @@ module Logidze
 
         def format_pgsql_array(ruby_array)
           return if ruby_array.blank?
+
           "'{" + ruby_array.join(', ') + "}'"
         end
 
         def escape_pgsql_string(string)
           return if string.blank?
+
           "'#{string}'"
         end
 

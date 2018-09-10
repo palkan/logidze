@@ -144,6 +144,7 @@ module Logidze
     def undo!(append: Logidze.append_on_undo)
       version = log_data.previous_version
       return false if version.nil?
+
       switch_to!(version.version, append: append)
     end
 
@@ -152,6 +153,7 @@ module Logidze
     def redo!
       version = log_data.next_version
       return false if version.nil?
+
       switch_to!(version.version)
     end
 
@@ -206,6 +208,7 @@ module Logidze
 
     def apply_column_diff(column, value)
       return if deleted_column?(column)
+
       write_attribute column, deserialize_value(column, value)
     end
 
