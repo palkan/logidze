@@ -24,6 +24,7 @@ module Logidze
 
     def suppress_output
       return yield if ENV['LOG'].present?
+
       retval = nil
       begin
         original_stderr = $stderr.clone
