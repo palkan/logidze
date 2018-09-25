@@ -10,7 +10,7 @@ module Logidze
 
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
-      class_option :debounce_time, type: :numeric, optional: true, desc: "Specify debounce time in which 2 logs will be merged"
+      class_option :debounce_time, type: :numeric, optional: true, desc: "Specify debounce time"
 
       class_option :backfill, type: :boolean, optional: true,
                               desc: "Add query to backfill existing records history"
@@ -89,6 +89,10 @@ module Logidze
           return if %w(nil null false).include?(value)
 
           escape_pgsql_string(value)
+        end
+
+        def debounce_time
+          options[:debounce_time]
         end
 
         def logidze_logger_parameters
