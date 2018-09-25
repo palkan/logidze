@@ -109,6 +109,42 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
       $body$
       LANGUAGE plpgsql;
 
+      CREATE OR REPLACE FUNCTION logidze_merge_recent(log_data jsonb, debounce_time integer) RETURNS jsonb AS $body$
+        DECLARE
+          merged jsonb;
+        BEGIN
+          IF (
+            (
+              (log_data#>'{h,-1,ts}')::text::bigint - (log_data#>'{h,-2,ts}')::text::bigint
+            ) <= debounce_time
+          ) THEN
+            merged := jsonb_build_object(
+              'ts',
+              log_data#>'{h,-1,ts}',
+              'v',
+              log_data#>'{h,-1,v}',
+              'c',
+              (log_data#>'{h,-2,c}') || (log_data#>'{h,-1,c}')
+            );
+
+            IF (log_data#>'{h,-1}' ? 'm') THEN
+              merged := jsonb_set(merged, ARRAY['m'], log_data#>'{h,-1,m}');
+            END IF;
+          END IF;
+
+          return jsonb_set(
+            log_data,
+            '{h}',
+            jsonb_set(
+              log_data->'h',
+              '{-1}',
+              merged
+            ) - -2
+          );
+        END;
+      $body$
+      LANGUAGE plpgsql;
+
       CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         DECLARE
           changes jsonb;
@@ -117,6 +153,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
           new_v integer;
           size integer;
           history_limit integer;
+          debounce_time integer;
           current_version integer;
           merged jsonb;
           iterator integer;
@@ -146,6 +183,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
             END IF;
 
             history_limit := NULLIF(TG_ARGV[0], 'null');
+            debounce_time := NULLIF(TG_ARGV[4], 'null');
+
             current_version := (NEW.log_data->>'v')::int;
 
             IF ts_column IS NULL THEN
@@ -205,6 +244,11 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
             IF history_limit IS NOT NULL AND history_limit = size THEN
               NEW.log_data := logidze_compact_history(NEW.log_data);
             END IF;
+
+            IF debounce_time IS NOT NULL THEN
+              NEW.log_data := logidze_merge_recent(NEW.log_data, debounce_time);
+            END IF;
+
           END IF;
 
           return NEW;
