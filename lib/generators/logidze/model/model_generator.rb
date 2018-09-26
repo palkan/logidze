@@ -10,7 +10,8 @@ module Logidze
 
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
-      class_option :debounce_time, type: :numeric, optional: true, desc: "Specify debounce time in millisecond"
+      class_option :debounce_time, type: :numeric, optional: true,
+                                   desc: "Specify debounce time in millisecond"
 
       class_option :backfill, type: :boolean, optional: true,
                               desc: "Add query to backfill existing records history"
