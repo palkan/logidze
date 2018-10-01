@@ -197,12 +197,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
               (version->>'ts')::bigint - (NEW.log_data#>'{h,-1,ts}')::text::bigint <= debounce_time
             ) THEN
               -- merge new version with the previous one
-              version := NEW.log_data#>'{h,-1}' || version;
-              version := jsonb_set(
-                version,
-                '{c}',
-                (NEW.log_data#>'{h,-1,c}')::jsonb || (version->>'c')::jsonb
-              );
+              new_v := (NEW.log_data#>>'{h,-1,v}')::int;
+              version := logidze_version(new_v, (NEW.log_data#>'{h,-1,c}')::jsonb || changes, ts, columns_blacklist);
               -- remove the previous version from log
               NEW.log_data := jsonb_set(
                 NEW.log_data,

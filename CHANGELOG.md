@@ -2,6 +2,33 @@
 
 ## master
 
+## 0.8.0 (2018-10-01)
+
+- [PR [#87](https://github.com/palkan/logidze/pull/87)] Adding debounce time to avoid spamming changelog creation
+
+Usage:
+
+```
+rails generate logidze:model story --debounce_time=5000
+```
+
+You see the following in generated migration
+
+```sql
+CREATE TRIGGER logidze_on_stories
+      BEFORE UPDATE OR INSERT ON stories FOR EACH ROW
+      WHEN (coalesce(#{current_setting('logidze.disabled')}, '') <> 'on')
+      EXECUTE PROCEDURE logidze_logger(null, 'updated_at', null, 5000);
+```
+
+How to upgrade.
+
+Please run `rails generate logidze:install --update` to regenerate stored functions.
+
+This feature checks if several logs came in within a debounce time period then only keep the latest one by merging the latest onto olders.
+
+The concept is similar to https://underscorejs.org/#debounce
+
 ## 0.7.0 (2018-08-29)
 
 - [Fixes [#75](https://github.com/palkan/logidze/issues/70)] Fix association versioning with an optional belongs to ([@ankursethi-uscis][])
@@ -72,7 +99,7 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 
 ## 0.5.1 (2017-06-15)
 
-- _(Fix)_ Drop *all* created functions upon rolling back (https://github.com/palkan/logidze/commit/b8e150cc18b3316a8cf0c78f7117339481fb49c6). ([@vassilevsky][])
+- _(Fix)_ Drop _all_ created functions upon rolling back (https://github.com/palkan/logidze/commit/b8e150cc18b3316a8cf0c78f7117339481fb49c6). ([@vassilevsky][])
 
 ## 0.5.0 (2017-03-28)
 
@@ -123,4 +150,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@akxcv]: https://github.com/akxcv
 [@vassilevsky]: https://github.com/vassilevsky
 [@ankursethi-uscis]: https://github.com/ankursethi-uscis
-[@DmitryTsepelev]: https://github.com/DmitryTsepelev
+[@dmitrytsepelev]: https://github.com/DmitryTsepelev

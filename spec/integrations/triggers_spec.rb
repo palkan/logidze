@@ -513,7 +513,7 @@ describe "Logidze triggers", :db do
       Timecop.freeze(Time.at(1_000_001)) do
         post.update!(rating: 100)
       end
-      expect(post.reload.log_version).to eq 2
+      expect(post.reload.log_version).to eq 1
       expect(post.log_size).to eq 1
       expect(post.log_data.versions.last.changes)
         .to include("title" => "Triggers", "rating" => 100)
@@ -532,7 +532,7 @@ describe "Logidze triggers", :db do
       Timecop.freeze(Time.at(1_000_101)) do
         post.update!(title: "Debounced")
       end
-      expect(post.reload.log_version).to eq 3
+      expect(post.reload.log_version).to eq 2
       expect(post.log_size).to eq 2
       expect(post.log_data.versions.last.changes)
         .to include("title" => "Debounced", "rating" => 100)
@@ -541,7 +541,7 @@ describe "Logidze triggers", :db do
         post.update!(active: true)
       end
 
-      expect(post.reload.log_version).to eq 4
+      expect(post.reload.log_version).to eq 3
       expect(post.log_size).to eq 3
     end
   end
