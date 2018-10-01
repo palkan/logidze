@@ -52,6 +52,15 @@ end
         end
       end
 
+      context "with debounce_time" do
+        let(:args) { ["user", "--debounce_time=5000"] }
+
+        it "creates trigger with debounce_time" do
+          is_expected.to exist
+          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, 5000\);/i)
+        end
+      end
+
       context "with columns blacklist" do
         let(:args) { ["user", "--blacklist", "age", "active"] }
 

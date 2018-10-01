@@ -117,6 +117,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
           new_v integer;
           size integer;
           history_limit integer;
+          debounce_time integer;
           current_version integer;
           merged jsonb;
           iterator integer;
@@ -126,7 +127,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
           ts_column text;
         BEGIN
           ts_column := NULLIF(TG_ARGV[1], 'null');
-          columns_blacklist := TG_ARGV[2];
+          columns_blacklist := COALESCE(NULLIF(TG_ARGV[2], 'null'), '{}');
 
           IF TG_OP = 'INSERT' THEN
             snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
@@ -146,6 +147,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
             END IF;
 
             history_limit := NULLIF(TG_ARGV[0], 'null');
+            debounce_time := NULLIF(TG_ARGV[3], 'null');
+
             current_version := (NEW.log_data->>'v')::int;
 
             IF ts_column IS NULL THEN
@@ -187,6 +190,21 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
 
             IF version->>'c' = '{}' THEN
               RETURN NEW;
+            END IF;
+
+            IF (
+              debounce_time IS NOT NULL AND
+              (version->>'ts')::bigint - (NEW.log_data#>'{h,-1,ts}')::text::bigint <= debounce_time
+            ) THEN
+              -- merge new version with the previous one
+              new_v := (NEW.log_data#>>'{h,-1,v}')::int;
+              version := logidze_version(new_v, (NEW.log_data#>'{h,-1,c}')::jsonb || changes, ts, columns_blacklist);
+              -- remove the previous version from log
+              NEW.log_data := jsonb_set(
+                NEW.log_data,
+                '{h}',
+                (NEW.log_data->'h') - (size - 1)
+              );
             END IF;
 
             NEW.log_data := jsonb_set(
