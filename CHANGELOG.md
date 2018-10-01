@@ -2,13 +2,12 @@
 
 ## master
 
-## 0.8.0 (2018-10-01)
-
-- [PR [#87](https://github.com/palkan/logidze/pull/87)] Adding debounce time to avoid spamming changelog creation
+- [PR [#87](https://github.com/palkan/logidze/pull/87)] Adding debounce time to avoid spamming changelog creation ([@zocoi][])
 
 Usage:
 
 ```
+# 5000ms
 rails generate logidze:model story --debounce_time=5000
 ```
 
@@ -25,9 +24,67 @@ How to upgrade.
 
 Please run `rails generate logidze:install --update` to regenerate stored functions.
 
-This feature checks if several logs came in within a debounce time period then only keep the latest one by merging the latest onto olders.
+This feature checks if several logs came in within a debounce time period then only keep the latest one
+by merging the latest in previous others.
 
 The concept is similar to https://underscorejs.org/#debounce
+
+without `debounce_time`
+
+```
+{
+    "h": [
+        {
+            "c": {
+                "content": "Content 1"
+            },
+            "v": 1,
+            "ts": 0
+        },
+        {
+            "c": {
+                "content": "content 2",
+                "active": true
+            },
+            "v": 2,
+            "ts": 100
+        },
+        {
+            "c": {
+                "content": "content 3",
+            },
+            "v": 3,
+            "ts": 101
+        }
+    ],
+    "v": 3
+}
+```
+
+with `debounce_time` of `10ms`
+
+```
+{
+    "h": [
+        {
+            "c": {
+                "content": "Content 1"
+            },
+            "v": 1,
+            "ts": 0
+        },
+        {
+            "c": {
+                "content": "content 3",
+                "active": true
+            },
+            "v": 2,
+            "ts": 101
+        }
+    ],
+    "v": 3
+}
+```
 
 ## 0.7.0 (2018-08-29)
 
@@ -151,3 +208,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@vassilevsky]: https://github.com/vassilevsky
 [@ankursethi-uscis]: https://github.com/ankursethi-uscis
 [@dmitrytsepelev]: https://github.com/DmitryTsepelev
+[@zocoi]: https://github.com/zocoi
