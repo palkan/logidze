@@ -2,6 +2,8 @@
 
 ## master
 
+## 0.8.0 (2018-10-01)
+
 - [PR [#87](https://github.com/palkan/logidze/pull/87)] Adding debounce time to avoid spamming changelog creation ([@zocoi][])
 
 Usage:
