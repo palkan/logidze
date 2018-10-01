@@ -6,7 +6,7 @@
 
 Usage:
 
-```
+```shell
 # 5000ms
 rails generate logidze:model story --debounce_time=5000
 ```
@@ -31,7 +31,7 @@ The concept is similar to https://underscorejs.org/#debounce
 
 without `debounce_time`
 
-```
+```js
 {
     "h": [
         {
@@ -63,7 +63,7 @@ without `debounce_time`
 
 with `debounce_time` of `10ms`
 
-```
+```js
 {
     "h": [
         {
