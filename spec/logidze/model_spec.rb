@@ -557,4 +557,18 @@ describe Logidze::Model, :db do
       end
     end
   end
+
+  describe '#log_size' do
+    subject { user.log_size }
+
+    it { is_expected.to eq(user.log_data.size) }
+
+    context 'when model created within a without_logging block' do
+      let(:user) { User.create!(name: 'test') }
+
+      before { Logidze.without_logging { user } }
+
+      it { is_expected.to be_zero }
+    end
+  end
 end
