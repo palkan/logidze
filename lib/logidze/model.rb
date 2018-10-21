@@ -196,9 +196,7 @@ module Logidze
     # rubocop: enable Metrics/MethodLength
 
     def log_size
-      return 0 unless log_data
-
-      log_data.size
+      log_data&.size || 0
     end
 
     protected
