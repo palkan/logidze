@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 module Logidze
-  VERSION = "0.8.0"
+  VERSION = "0.8.0-=patch.1"
 end
