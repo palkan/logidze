@@ -25,7 +25,7 @@ module Logidze
         attribute :log_data, Logidze::History::Type.new
       end
 
-      delegate :version, :size, to: :log_data, prefix: "log"
+      delegate :version, to: :log_data, prefix: "log"
     end
 
     module ClassMethods # :nodoc:
@@ -194,6 +194,10 @@ module Logidze
       association
     end
     # rubocop: enable Metrics/MethodLength
+
+    def log_size
+      log_data&.size || 0
+    end
 
     protected
 
