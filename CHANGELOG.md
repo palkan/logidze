@@ -2,6 +2,10 @@
 
 ## master
 
+## 0.8.1 (2018-10-22)
+
+- [PR #93](https://github.com/palkan/logidze/pull/93)] Return 0 for log size when log_data is nil ([@duderman][])
+
 ## 0.8.0 (2018-10-01)
 
 - [PR [#87](https://github.com/palkan/logidze/pull/87)] Adding debounce time to avoid spamming changelog creation ([@zocoi][])
@@ -211,3 +215,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@ankursethi-uscis]: https://github.com/ankursethi-uscis
 [@dmitrytsepelev]: https://github.com/DmitryTsepelev
 [@zocoi]: https://github.com/zocoi
+[@duderman]: https://github.com/duderman
