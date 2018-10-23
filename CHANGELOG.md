@@ -215,3 +215,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@ankursethi-uscis]: https://github.com/ankursethi-uscis
 [@dmitrytsepelev]: https://github.com/DmitryTsepelev
 [@zocoi]: https://github.com/zocoi
+[@duderman]: https://github.com/duderman
