@@ -2,6 +2,24 @@
 
 ## master
 
+- PR [#98](https://github.com/palkan/logidze/pull/98) Add `:ignore_log_data` option to `#has_logidze` ([@dmitrytsepelev][])
+
+Usage:
+
+```ruby
+class User < ActiveRecord::Base
+  has_logidze ignore_log_data: true
+end
+
+User.all #=> SELECT id, name FROM users
+
+User.with_log_data #=> SELECT id, name, log_data FROM users
+
+user = User.find(params[:id])
+user.log_data #=> ActiveModel::MissingAttributeError
+user.log_data! #=> Logidze::History
+```
+
 ## 0.8.1 (2018-10-22)
 
 - [PR #93](https://github.com/palkan/logidze/pull/93)] Return 0 for log size when log_data is nil ([@duderman][])

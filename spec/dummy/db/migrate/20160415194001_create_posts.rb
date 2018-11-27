@@ -5,6 +5,7 @@ class CreatePosts < ActiveRecord::Migration[5.0]
       t.integer :rating
       t.boolean :active
       t.jsonb :meta
+      t.references :user
 
       t.timestamps null: false
     end

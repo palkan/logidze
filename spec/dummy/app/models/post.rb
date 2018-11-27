@@ -5,6 +5,8 @@ class Post < ActiveRecord::Base
 
   has_logidze
 
+  belongs_to :user
+
   def reload
     self.errored = nil
     super

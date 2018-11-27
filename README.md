@@ -204,6 +204,16 @@ Alternatively, you can configure Logidze to always default to `append: true`.
 Logidze.append_on_undo = true
 ```
 
+If you want to reduce the data loaded from the DB, you can turn off automatic loading of `log_data` column in the following way:
+
+```ruby
+class User < ActiveRecord::Base
+  has_logidze ignore_log_data: true
+end
+```
+
+After that, each time you use `User.all` (or any other relation method) `log_data` won't be loaded from the DB. If you try to call `#log_data` on the model loaded in a such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g. during the console debugging) - use the bang version (`user.log_data!`), which forces loading the column from the DB. If you need to select `log_data` during the initial load - use a special scope `User.with_log_data`.
+
 
 ## Track meta information
 
