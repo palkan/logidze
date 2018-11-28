@@ -10,7 +10,7 @@ module Logidze
       def log_data
         return attributes["log_data"] if attributes["log_data"].is_a?(Logidze::History)
 
-        attributes["log_data"] = Logidze::History::Type.new.cast_value(super)
+        self.log_data = Logidze::History::Type.new.cast_value(super)
       end
     end
   end

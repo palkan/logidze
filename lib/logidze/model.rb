@@ -199,6 +199,11 @@ module Logidze
       log_data&.size || 0
     end
 
+    # Loads log_data field from the database, stores to the attributes hash and returns it
+    def reload_log_data
+      self.log_data = self.class.where(self.class.primary_key => id).pluck(:log_data).first
+    end
+
     protected
 
     def apply_diff(version, diff)

@@ -26,9 +26,5 @@ module Logidze
         select(column_names + ["log_data"])
       end
     end
-
-    def log_data!
-      attributes["log_data"] ||= self.class.where(id: id).pluck(:log_data).first
-    end
   end
 end

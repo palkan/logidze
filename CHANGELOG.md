@@ -17,7 +17,7 @@ User.with_log_data #=> SELECT id, name, log_data FROM users
 
 user = User.find(params[:id])
 user.log_data #=> ActiveModel::MissingAttributeError
-user.log_data! #=> Logidze::History
+user.reload_log_data #=> Logidze::History
 ```
 
 ## 0.8.1 (2018-10-22)

@@ -300,6 +300,13 @@ describe Logidze::Model, :db do
     end
   end
 
+  describe ".reload_log_data" do
+    it "returns log_data" do
+      expect(User).to receive(:where).and_call_original
+      expect(user.reload_log_data).to eq(user.log_data)
+    end
+  end
+
   context "Versioned associations" do
     before(:all) { Logidze.associations_versioning = true }
 
