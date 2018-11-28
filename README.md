@@ -186,6 +186,12 @@ post.redo!
 post.switch_to!(2)
 ```
 
+You can initiate reloading of `log_data` from the DB:
+
+```ruby
+post.reload_log_data # => returns the latest log data value
+```
+
 Normally, if you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no
 longer possible. However, you can provide an `append: true` option to `#undo!` or `#switch_to!`, which will
 create a new version with old data. Caveat: when switching to a newer version, `append` will have no effect.
@@ -212,7 +218,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-After that, each time you use `User.all` (or any other relation method) `log_data` won't be loaded from the DB. If you try to call `#log_data` on the model loaded in a such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g. during the console debugging) - use the bang version (`user.log_data!`), which forces loading the column from the DB. If you need to select `log_data` during the initial load - use a special scope `User.with_log_data`.
+After that, each time you use `User.all` (or any other relation method) `log_data` won't be loaded from the DB. If you try to call `#log_data` on the model loaded in a such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g. during the console debugging) - use `user.reload_log_data`, which forces loading the column from the DB. If you need to select `log_data` during the initial load - use a special scope `User.with_log_data`.
 
 
 ## Track meta information

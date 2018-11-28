@@ -31,14 +31,15 @@ describe Logidze::IgnoreLogData, :db do
     end
   end
 
-  shared_context "test #log_data!" do
-    context "#log_data!" do
+  shared_context "test #reload_log_data" do
+    context "#reload_log_data" do
       it "loads data from DB" do
-        expect(post.log_data!).not_to be_nil
+        expect(post.reload_log_data).not_to be_nil
+        expect(post.log_data).not_to be_nil
       end
 
       it "deserializes log_data properly" do
-        expect(post.log_data!).to be_a(Logidze::History)
+        expect(post.reload_log_data).to be_a(Logidze::History)
       end
     end
   end
@@ -47,7 +48,7 @@ describe Logidze::IgnoreLogData, :db do
     subject(:post) { NotLoggedPost.find(source_post.id) }
 
     include_context "test #log_data"
-    include_context "test #log_data!"
+    include_context "test #reload_log_data"
   end
 
   context "with .with_log_data" do
@@ -61,11 +62,6 @@ describe Logidze::IgnoreLogData, :db do
       it "deserializes log_data properly" do
         expect(post.log_data).to be_a(Logidze::History)
       end
-    end
-
-    it "avoids reloading data from DB on log_data! call" do
-      expect(NotLoggedPost).not_to receive(:where)
-      post.log_data!
     end
   end
 
@@ -81,6 +77,6 @@ describe Logidze::IgnoreLogData, :db do
     subject(:post) { User.eager_load(:not_logged_posts).last.not_logged_posts.last }
 
     include_context "test #log_data"
-    include_context "test #log_data!"
+    include_context "test #reload_log_data"
   end
 end
