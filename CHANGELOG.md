@@ -2,6 +2,8 @@
 
 ## master
 
+## 0.9.0 (2018-11-28)
+
 - PR [#98](https://github.com/palkan/logidze/pull/98) Add `:ignore_log_data` option to `#has_logidze` ([@dmitrytsepelev][])
 
 Usage:
