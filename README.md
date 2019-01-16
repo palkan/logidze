@@ -145,7 +145,7 @@ post.log_size #=> 3
 old_post = post.at(time: 2.days.ago)
 
 # or revert the record itself to the previous state (without committing to DB)
-post.at!(time: '201-04-15 12:00:00')
+post.at!(time: '2018-04-15 12:00:00')
 
 # If no version found
 post.at(time: '1945-05-09 09:00:00') #=> nil
