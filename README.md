@@ -216,7 +216,7 @@ By default, Active Record _selects_ all the table columns when no explicit `sele
 
 That could slow down queries execution if you have field values which exceed the size of the data block (typically 8KB). PostgreSQL turns on its [TOAST](https://wiki.postgresql.org/wiki/TOAST) mechanism), which requires reading from multiple physical locations for fetching the row's data.
 
-If you do not use [compaction]() for `log_data`, you're likely face this problem.
+If you do not use compaction (`generate logidze:model ... --limit N`) for `log_data`, you're likely face this problem.
 
 Logidze provides a way to avoid loading `log_data` by default (and load it on demand):
 
