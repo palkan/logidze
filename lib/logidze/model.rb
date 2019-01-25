@@ -53,6 +53,11 @@ module Logidze
         true
       end
       # rubocop: enable Naming/PredicateName
+
+      # Nullify log_data column for a association
+      def reset_log_data
+        without_logging { update_all(log_data: nil) }
+      end
     end
 
     # Use this to convert Ruby time to milliseconds
@@ -202,6 +207,11 @@ module Logidze
     # Loads log_data field from the database, stores to the attributes hash and returns it
     def reload_log_data
       self.log_data = self.class.where(self.class.primary_key => id).pluck(:log_data).first
+    end
+
+    # Nullify log_data column for a single record
+    def reset_log_data
+      self.class.without_logging { update_column(:log_data, nil) }
     end
 
     protected
