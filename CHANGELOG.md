@@ -2,6 +2,22 @@
 
 ## master
 
+- PR [#111](https://github.com/palkan/logidze/pull/111) Global configuration for `:ignore_log_data` option ([@dmitrytsepelev][])
+
+Now it's possible to avoid loading `log_data` from the DB by default with
+
+```ruby
+Logidze.ignore_log_data_by_default = true
+```
+
+In cases when `ignore_log_data: false` is explicitly passed to the `ignore_log_data` the default setting is being overriden. Also, it's possible to change it inside the block:
+
+```ruby
+Logidze.with_log_data do
+  Post.find(params[:id]).log_data
+end
+```
+
 - PR [#110](https://github.com/palkan/logidze/pull/110) Add `reset_log_data` API to nullify log_data column ([@Arkweid][])
 
 Usage:

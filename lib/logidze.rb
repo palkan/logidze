@@ -18,23 +18,48 @@ module Logidze
   class << self
     # Determines if Logidze should append a version to the log after updating an old version.
     attr_accessor :append_on_undo
+
     attr_writer :associations_versioning
 
     def associations_versioning
       @associations_versioning || false
     end
-  end
 
-  # Temporary disable DB triggers.
-  #
-  # @example
-  #   Logidze.without_logging { Post.update_all(active: true) }
-  def self.without_logging
-    ActiveRecord::Base.transaction do
-      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO on;"
-      res = yield
-      ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO DEFAULT;"
-      res
+    # Determines if Logidze should exclude log data from SELECT statements
+    attr_writer :ignore_log_data_by_default
+
+    def ignore_log_data_by_default
+      @ignore_log_data_by_default || false
+    end
+
+    attr_writer :force_load_log_data
+
+    def force_load_log_data
+      @force_load_log_data || false
+    end
+
+    # Temporary disable DB triggers.
+    #
+    # @example
+    #   Logidze.without_logging { Post.update_all(active: true) }
+    def without_logging
+      ActiveRecord::Base.transaction do
+        ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO on;"
+        res = yield
+        ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO DEFAULT;"
+        res
+      end
+    end
+
+    # Temporary turn off ignore_log_data_by_default config
+    #
+    # @example
+    #   Logidze.with_log_data { Post.update_all(active: true) }
+    def with_log_data
+      Logidze.force_load_log_data = true
+      yield
+    ensure
+      Logidze.force_load_log_data = false
     end
   end
 end

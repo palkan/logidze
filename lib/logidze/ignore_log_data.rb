@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Logidze
-  # Add `has_logidze` method to AR::Base
-  module IgnoreLogData
+  module IgnoreLogData # :nodoc:
     extend ActiveSupport::Concern
 
     included do
@@ -16,14 +15,19 @@ module Logidze
 
         require "logidze/ignore_log_data/missing_attribute_patch"
         include MissingAttributePatch
+
+        require "logidze/ignore_log_data/default_scope_patch"
+        include DefaultScopePatch
       end
 
       self.ignored_columns += ["log_data"]
+
+      scope :with_log_data, -> { select(column_names + ["log_data"]) }
     end
 
-    module ClassMethods # :nodoc:
-      def with_log_data
-        select(column_names + ["log_data"])
+    class_methods do
+      def self.default_scope
+        ignores_log_data? ? super : super.with_log_data
       end
     end
   end

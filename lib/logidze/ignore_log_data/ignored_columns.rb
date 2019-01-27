@@ -16,7 +16,7 @@ module Logidze
         private
 
         def build_select(arel)
-          if select_values.blank? && klass.ignored_columns.any?
+          if select_values.blank? && klass.ignored_columns.any? && ignores_log_data?
             arel.project(*arel_columns(klass.column_names - klass.ignored_columns))
           else
             super

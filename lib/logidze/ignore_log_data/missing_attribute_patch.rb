@@ -7,7 +7,9 @@ module Logidze
     # from Rails 4 - raise ActiveModel::MissingAttributeError
     module MissingAttributePatch
       def log_data
-        raise ActiveModel::MissingAttributeError if attributes["log_data"].nil?
+        if self.class.ignores_log_data? && attributes["log_data"].nil?
+          raise ActiveModel::MissingAttributeError
+        end
 
         super
       end
