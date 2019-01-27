@@ -14,69 +14,93 @@ describe Logidze::IgnoreLogData, :db do
       # Close active connections to handle db variables
       ActiveRecord::Base.connection_pool.disconnect!
     end
-
-    Post.reset_column_information
-    # For Rails 4
-    Post.instance_variable_set(:@attribute_names, nil)
   end
 
   let(:user) { User.create! }
-  let!(:source_post) { Post.create!(user: user) }
+  let!(:post) { NotLoggedPost.create!(user: user) }
 
-  shared_context "test #log_data" do
-    context "#log_data" do
-      it "raises error when log_data is called" do
-        expect { post.log_data }.to raise_error(ActiveModel::MissingAttributeError)
-      end
-    end
-  end
-
-  shared_context "test #reload_log_data" do
-    context "#reload_log_data" do
-      it "loads data from DB" do
-        expect(post.reload_log_data).not_to be_nil
-        expect(post.log_data).not_to be_nil
-      end
-
-      it "deserializes log_data properly" do
-        expect(post.reload_log_data).to be_a(Logidze::History)
-      end
-    end
-  end
-
-  context "with .all" do
-    subject(:post) { NotLoggedPost.find(source_post.id) }
-
-    include_context "test #log_data"
-    include_context "test #reload_log_data"
-  end
-
-  context "with .with_log_data" do
-    subject(:post) { NotLoggedPost.with_log_data.find(source_post.id) }
-
-    context "#log_data" do
-      it "loads log_data" do
-        expect(post.log_data).not_to be_nil
-      end
-
-      it "deserializes log_data properly" do
-        expect(post.log_data).to be_a(Logidze::History)
-      end
-    end
-  end
-
-  context "#update!" do
+  describe "#update!" do
     it "updates log_data" do
       expect do
-        NotLoggedPost.find(source_post.id).update!(title: "new")
-      end.to change { Post.find(source_post.id).log_data.version }.by(1)
+        NotLoggedPost.find(post.id).update!(title: "new")
+      end.to change { Post.find(post.id).log_data.version }.by(1)
     end
   end
 
-  context "with .eager_load" do
-    subject(:post) { User.eager_load(:not_logged_posts).last.not_logged_posts.last }
+  describe "#log_data" do
+    shared_examples "test loads #log_data" do
+      it "loads log_data" do
+        expect(subject.log_data).not_to be_nil
+        expect(subject.log_data).to be_a(Logidze::History)
+      end
+    end
 
-    include_context "test #log_data"
-    include_context "test #reload_log_data"
+    shared_examples "test raises error when #log_data is called" do
+      it "raises error when #log_data is called" do
+        expect { subject.reload.log_data }.to raise_error(ActiveModel::MissingAttributeError)
+      end
+    end
+
+    context "when Logidze.ignore_log_data_by_default = true" do
+      before(:all) { Logidze.ignore_log_data_by_default = true }
+      after(:all) { Logidze.ignore_log_data_by_default = false }
+
+      subject { Post.create! }
+
+      include_examples "test raises error when #log_data is called"
+
+      context "when inside Logidze.with_log_data block" do
+        it "loads log_data" do
+          Logidze.with_log_data do
+            expect(subject.reload.log_data).not_to be_nil
+          end
+        end
+      end
+    end
+
+    context "when model is configured with has_logidze(ignore_log_data: false)" do
+      context "when Logidze.ignore_log_data_by_default = true" do
+        before(:all) { Logidze.ignore_log_data_by_default = true }
+        after(:all) { Logidze.ignore_log_data_by_default = false }
+
+        subject { AlwaysLoggedPost.find(post.id) }
+        include_examples "test loads #log_data"
+      end
+    end
+
+    context "when model is configured with has_logidze(ignore_log_data: true)" do
+      shared_context "test #reload_log_data" do
+        context "#reload_log_data" do
+          it "loads data from DB" do
+            expect(subject.reload_log_data).not_to be_nil
+            expect(subject.log_data).not_to be_nil
+          end
+
+          it "deserializes log_data properly" do
+            expect(subject.reload_log_data).to be_a(Logidze::History)
+          end
+        end
+      end
+
+      context "with default scope" do
+        subject { NotLoggedPost.find(post.id) }
+
+        include_examples "test raises error when #log_data is called"
+        include_context "test #reload_log_data"
+      end
+
+      context ".with_log_data" do
+        subject { NotLoggedPost.with_log_data.find(post.id) }
+
+        include_examples "test loads #log_data"
+      end
+
+      describe ".eager_load" do
+        subject(:model) { User.eager_load(:not_logged_posts).last.not_logged_posts.last }
+
+        include_examples "test raises error when #log_data is called"
+        include_context "test #reload_log_data"
+      end
+    end
   end
 end

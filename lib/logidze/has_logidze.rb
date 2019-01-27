@@ -10,9 +10,19 @@ module Logidze
       # Include methods to work with history.
       #
       # rubocop:disable Naming/PredicateName
-      def has_logidze(ignore_log_data: false)
+      def has_logidze(ignore_log_data: nil)
         include Logidze::Model
-        include Logidze::IgnoreLogData if ignore_log_data
+        include Logidze::IgnoreLogData
+
+        @ignore_log_data = ignore_log_data
+      end
+
+      def ignores_log_data?
+        if @ignore_log_data.nil? && Logidze.ignore_log_data_by_default
+          !Logidze.force_load_log_data
+        else
+          @ignore_log_data
+        end
       end
     end
   end

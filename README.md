@@ -227,7 +227,21 @@ class User < ActiveRecord::Base
 end
 ```
 
-After that, each time you use `User.all` (or any other relation method) `log_data` won't be loaded from the DB.
+If you want Logidze to always behave this way - you can set up a global configuration option:
+
+```ruby
+Rails.application.config.logidze.ignore_log_data_by_default = true
+```
+
+However, you can override it by explicitly passing `ignore_log_data: false` to the `ignore_log_data`. Also, it's possible to change it temporary inside the block:
+
+```ruby
+Logidze.with_log_data do
+  Post.find(params[:id]).log_data
+end
+```
+
+When `ignore_log_data` is turned on, each time you use `User.all` (or any other relation method) `log_data` won't be loaded from the DB.
 
 The chart below shows the difference in PG query time before and after turning `ignore_log_data` on. (Special thanks to [@aderyabin](https://github.com/aderyabin) for sharing it.)
 
