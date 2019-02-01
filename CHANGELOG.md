@@ -13,7 +13,7 @@ Reset the history for a record (or records):
 record.reset_log_data
 
 # for relation
-User.where(...).reset_log_data
+User.where(active: true).reset_log_data
 ```
 
 ## 0.9.0 (2018-11-28)
