@@ -304,6 +304,18 @@ Logidze.without_logging { Post.update_all(seen: true) }
 Post.without_logging { Post.update_all(seen: true) }
 ```
 
+## Reset log
+
+Reset the history for a record (or records):
+
+```ruby
+# for single record
+record.reset_log_data
+
+# for relation
+User.where(active: true).reset_log_data
+```
+
 ## Log format
 
 The `log_data` column has the following format:
