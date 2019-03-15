@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "logidze/ignore_log_data/association"
+
 module Logidze
   module IgnoreLogData # :nodoc:
     extend ActiveSupport::Concern
@@ -25,10 +27,25 @@ module Logidze
       scope :with_log_data, -> { select(column_names + ["log_data"]) }
     end
 
-    class_methods do
+    module ClassMethods # :nodoc:
       def self.default_scope
         ignores_log_data? ? super : super.with_log_data
       end
+    end
+
+    def association(name)
+      association = super
+
+      should_load_log_data =
+        attributes["log_data"] &&
+        association.klass.respond_to?(:has_logidze?) &&
+        !association.singleton_class.include?(Logidze::IgnoreLogData::Association)
+
+      return association unless should_load_log_data
+
+      association.singleton_class.prepend(Logidze::IgnoreLogData::Association)
+
+      association
     end
   end
 end
