@@ -9,6 +9,7 @@ describe Logidze::IgnoreLogData, :db do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       successfully "rails generate logidze:install"
       successfully "rails generate logidze:model post"
+      successfully "rails generate logidze:model post_comment"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
@@ -100,6 +101,19 @@ describe Logidze::IgnoreLogData, :db do
 
         include_examples "test raises error when #log_data is called"
         include_context "test #reload_log_data"
+      end
+    end
+
+    describe "associations" do
+      context "when owner has loaded log_data" do
+        before { post.comments.create(content: 'New comment') }
+
+        subject do
+          loaded = NotLoggedPost.with_log_data.find(post.id)
+          loaded.comments[0]
+        end
+
+        include_examples "test loads #log_data"
       end
     end
   end

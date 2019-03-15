@@ -4,4 +4,5 @@ class NotLoggedPost < ActiveRecord::Base
   self.table_name = "posts"
 
   belongs_to :user
+  has_many :comments, class_name: "NotLoggedPostComment", foreign_key: :post_id
 end
