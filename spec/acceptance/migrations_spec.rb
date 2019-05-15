@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "acceptance_helper"
 
 describe "Logidze migrations" do

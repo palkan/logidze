@@ -1,19 +1,20 @@
 # frozen_string_literal: true
+
 require "logidze/version"
 
 # Logidze provides tools for adding in-table JSON-based audit to DB tables
 # and ActiveRecord extensions to work with changes history.
 module Logidze
-  require 'logidze/history'
-  require 'logidze/model'
-  require 'logidze/versioned_association'
-  require 'logidze/ignore_log_data'
-  require 'logidze/has_logidze'
-  require 'logidze/meta'
+  require "logidze/history"
+  require "logidze/model"
+  require "logidze/versioned_association"
+  require "logidze/ignore_log_data"
+  require "logidze/has_logidze"
+  require "logidze/meta"
 
   extend Logidze::Meta
 
-  require 'logidze/engine' if defined?(Rails)
+  require "logidze/engine" if defined?(Rails)
 
   class << self
     # Determines if Logidze should append a version to the log after updating an old version.

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'active_model/type'
+require "active_model/type"
 
 module Logidze
   class History

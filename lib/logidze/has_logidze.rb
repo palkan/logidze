@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require 'active_support'
+
+require "active_support"
 
 module Logidze
   # Add `has_logidze` method to AR::Base
@@ -9,7 +10,6 @@ module Logidze
     module ClassMethods # :nodoc:
       # Include methods to work with history.
       #
-      # rubocop:disable Naming/PredicateName
       def has_logidze(ignore_log_data: nil)
         include Logidze::Model
         include Logidze::IgnoreLogData

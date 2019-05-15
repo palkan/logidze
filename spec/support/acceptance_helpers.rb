@@ -23,7 +23,7 @@ module Logidze
     end
 
     def suppress_output
-      return yield if ENV['LOG'].present?
+      return yield if ENV["LOG"].present?
 
       retval = nil
       begin

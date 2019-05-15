@@ -17,14 +17,14 @@ When changeset has 2 fields:
 
 ```
 PaperTrail UPDATE #1    256.651  (±26.5%) i/s -      1.206k in   5.002300s
-   Logidze UPDATE #1    356.932  (±12.6%) i/s -      1.764k in   5.030560s
+Logidze UPDATE #1    356.932  (±12.6%) i/s -      1.764k in   5.030560s
 ```
 
 When changeset has 5 fields:
 
 ```
 PaperTrail UPDATE #2    246.281  (±24.0%) i/s -      1.168k in   5.008234s
-   Logidze UPDATE #2    331.942  (±16.6%) i/s -      1.593k in   5.028135s
+Logidze UPDATE #2    331.942  (±16.6%) i/s -      1.593k in   5.028135s
 ```
 
 ## Getting diff ([source](diff_bench.rb))

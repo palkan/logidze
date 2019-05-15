@@ -1,15 +1,16 @@
 # frozen_string_literal: true
-require 'active_support/core_ext/module/delegation'
+
+require "active_support/core_ext/module/delegation"
 
 module Logidze
   # Log data wrapper
   class History
-    require 'logidze/history/version'
+    require "logidze/history/version"
 
     # History key
-    HISTORY = 'h'
+    HISTORY = "h"
     # Version key
-    VERSION = 'v'
+    VERSION = "v"
 
     attr_reader :data
 
@@ -128,7 +129,7 @@ module Logidze
 
     def build_changes(a, b)
       b.each_with_object({}) do |(k, v), acc|
-        acc[k] = { "old" => a[k], "new" => v } unless v == a[k]
+        acc[k] = {"old" => a[k], "new" => v} unless v == a[k]
       end
     end
 

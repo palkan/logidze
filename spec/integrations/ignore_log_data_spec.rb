@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 require "acceptance_helper"
 
@@ -106,7 +107,7 @@ describe Logidze::IgnoreLogData, :db do
 
     describe "associations" do
       context "when owner has loaded log_data" do
-        before { post.comments.create(content: 'New comment') }
+        before { post.comments.create(content: "New comment") }
 
         subject do
           loaded = NotLoggedPost.with_log_data.find(post.id)

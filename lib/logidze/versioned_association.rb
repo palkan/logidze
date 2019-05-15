@@ -12,7 +12,6 @@ end
 
 module Logidze # :nodoc: all
   module VersionedAssociation
-    # rubocop: disable Metrics/MethodLength, Metrics/AbcSize
     def load_target
       target = super
       return unless target

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require 'active_support'
+
+require "active_support"
 
 module Logidze
   module Deprecations # :nodoc:
@@ -12,9 +13,8 @@ module Logidze
   end
 
   # Extends model with methods to browse history
-  # rubocop: disable Metrics/ModuleLength
   module Model
-    require 'logidze/history/type' if Rails::VERSION::MAJOR >= 5
+    require "logidze/history/type" if Rails::VERSION::MAJOR >= 5
 
     extend ActiveSupport::Concern
 
@@ -141,7 +141,7 @@ module Logidze
 
       changes.delete_if { |k, _v| deleted_column?(k) }
 
-      { "id" => id, "changes" => changes }
+      {"id" => id, "changes" => changes}
     end
 
     # Restore record to the previous version.

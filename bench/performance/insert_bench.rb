@@ -1,5 +1,7 @@
-require 'benchmark/ips'
-require './setup'
+# frozen_string_literal: true
+
+require "benchmark/ips"
+require "./setup"
 
 params = {
   email: Faker::Internet.email,
@@ -10,11 +12,11 @@ params = {
 }
 
 Benchmark.ips do |x|
-  x.report('PaperTrail INSERT') do
+  x.report("PaperTrail INSERT") do
     User.create!(params)
   end
 
-  x.report('Logidze INSERT') do
+  x.report("Logidze INSERT") do
     LogidzeUser.create!(params)
   end
 end

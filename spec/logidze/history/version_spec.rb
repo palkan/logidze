@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 
 describe Logidze::History::Version do
   describe "#responsible_id" do
     it "takes value from meta" do
-      subject = described_class.new('m' => { Logidze::History::Version::META_RESPONSIBLE => 2 })
+      subject = described_class.new("m" => {Logidze::History::Version::META_RESPONSIBLE => 2})
       expect(subject.responsible_id).to eq(2)
     end
 
@@ -16,7 +17,7 @@ describe Logidze::History::Version do
     it "prefers meta value over the root one" do
       subject = described_class.new(
         Logidze::History::Version::RESPONSIBLE => 1,
-        'm' => { Logidze::History::Version::META_RESPONSIBLE => 2 }
+        "m" => {Logidze::History::Version::META_RESPONSIBLE => 2}
       )
       expect(subject.responsible_id).to eq(2)
     end

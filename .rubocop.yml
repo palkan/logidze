@@ -1,94 +1,55 @@
 require:
+  - standard/cop/semantic_blocks
   - rubocop-md
 
+inherit_gem:
+  standard: config/base.yml
+
 AllCops:
-  # Include gemspec and Rakefile
-  Include:
-    - 'lib/**/*.rb'
-    - 'lib/**/*.rake'
-    - 'spec/**/*.rb'
   Exclude:
-    - 'bin/**/*'
-    - 'spec/dummy/**/*'
+    - 'bin/*'
+    - 'tmp/**/*'
+    - 'docs/**/*'
+    - 'Gemfile'
     - 'vendor/**/*'
     - 'gemfiles/**/*'
-    - 'tmp/**/*'
-    - 'bench/**/*'
-    - 'Rakefile'
-    - 'Gemfile'
-    - '*.gemspec'
   DisplayCopNames: true
-  StyleGuideCopsOnly: false
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.4
 
-Naming/AccessorMethodName:
+Standard/SemanticBlocks:
   Enabled: false
 
-Naming/UncommunicativeMethodParamName:
-  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: true
 
-Style/TrivialAccessors:
-  Enabled: false
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: no_comma
 
-Style/Documentation:
-  Exclude:
-    - 'spec/**/*.rb'
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: no_comma
 
-Style/StringLiterals:
-  Enabled: false
+Layout/AlignParameters:
+  EnforcedStyle: with_first_parameter
 
-Layout/SpaceInsideStringInterpolation:
-  EnforcedStyle: no_space
-
-Style/BlockDelimiters:
-  Exclude:
-    - 'spec/**/*.rb'
-
-Style/PercentLiteralDelimiters:
-  Enabled: false
-
-Lint/AmbiguousRegexpLiteral:
-  Enabled: false
-
-Lint/MissingCopEnableDirective:
-  Enabled: false
-
-Lint/UselessAssignment:
+Lint/Void:
   Exclude:
     - '**/*.md'
 
-Metrics/MethodLength:
+# See https://github.com/rubocop-hq/rubocop/issues/4222
+Lint/AmbiguousBlockAssociation:
   Exclude:
-    - 'spec/**/*.rb'
+    - 'spec/**/*'
+    - '**/*.md'
 
-Metrics/BlockLength:
+Lint/DuplicateMethods:
   Exclude:
-    - 'spec/**/*.rb'
+    - '**/*.md'
 
-Metrics/LineLength:
-  Max: 100
+Naming/FileName:
   Exclude:
-    - 'spec/**/*.rb'
+    - 'lib/test-prof.rb'
+    - '**/*.md'
 
-Rails/Date:
-  Enabled: false
-
-Rails/TimeZone:
-  Enabled: false
-
-Style/NumericLiteralPrefix:
-  Enabled: false
-
-Lint/HandleExceptions:
-  Enabled: true
+Layout/InitialIndentation:
   Exclude:
-    - 'spec/**/*.rb'
-
-Layout/DotPosition:
-  EnforcedStyle: leading
-
-Layout/IndentHeredoc:
-  Enabled: false
-
-Layout/EmptyLineAfterMagicComment:
-  Enabled: false
+    - 'CHANGELOG.md'
