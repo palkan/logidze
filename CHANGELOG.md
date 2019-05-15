@@ -2,6 +2,8 @@
 
 ## master
 
+- **Ruby >= 2.4 is required**
+
 - PR [#111](https://github.com/palkan/logidze/pull/111) Global configuration for `:ignore_log_data` option ([@dmitrytsepelev][])
 
 Now it's possible to avoid loading `log_data` from the DB by default with
