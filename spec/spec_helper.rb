@@ -1,16 +1,13 @@
 # frozen_string_literal: true
 ENV["RAILS_ENV"] = "test"
 
-require "pry-byebug"
+begin
+  require "pry-byebug"
+rescue LoadError
+end
+
 require "ammeter"
 require "timecop"
-
-if ENV['COVER']
-  require 'simplecov'
-  SimpleCov.root File.join(File.dirname(__FILE__), '..')
-  SimpleCov.add_filter "/spec/"
-  SimpleCov.start
-end
 
 require File.expand_path('dummy/config/environment', __dir__)
 
