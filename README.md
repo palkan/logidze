@@ -13,7 +13,7 @@ Currently, only PostgreSQL 9.5+ is supported (for PostgreSQL 9.4 try [jsonbx](ht
 [How is Logidze pronounced?](https://github.com/palkan/logidze/issues/73)
 
 Other requirements:
-- Ruby >= 2.4
+- Ruby ~> 2.1
 - Rails >= 4.2 (**Rails 6 is supported**)
 
 <a href="https://evilmartians.com/">
@@ -33,7 +33,7 @@ Install required DB extensions and create trigger function:
 rails generate logidze:install
 ```
 
-This creates migration for adding trigger function and enabling hstore extension.
+This creates a migration for adding trigger function and enabling the hstore extension.
 
 Run migrations:
 
@@ -57,13 +57,13 @@ rake db:migrate
 
 This also adds `has_logidze` line to your model, which adds methods for working with logs.
 
-You can provide `limit` option to `generate` to limit the size of the log (by default it's unlimited):
+You can provide the `limit` option to `generate` to limit the size of the log (by default it's unlimited):
 
 ```sh
 rails generate logidze:model Post --limit=10
 ```
 
-To backfill table data (i.e. create initial snapshots) add `backfill` option:
+To backfill table data (i.e., create initial snapshots) add `backfill` option:
 
 ```sh
 rails generate logidze:model Post --backfill
@@ -78,7 +78,7 @@ rails generate logidze:model Post --blacklist=created_at active
 rails generate logidze:model Post --whitelist=title body
 ```
 
-By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case you should specify the path explicitly:
+By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case, you should specify the path explicitly:
 
 ```sh
 rails generate logidze:model Post --path "app/models/custom/post.rb"
@@ -101,7 +101,7 @@ If you want to update Logidze settings for the model, run migration with `--upda
 rails generate logidze:model Post --update --whitelist=title body rating
 ```
 
-Logidze also supports associations versioning. It is experimental feature, and disabled by default. You can learn more
+Logidze also supports associations versioning. It is an experimental feature and disabled by default. You can learn more
 in the [wiki](https://github.com/palkan/logidze/wiki/Associations-versioning).
 
 ## Troubleshooting
@@ -118,7 +118,7 @@ Nevertheless, you still need super-user privileges to enable `hstore` extension 
 
 ## Upgrade from previous versions
 
-We try to make upgrade process as simple as possible. For now, the only required action is to create and run a migration:
+We try to make an upgrade process as simple as possible. For now, the only required action is to create and run a migration:
 
 ```sh
 rails generate logidze:install --update
@@ -128,7 +128,7 @@ This updates core `logdize_logger` DB function. No need to update tables or trig
 
 ## Usage
 
-Your model now has `log_data` column which stores changes log.
+Your model now has `log_data` column, which stores changes log.
 
 To retrieve record version at a given time use `#at` or `#at!` methods:
 
@@ -192,7 +192,7 @@ You can initiate reloading of `log_data` from the DB:
 post.reload_log_data # => returns the latest log data value
 ```
 
-Normally, if you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no
+Typically, if you update record after `#undo!` or `#switch_to!` you lose all "future" versions and `#redo!` is no
 longer possible. However, you can provide an `append: true` option to `#undo!` or `#switch_to!`, which will
 create a new version with old data. Caveat: when switching to a newer version, `append` will have no effect.
 
@@ -204,7 +204,7 @@ post.undo!(append: true)                 # v3 (with same attributes as v1)
 
 Note that `redo!` will not work after `undo!(append: true)` because the latter will create a new version
 instead of rolling back to an old one.
-Alternatively, you can configure Logidze to always default to `append: true`.
+Alternatively, you can configure Logidze always to default to `append: true`.
 
 ```ruby
 Logidze.append_on_undo = true
@@ -216,7 +216,7 @@ By default, Active Record _selects_ all the table columns when no explicit `sele
 
 That could slow down queries execution if you have field values which exceed the size of the data block (typically 8KB). PostgreSQL turns on its [TOAST](https://wiki.postgresql.org/wiki/TOAST) mechanism), which requires reading from multiple physical locations for fetching the row's data.
 
-If you do not use compaction (`generate logidze:model ... --limit N`) for `log_data`, you're likely face this problem.
+If you do not use compaction (`generate logidze:model ... --limit N`) for `log_data`, you're likely to face this problem.
 
 Logidze provides a way to avoid loading `log_data` by default (and load it on demand):
 
@@ -227,7 +227,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-If you want Logidze to always behave this way - you can set up a global configuration option:
+If you want Logidze always to behave this way - you can set up a global configuration option:
 
 ```ruby
 Rails.application.config.logidze.ignore_log_data_by_default = true
@@ -241,19 +241,19 @@ Logidze.with_log_data do
 end
 ```
 
-When `ignore_log_data` is turned on, each time you use `User.all` (or any other relation method) `log_data` won't be loaded from the DB.
+When `ignore_log_data` is turned on, each time you use `User.all` (or any other Relation method) `log_data` won't be loaded from the DB.
 
 The chart below shows the difference in PG query time before and after turning `ignore_log_data` on. (Special thanks to [@aderyabin](https://github.com/aderyabin) for sharing it.)
 
 ![](./assets/pg_log_data_chart.png)
 
-If you try to call `#log_data` on the model loaded in a such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g. during the console debugging) - use **`user.reload_log_data`**, which forces loading the column from the DB.
+If you try to call `#log_data` on the model loaded in such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g., during the console debugging) - use **`user.reload_log_data`**, which forces loading the column from the DB.
 
 If you need to select `log_data` during the initial load-use a special scope `User.with_log_data`.
 
 ## Track meta information
 
-You can store any meta information you want inside your version (it could be IP address, user agent etc). In order to add it you should wrap your code with a block:
+You can store any meta information you want inside your version (it could be IP address, user agent, etc.). To add it you should wrap your code with a block:
 
 ```ruby
 Logidze.with_meta(ip: request.ip) do
@@ -281,7 +281,7 @@ And then to retrieve `responsible_id`:
 post.log_data.responsible_id
 ```
 
-Logidze does not require `responsible_id` to be `SomeModel` ID. It can be anything. Thus Logidze does not provide methods for retrieving the corresponding object. However, you can easy write it yourself:
+Logidze does not require `responsible_id` to be `SomeModel` ID. It can be anything. Thus Logidze does not provide methods for retrieving the corresponding object. However, you can easily write it yourself:
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -308,7 +308,7 @@ end
 
 ## Disable logging temporary
 
-If you want to make update without logging (e.g. mass update), you can turn it off the following way:
+If you want to make update without logging (e.g., mass update), you can turn it off the following way:
 
 ```ruby
 Logidze.without_logging { Post.update_all(seen: true) }
@@ -323,7 +323,7 @@ Post.without_logging { Post.update_all(seen: true) }
 Reset the history for a record (or records):
 
 ```ruby
-# for single record
+# for a single record
 record.reset_log_data
 
 # for relation
@@ -356,7 +356,7 @@ The `log_data` column has the following format:
 }
 ```
 
-If you specify the limit in the trigger definition then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
+If you specify the limit in the trigger definition, then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
 
 ## Development
 
@@ -366,8 +366,7 @@ For development setup run `./bin/setup`. This runs `bundle install` and creates 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/palkan/logidze.
 
-
-## TODO
+## Future ideas
 
 - Enhance update_all to support mass-logging.
 - Other DB adapters.
