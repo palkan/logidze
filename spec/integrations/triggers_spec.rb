@@ -466,6 +466,8 @@ describe "Logidze triggers", :db do
         ActiveRecord::Base.connection_pool.disconnect!
       end
 
+      # Start new transaction 'cause we closed the previous one on disconnect
+      ActiveRecord::Base.connection.begin_transaction(joinable: false)
       post2 = Post.create!(params).reload
 
       changes2 = post2.log_data.current_version.changes

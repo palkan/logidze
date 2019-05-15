@@ -3,7 +3,6 @@ ENV["RAILS_ENV"] = "test"
 
 require "pry-byebug"
 require "ammeter"
-require "database_cleaner"
 require "timecop"
 
 if ENV['COVER']
@@ -33,11 +32,11 @@ RSpec.configure do |config|
 
   config.include Logidze::TestHelpers
 
-  DatabaseCleaner.strategy = :transaction
+  config.before(:each, db: true) do
+    ActiveRecord::Base.connection.begin_transaction(joinable: false)
+  end
 
-  config.around(:each, db: true) do |example|
-    DatabaseCleaner.start
-    example.run
-    DatabaseCleaner.clean
+  config.append_after(:each, db: true) do
+    ActiveRecord::Base.connection.rollback_transaction
   end
 end

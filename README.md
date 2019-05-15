@@ -13,8 +13,8 @@ Currently, only PostgreSQL 9.5+ is supported (for PostgreSQL 9.4 try [jsonbx](ht
 [How is Logidze pronounced?](https://github.com/palkan/logidze/issues/73)
 
 Other requirements:
-- Ruby ~> 2.1
-- Rails >= 4.2
+- Ruby >= 2.4
+- Rails >= 4.2 (**Rails 6 is supported**)
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
