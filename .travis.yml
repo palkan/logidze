@@ -4,6 +4,9 @@ cache: bundler
 dist: trusty
 sudo: false
 
+notifications:
+  email: false
+
 addons:
   postgresql: "9.6"
 
@@ -16,7 +19,7 @@ before_script:
   - gem update --system
   - bundle exec rake dummy:db:create
   - psql -U postgres -d logidze -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
-  - bundle exec rake dummy:db:test:prepare
+  - RAILS_ENV=test bundle exec rake dummy:db:create dummy:db:migrate
 
 matrix:
   include:
