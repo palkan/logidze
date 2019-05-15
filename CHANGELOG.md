@@ -1,6 +1,8 @@
 # Change log
 
-## master
+## master (unreleased)
+
+## 0.10.0 (2019-05-15)
 
 - **Ruby >= 2.4 is required**
 
