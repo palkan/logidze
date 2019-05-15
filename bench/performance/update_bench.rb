@@ -1,5 +1,7 @@
-require 'benchmark/ips'
-require './setup'
+# frozen_string_literal: true
+
+require "benchmark/ips"
+require "./setup"
 
 params = {
   age: Faker::Number.number(2),
@@ -18,19 +20,19 @@ LogidzeBench.cleanup
 LogidzeBench.populate
 
 Benchmark.ips do |x|
-  x.report('PT UPDATE #1') do
+  x.report("PT UPDATE #1") do
     User.random.update!(params)
   end
 
-  x.report('Logidze UPDATE #1') do
+  x.report("Logidze UPDATE #1") do
     LogidzeUser.random.update!(params)
   end
 
-  x.report('PT UPDATE #2') do
+  x.report("PT UPDATE #2") do
     User.random.update!(params2)
   end
 
-  x.report('Logidze UPDATE #2') do
+  x.report("Logidze UPDATE #2") do
     LogidzeUser.random.update!(params2)
   end
 end

@@ -1,21 +1,22 @@
 # frozen_string_literal: true
-require 'spec_helper'
+
+require "spec_helper"
 
 describe Logidze::Model, :db do
   let(:user) do
     User.create!(
-      name: 'test',
+      name: "test",
       age: 10,
       active: false,
       log_data: {
-        'v' => 5,
-        'h' =>
+        "v" => 5,
+        "h" =>
           [
-            { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } },
-            { 'v' => 2, 'ts' => time(200), 'c' => { 'active' => true } },
-            { 'v' => 3, 'ts' => time(200), 'r' => 1, 'c' => { 'name' => 'test' }, 'm' => { 'some_key' => 'old_val' } },
-            { 'v' => 4, 'ts' => time(300), 'c' => { 'age' => 0 } },
-            { 'v' => 5, 'ts' => time(400), 'c' => { 'age' => 10, 'active' => false }, 'm' => { '_r' => 2, 'some_key' => 'current_val' } }
+            {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil}},
+            {"v" => 2, "ts" => time(200), "c" => {"active" => true}},
+            {"v" => 3, "ts" => time(200), "r" => 1, "c" => {"name" => "test"}, "m" => {"some_key" => "old_val"}},
+            {"v" => 4, "ts" => time(300), "c" => {"age" => 0}},
+            {"v" => 5, "ts" => time(400), "c" => {"age" => 10, "active" => false}, "m" => {"_r" => 2, "some_key" => "current_val"}}
           ]
       }
     )
@@ -24,7 +25,7 @@ describe Logidze::Model, :db do
   describe "#at(time)" do
     it "returns version at specified time", :aggregate_failures do
       user_old = user.at(time: time(350))
-      expect(user_old.name).to eq 'test'
+      expect(user_old.name).to eq "test"
       expect(user_old.age).to eq 0
       expect(user_old.active).to eq true
     end
@@ -52,20 +53,20 @@ describe Logidze::Model, :db do
 
     it "handles time as string", :aggregate_failures do
       user_old = user.at(time: "2016-04-12 12:05:50")
-      expect(user_old.name).to eq 'test'
+      expect(user_old.name).to eq "test"
       expect(user_old.age).to eq 0
       expect(user_old.active).to eq true
     end
 
     it "handles time as Time", :aggregate_failures do
-      user_old = user.at(time: Time.new(2016, 04, 12, 12, 05, 50))
-      expect(user_old.name).to eq 'test'
+      user_old = user.at(time: Time.new(2016, 0o4, 12, 12, 0o5, 50))
+      expect(user_old.name).to eq "test"
       expect(user_old.age).to eq 0
       expect(user_old.active).to eq true
     end
 
     it "handles time as Date", :aggregate_failures do
-      user_old = user.at(time: Date.new(2016, 04, 13))
+      user_old = user.at(time: Date.new(2016, 0o4, 13))
       expect(user_old).to be_equal user
     end
   end
@@ -73,7 +74,7 @@ describe Logidze::Model, :db do
   describe "#at(version)" do
     it "returns specified version", :aggregate_failures do
       user_old = user.at(version: 4)
-      expect(user_old.name).to eq 'test'
+      expect(user_old.name).to eq "test"
       expect(user_old.age).to eq 0
       expect(user_old.active).to eq true
     end
@@ -83,7 +84,7 @@ describe Logidze::Model, :db do
     it "update object in-place", :aggregate_failures do
       user.at!(time: time(350))
 
-      expect(user.name).to eq 'test'
+      expect(user.name).to eq "test"
       expect(user.age).to eq 0
       expect(user.active).to eq true
 
@@ -98,8 +99,8 @@ describe Logidze::Model, :db do
           "id" => user.id,
           "changes" =>
             {
-              "age" => { "old" => 0, "new" => 10 },
-              "active" => { "old" => true, "new" => false }
+              "age" => {"old" => 0, "new" => 10},
+              "active" => {"old" => true, "new" => false}
             }
         )
     end
@@ -109,7 +110,7 @@ describe Logidze::Model, :db do
     it "revert record to previous state", :aggregate_failures do
       expect(user.undo!).to eq true
       user.reload
-      expect(user.name).to eq 'test'
+      expect(user.name).to eq "test"
       expect(user.age).to eq 0
       expect(user.active).to eq true
     end
@@ -135,10 +136,10 @@ describe Logidze::Model, :db do
     it "return false no possible undo" do
       u = User.create!(
         log_data: {
-          'v' => 1,
-          'h' =>
+          "v" => 1,
+          "h" =>
           [
-            { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } }
+            {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil}}
           ]
         }
       )
@@ -156,7 +157,7 @@ describe Logidze::Model, :db do
     it "revert record to future state", :aggregate_failures do
       expect(user.redo!).to eq true
       user.reload
-      expect(user.name).to eq 'test'
+      expect(user.name).to eq "test"
       expect(user.age).to eq 10
       expect(user.active).to eq false
     end
@@ -165,7 +166,7 @@ describe Logidze::Model, :db do
       user.undo!
       user.reload
 
-      expect(user.name).to eq 'test'
+      expect(user.name).to eq "test"
       expect(user.age).to be_nil
       expect(user.active).to eq true
 
@@ -173,7 +174,7 @@ describe Logidze::Model, :db do
       user.redo!
       user.reload
 
-      expect(user.name).to eq 'test'
+      expect(user.name).to eq "test"
       expect(user.age).to eq 10
       expect(user.active).to eq false
     end
@@ -181,10 +182,10 @@ describe Logidze::Model, :db do
     it "return false no possible redo" do
       u = User.create!(
         log_data: {
-          'v' => 1,
-          'h' =>
+          "v" => 1,
+          "h" =>
           [
-            { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } }
+            {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil}}
           ]
         }
       )
@@ -198,7 +199,7 @@ describe Logidze::Model, :db do
       expect(user.switch_to!(3)).to eq true
       user.reload
       expect(user.log_version).to eq 3
-      expect(user.name).to eq 'test'
+      expect(user.name).to eq "test"
       expect(user.age).to be_nil
       expect(user.active).to eq true
     end
@@ -214,7 +215,7 @@ describe Logidze::Model, :db do
     it "returns reverted records", :aggregate_failures do
       u = User.at(time: time(350)).first
 
-      expect(u.name).to eq 'test'
+      expect(u.name).to eq "test"
       expect(u.age).to eq 0
       expect(u.active).to eq true
     end
@@ -222,7 +223,7 @@ describe Logidze::Model, :db do
     it "returns reverted records when called on relation", :aggregate_failures do
       u = User.where(active: false).order(age: :desc).at(time: time(350)).first
 
-      expect(u.name).to eq 'test'
+      expect(u.name).to eq "test"
       expect(u.age).to eq 0
       expect(u.active).to eq true
     end
@@ -230,10 +231,10 @@ describe Logidze::Model, :db do
     it "skips nil records" do
       User.create!(
         log_data: {
-          'v' => 1,
-          'h' =>
+          "v" => 1,
+          "h" =>
             [
-              { 'v' => 1, 'ts' => time(400), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil } }
+              {"v" => 1, "ts" => time(400), "c" => {"name" => nil, "age" => nil, "active" => nil}}
             ]
         }
       )
@@ -252,8 +253,8 @@ describe Logidze::Model, :db do
         "id" => user.id,
         "changes" =>
           {
-            "age" => { "old" => 0, "new" => 10 },
-            "active" => { "old" => true, "new" => false }
+            "age" => {"old" => 0, "new" => 10},
+            "active" => {"old" => true, "new" => false}
           }
       )
     end
@@ -265,8 +266,8 @@ describe Logidze::Model, :db do
         "id" => user.id,
         "changes" =>
           {
-            "age" => { "old" => 0, "new" => 10 },
-            "active" => { "old" => true, "new" => false }
+            "age" => {"old" => 0, "new" => 10},
+            "active" => {"old" => true, "new" => false}
           }
       )
     end
@@ -288,7 +289,7 @@ describe Logidze::Model, :db do
 
   describe "#meta" do
     it "returns meta for current version" do
-      expect(user.log_data.meta).to eq("_r" => 2, 'some_key' => 'current_val')
+      expect(user.log_data.meta).to eq("_r" => 2, "some_key" => "current_val")
     end
 
     it "returns nil if no information" do
@@ -296,7 +297,7 @@ describe Logidze::Model, :db do
     end
 
     it "returns meta for previous version" do
-      expect(user.at(time: time(250)).log_data.meta).to eq('some_key' => 'old_val')
+      expect(user.at(time: time(250)).log_data.meta).to eq("some_key" => "old_val")
     end
   end
 
@@ -312,17 +313,17 @@ describe Logidze::Model, :db do
 
     let(:user) do
       User.create(
-        name: 'John Doe',
+        name: "John Doe",
         age: 35,
         active: true,
         log_data: {
-          'v' => 4,
-          'h' =>
+          "v" => 4,
+          "h" =>
             [
-              { 'v' => 1, 'ts' => time(50), 'c' => { 'name' => 'John Harris', 'active' => false, 'age' => 45 } },
-              { 'v' => 2, 'ts' => time(150), 'c' => { 'active' => true, 'age' => 34 } },
-              { 'v' => 3, 'ts' => time(300), 'c' => { 'name' => 'John Doe Jr.', 'age' => 35 } },
-              { 'v' => 4, 'ts' => time(350), 'c' => { 'name' => 'John Doe' } }
+              {"v" => 1, "ts" => time(50), "c" => {"name" => "John Harris", "active" => false, "age" => 45}},
+              {"v" => 2, "ts" => time(150), "c" => {"active" => true, "age" => 34}},
+              {"v" => 3, "ts" => time(300), "c" => {"name" => "John Doe Jr.", "age" => 35}},
+              {"v" => 4, "ts" => time(350), "c" => {"name" => "John Doe"}}
             ]
         }
       )
@@ -330,39 +331,39 @@ describe Logidze::Model, :db do
 
     let(:article) do
       article = Article.create(
-        title: 'Post',
+        title: "Post",
         rating: 5,
         active: true,
         user: user,
         log_data: {
-          'v' => 4,
-          'h' =>
+          "v" => 4,
+          "h" =>
             [
-              { 'v' => 1, 'ts' => time(25), 'c' => { 'title' => 'Anonymous inactive', 'active' => false, user_id: nil } },
-              { 'v' => 2, 'ts' => time(100), 'c' => { 'title' => 'Cool article', 'active' => false, user_id: user.id } },
-              { 'v' => 3, 'ts' => time(200), 'c' => { 'title' => 'Article', 'active' => true } },
-              { 'v' => 4, 'ts' => time(300), 'c' => { 'rating' => 5, 'title' => 'Post' } }
+              {"v" => 1, "ts" => time(25), "c" => {"title" => "Anonymous inactive", "active" => false, :user_id => nil}},
+              {"v" => 2, "ts" => time(100), "c" => {"title" => "Cool article", "active" => false, :user_id => user.id}},
+              {"v" => 3, "ts" => time(200), "c" => {"title" => "Article", "active" => true}},
+              {"v" => 4, "ts" => time(300), "c" => {"rating" => 5, "title" => "Post"}}
             ]
         }
       )
       article.comments.create(
-        content: 'New comment',
+        content: "New comment",
         log_data: {
-          'v' => 2,
-          'h' =>
+          "v" => 2,
+          "h" =>
         [
-          { 'v' => 1, 'ts' => time(150), 'c' => { 'content' => 'My comment' } },
-          { 'v' => 2, 'ts' => time(250), 'c' => { 'content' => 'New comment' } }
+          {"v" => 1, "ts" => time(150), "c" => {"content" => "My comment"}},
+          {"v" => 2, "ts" => time(250), "c" => {"content" => "New comment"}}
         ]
         }
       )
       article.comments.create(
-        content: 'New comment 2',
+        content: "New comment 2",
         log_data: {
-          'v' => 1,
-          'h' =>
+          "v" => 1,
+          "h" =>
         [
-          { 'v' => 1, 'ts' => time(230), 'c' => { 'content' => 'New comment 2' } }
+          {"v" => 1, "ts" => time(230), "c" => {"content" => "New comment 2"}}
         ]
         }
       )
@@ -385,7 +386,7 @@ describe Logidze::Model, :db do
 
       describe "has_many" do
         it "returns not versioned association" do
-          expect(old_article.comments.first.content).to eql('New comment')
+          expect(old_article.comments.first.content).to eql("New comment")
         end
       end
     end
@@ -404,28 +405,28 @@ describe Logidze::Model, :db do
         end
 
         it "returns association version, according to the owner" do
-          expect(old_article.user.name).to eql('John Harris')
+          expect(old_article.user.name).to eql("John Harris")
           expect(very_old_article.user.age).to eql(45)
         end
 
         context "#at(version)" do
           let(:old_article) { article.at(version: 3) }
 
-          specify { expect(old_article.user.name).to eql('John Harris') }
+          specify { expect(old_article.user.name).to eql("John Harris") }
         end
 
-        context 'when owner was not changed at the given time' do
+        context "when owner was not changed at the given time" do
           it "still returns association version" do
             # this returns the same article object due to implementation
             not_changed_article = article.at(time: time(330))
-            expect(not_changed_article.user.name).to eql('John Doe Jr.')
+            expect(not_changed_article.user.name).to eql("John Doe Jr.")
           end
         end
       end
 
       describe "has_many" do
         it "returns association version, according to the owner" do
-          expect(old_article.comments.first.content).to eql('My comment')
+          expect(old_article.comments.first.content).to eql("My comment")
         end
 
         it "responds to #length correctly" do
@@ -444,7 +445,7 @@ describe Logidze::Model, :db do
         context "#at(version)" do
           let(:old_article) { article.at(version: 3) }
 
-          specify { expect(old_article.comments.first.content).to eql('My comment') }
+          specify { expect(old_article.comments.first.content).to eql("My comment") }
         end
 
         describe "Presence-like methods" do
@@ -471,7 +472,7 @@ describe Logidze::Model, :db do
 
         it "sets inversed association properly" do
           old_comment = old_article.comments.first
-          expect(old_comment.article.title).to eql('Article')
+          expect(old_comment.article.title).to eql("Article")
         end
       end
     end
@@ -480,18 +481,18 @@ describe Logidze::Model, :db do
   context "Serialized types" do
     let(:user) do
       User.create!(
-        name: 'test',
-        extra: { gender: 'X', social: { fb: [1, 2], vk: false } },
+        name: "test",
+        extra: {gender: "X", social: {fb: [1, 2], vk: false}},
         settings: %i[sms mail],
         log_data: {
-          'v' => 5,
-          'h' =>
+          "v" => 5,
+          "h" =>
             [
-              { 'v' => 1, 'ts' => time(100), 'c' => { 'name' => nil, 'age' => nil, 'active' => nil, 'extra' => nil, 'settings' => nil } },
-              { 'v' => 2, 'ts' => time(200), 'c' => { 'extra' => { 'gender' => 'M', 'social' => { 'fb' => [1] } }.to_json } },
-              { 'v' => 3, 'ts' => time(200), 'r' => 1, 'c' => { 'settings' => '{mail}' } },
-              { 'v' => 4, 'ts' => time(300), 'c' => { 'extra' => { 'gender' => 'F', 'social' => { 'fb' => [2] } }.to_json } },
-              { 'v' => 5, 'ts' => time(400), 'r' => 2, 'c' => { 'extra' => { 'gender' => 'X', 'social' => { 'fb' => [1, 2], 'vk' => false } }.to_json, 'settings' => '{sms,mail}' } }
+              {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil, "extra" => nil, "settings" => nil}},
+              {"v" => 2, "ts" => time(200), "c" => {"extra" => {"gender" => "M", "social" => {"fb" => [1]}}.to_json}},
+              {"v" => 3, "ts" => time(200), "r" => 1, "c" => {"settings" => "{mail}"}},
+              {"v" => 4, "ts" => time(300), "c" => {"extra" => {"gender" => "F", "social" => {"fb" => [2]}}.to_json}},
+              {"v" => 5, "ts" => time(400), "r" => 2, "c" => {"extra" => {"gender" => "X", "social" => {"fb" => [1, 2], "vk" => false}}.to_json, "settings" => "{sms,mail}"}}
             ]
         }
       )
@@ -500,14 +501,14 @@ describe Logidze::Model, :db do
     describe "#at" do
       it "returns version at specified time", :aggregate_failures do
         user_old = user.at(time: time(350))
-        expect(user_old.extra['gender']).to eq 'F'
-        expect(user_old.extra['social']).to eq('fb' => [2])
-        expect(user_old.settings).to eq(['mail'])
+        expect(user_old.extra["gender"]).to eq "F"
+        expect(user_old.extra["social"]).to eq("fb" => [2])
+        expect(user_old.settings).to eq(["mail"])
 
         user_old = user.at(time: time(250))
-        expect(user_old.extra['gender']).to eq 'M'
-        expect(user_old.extra['social']).to eq('fb' => [1])
-        expect(user_old.settings).to eq(['mail'])
+        expect(user_old.extra["gender"]).to eq "M"
+        expect(user_old.extra["social"]).to eq("fb" => [1])
+        expect(user_old.settings).to eq(["mail"])
       end
     end
 
@@ -518,8 +519,8 @@ describe Logidze::Model, :db do
             "id" => user.id,
             "changes" =>
               {
-                "extra" => { "old" => { "gender" => "M", "social" => { "fb" => [1] } }, "new" => { "gender" => "X", "social" => { "fb" => [1, 2], "vk" => false } } },
-                "settings" => { "old" => ['mail'], "new" => %w[sms mail] }
+                "extra" => {"old" => {"gender" => "M", "social" => {"fb" => [1]}}, "new" => {"gender" => "X", "social" => {"fb" => [1, 2], "vk" => false}}},
+                "settings" => {"old" => ["mail"], "new" => %w[sms mail]}
               }
           )
       end
@@ -529,14 +530,14 @@ describe Logidze::Model, :db do
   context "Schema changes" do
     let(:user) do
       User.create!(
-        name: 'test',
+        name: "test",
         log_data: {
-          'v' => 3,
-          'h' =>
+          "v" => 3,
+          "h" =>
             [
-              { 'v' => 1, 'ts' => time(100), 'c' => { 'age' => nil } },
-              { 'v' => 2, 'ts' => time(120), 'c' => { 'age' => 1, 'last_name' => 'Harry' } },
-              { 'v' => 3, 'ts' => time(200), 'c' => { 'name' => 'Harry', 'age' => 10 } }
+              {"v" => 1, "ts" => time(100), "c" => {"age" => nil}},
+              {"v" => 2, "ts" => time(120), "c" => {"age" => 1, "last_name" => "Harry"}},
+              {"v" => 3, "ts" => time(200), "c" => {"name" => "Harry", "age" => 10}}
             ]
         }
       )
@@ -545,7 +546,7 @@ describe Logidze::Model, :db do
     describe "#at" do
       it "returns version at specified time", :aggregate_failures do
         user_old = user.at(time: time(150))
-        expect(user_old.name).to eq 'test'
+        expect(user_old.name).to eq "test"
         expect(user_old.age).to eq 1
       end
     end
@@ -557,21 +558,21 @@ describe Logidze::Model, :db do
             "id" => user.id,
             "changes" =>
               {
-                "age" => { "old" => nil, "new" => 10 },
-                "name" => { "old" => nil, "new" => "Harry" }
+                "age" => {"old" => nil, "new" => 10},
+                "name" => {"old" => nil, "new" => "Harry"}
               }
           )
       end
     end
   end
 
-  describe '#log_size' do
+  describe "#log_size" do
     subject { user.log_size }
 
     it { is_expected.to eq(user.log_data.size) }
 
-    context 'when model created within a without_logging block' do
-      let(:user) { User.create!(name: 'test') }
+    context "when model created within a without_logging block" do
+      let(:user) { User.create!(name: "test") }
 
       before { Logidze.without_logging { user } }
 
@@ -579,28 +580,28 @@ describe Logidze::Model, :db do
     end
   end
 
-  describe '.reset_log_data' do
+  describe ".reset_log_data" do
     let!(:user2) { user.dup.tap(&:save!) }
     let!(:user3) { user.dup.tap(&:save!) }
 
     before { User.limit(2).reset_log_data }
 
-    it 'nullify log_data column for a association' do
+    it "nullify log_data column for a association" do
       expect(user.reload.log_size).to be_zero
       expect(user2.reload.log_size).to be_zero
     end
 
-    it 'not affect other model records' do
+    it "not affect other model records" do
       expect(user3.reload.log_size).to eq 5
     end
   end
 
-  describe '#reset_log_data' do
+  describe "#reset_log_data" do
     subject { user.log_size }
 
     before { user.reset_log_data }
 
-    it 'nullify log_data column for a single record' do
+    it "nullify log_data column for a single record" do
       is_expected.to be_zero
     end
   end

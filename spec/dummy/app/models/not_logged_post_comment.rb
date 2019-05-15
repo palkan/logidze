@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NotLoggedPostComment < ActiveRecord::Base
   has_logidze ignore_log_data: true
 

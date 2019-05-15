@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec::Matchers.define :use_timestamp do |expected|
   match do |record|
     record.log_data.current_version.time / 1000 == record.public_send(expected).to_i

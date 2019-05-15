@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Post < ActiveRecord::Base
   attr_accessor :errored
 
@@ -14,6 +16,6 @@ class Post < ActiveRecord::Base
 
   def is_errored
     return unless errored
-    errors.add(:base, 'Errored')
+    errors.add(:base, "Errored")
   end
 end

@@ -1,12 +1,14 @@
-require './setup'
-require 'active_support/core_ext'
-require 'memory_profiler'
+# frozen_string_literal: true
+
+require "./setup"
+require "active_support/core_ext"
+require "memory_profiler"
 
 # How many records do you want?
-N = (ENV['N'] || '10').to_i
+N = (ENV["N"] || "10").to_i
 
 # How many version each record has?
-V = (ENV['V'] || '10').to_i
+V = (ENV["V"] || "10").to_i
 
 LogidzeBench.cleanup
 LogidzeBench.populate(N)
@@ -17,6 +19,7 @@ module MemoryReport
   MEGA_BYTE = 1024 * 1024
 
   module_function
+
   def call(msg, relation)
     buffer = nil
     delta = N / 10
@@ -36,6 +39,7 @@ module MemoryReport
   end
 
   module_function
+
   def to_human_size(size)
     if size > MEGA_BYTE
       "#{(size.to_f / MEGA_BYTE).round(2)} MB"
@@ -47,7 +51,6 @@ module MemoryReport
   end
 end
 
-
-MemoryReport.("PT records", User.all)
-MemoryReport.("PT with versions", User.joins(:versions).all)
-MemoryReport.("Logidze records", LogidzeUser.all)
+MemoryReport.call("PT records", User.all)
+MemoryReport.call("PT with versions", User.joins(:versions).all)
+MemoryReport.call("Logidze records", LogidzeUser.all)

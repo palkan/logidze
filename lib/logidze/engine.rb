@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require 'logidze'
+
+require "logidze"
 
 module Logidze
   class Engine < Rails::Engine # :nodoc:

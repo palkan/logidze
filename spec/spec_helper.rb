@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+
 ENV["RAILS_ENV"] = "test"
 
 begin
   require "pry-byebug"
-rescue LoadError
+rescue LoadError # rubocop:disable Lint/HandleExceptions
 end
 
 require "ammeter"
 require "timecop"
 
-require File.expand_path('dummy/config/environment', __dir__)
+require File.expand_path("dummy/config/environment", __dir__)
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 

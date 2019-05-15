@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CustomUser < User
   validates :name, presence: true
 

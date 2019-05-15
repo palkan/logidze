@@ -10,7 +10,7 @@ module Logidze # :nodoc:
     def with_responsible(responsible_id, &block)
       return yield if responsible_id.nil?
 
-      meta = { Logidze::History::Version::META_RESPONSIBLE => responsible_id }
+      meta = {Logidze::History::Version::META_RESPONSIBLE => responsible_id}
       with_meta(meta, &block)
     end
 

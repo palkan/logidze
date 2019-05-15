@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 
 describe "Logidze::History::Type", :rails5 do
@@ -6,9 +7,9 @@ describe "Logidze::History::Type", :rails5 do
 
   describe "#cast" do
     it "handles hash" do
-      val = subject.cast('a' => 'b')
+      val = subject.cast("a" => "b")
       expect(val).to be_a(Logidze::History)
-      expect(val.data).to eq 'a' => 'b'
+      expect(val.data).to eq "a" => "b"
     end
 
     it "handles nil" do
@@ -20,7 +21,7 @@ describe "Logidze::History::Type", :rails5 do
     it "handles valid json" do
       val = subject.deserialize('{"a":"b"}')
       expect(val).to be_a(Logidze::History)
-      expect(val.data).to eq 'a' => 'b'
+      expect(val.data).to eq "a" => "b"
     end
 
     it "handles nil" do
@@ -34,7 +35,7 @@ describe "Logidze::History::Type", :rails5 do
     end
 
     it "handles history" do
-      expect(subject.serialize(Logidze::History.new('a' => 'b')))
+      expect(subject.serialize(Logidze::History.new("a" => "b")))
         .to eq '{"a":"b"}'
     end
   end

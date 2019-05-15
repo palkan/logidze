@@ -1,18 +1,19 @@
 # frozen_string_literal: true
+
 module Logidze
   class History
     # Represents one log item
     class Version
       # Timestamp key
-      TS = 'ts'
+      TS = "ts"
       # Changes key
-      CHANGES = 'c'
+      CHANGES = "c"
       # Responsible ID
-      RESPONSIBLE = 'r'
+      RESPONSIBLE = "r"
       # Meta Responsible ID
-      META_RESPONSIBLE = '_r'
+      META_RESPONSIBLE = "_r"
       # Meta key
-      META = 'm'
+      META = "m"
 
       attr_reader :data
 

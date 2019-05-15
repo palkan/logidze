@@ -1,19 +1,20 @@
 # frozen_string_literal: true
+
 require "acceptance_helper"
 
 describe "Logidze triggers", :db do
-  it 'cannot be used with both whitelist and blacklist options' do
+  it "cannot be used with both whitelist and blacklist options" do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post "\
                      "--whitelist=title --blacklist=created_at"
     end
   end
 
-  context 'without blacklisting' do
+  context "without blacklisting" do
     include_context "cleanup migrations"
 
     before(:all) do
-      @old_post = Post.create!(title: 'First', rating: 100, active: true)
+      @old_post = Post.create!(title: "First", rating: 100, active: true)
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post --limit 4 --backfill"
@@ -30,7 +31,7 @@ describe "Logidze triggers", :db do
 
     after(:all) { @old_post.destroy! }
 
-    let(:params) { { title: 'Triggers', rating: 10, active: false, meta: { tags: %w(some tag) } } }
+    let(:params) { {title: "Triggers", rating: 10, active: false, meta: {tags: %w[some tag]}} }
 
     describe "backfill" do
       let(:post) { Post.find(@old_post.id) }
@@ -63,11 +64,11 @@ describe "Logidze triggers", :db do
       let(:post) { Post.create!(params).reload }
 
       it "generates the correct diff", :aggregate_failures do
-        post.update!(meta: { tags: ['other'] })
+        post.update!(meta: {tags: ["other"]})
         diff = post.reload.diff_from(version: (post.reload.log_version - 1))["changes"]
         expected_diff_meta = {
-          "old" => { "tags" => %w(some tag) },
-          "new" => { "tags" => %w(other) }
+          "old" => {"tags" => %w[some tag]},
+          "new" => {"tags" => %w[other]}
         }
         expect(diff["meta"]["new"].class).to eq diff["meta"]["old"].class
         expect(diff["meta"]).to eq expected_diff_meta
@@ -143,7 +144,7 @@ describe "Logidze triggers", :db do
 
         it "creates several versions", :aggregate_failures do
           post.update!(rating: 0)
-          post.update!(title: 'Updated')
+          post.update!(title: "Updated")
           expect(post.log_data).to be_nil
 
           expect(post.reload.log_version).to eq 2
@@ -155,14 +156,14 @@ describe "Logidze triggers", :db do
     end
 
     describe "undo/redo" do
-      before(:all) { @post = Post.create!(title: 'Triggers', rating: 10) }
+      before(:all) { @post = Post.create!(title: "Triggers", rating: 10) }
       after(:all) { @post.destroy! }
 
       let(:post) { @post.reload }
 
       it "undo and redo" do
         post.update!(rating: 5)
-        post.update!(title: 'Good Triggers')
+        post.update!(title: "Good Triggers")
 
         expect(post.reload.log_version).to eq 3
         expect(post.log_size).to eq 3
@@ -170,25 +171,25 @@ describe "Logidze triggers", :db do
         post.undo!
         expect(post.reload.log_version).to eq 2
         expect(post.log_size).to eq 3
-        expect(post.title).to eq 'Triggers'
+        expect(post.title).to eq "Triggers"
         expect(post.rating).to eq 5
 
         post.undo!
         expect(post.reload.log_version).to eq 1
         expect(post.log_size).to eq 3
-        expect(post.title).to eq 'Triggers'
+        expect(post.title).to eq "Triggers"
         expect(post.rating).to eq 10
 
         post.redo!
         expect(post.reload.log_version).to eq 2
         expect(post.log_size).to eq 3
-        expect(post.title).to eq 'Triggers'
+        expect(post.title).to eq "Triggers"
         expect(post.rating).to eq 5
 
         post.redo!
         expect(post.reload.log_version).to eq 3
         expect(post.log_size).to eq 3
-        expect(post.title).to eq 'Good Triggers'
+        expect(post.title).to eq "Good Triggers"
         expect(post.rating).to eq 5
       end
 
@@ -200,7 +201,7 @@ describe "Logidze triggers", :db do
         expect(post.log_size).to eq 2
         expect(post.rating).to eq 10
 
-        post.update!(title: 'No Future')
+        post.update!(title: "No Future")
         expect(post.reload.log_version).to eq 2
         expect(post.log_size).to eq 2
 
@@ -232,7 +233,7 @@ describe "Logidze triggers", :db do
     end
 
     describe "switch_to!" do
-      before(:all) { @post = Post.create!(title: 'Triggers', rating: 10) }
+      before(:all) { @post = Post.create!(title: "Triggers", rating: 10) }
       after(:all) { @post.destroy! }
 
       let(:post) { @post.reload }
@@ -295,7 +296,7 @@ describe "Logidze triggers", :db do
     end
 
     describe "limit" do
-      before(:all) { @post = Post.create!(title: 'Triggers', rating: 10) }
+      before(:all) { @post = Post.create!(title: "Triggers", rating: 10) }
       after(:all) { @post.destroy! }
 
       let(:post) { @post.reload }
@@ -323,16 +324,16 @@ describe "Logidze triggers", :db do
     end
   end
 
-  context 'with blacklist' do
+  context "with blacklist" do
     include_context "cleanup migrations"
 
     before(:all) do
-      @blacklist = %w(updated_at created_at active)
+      @blacklist = %w[updated_at created_at active]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
-                     "--blacklist=#{@blacklist.join(' ')}"
+                     "--blacklist=#{@blacklist.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -344,7 +345,7 @@ describe "Logidze triggers", :db do
       Post.instance_variable_set(:@attribute_names, nil)
     end
 
-    let(:params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:params) { {title: "Triggers", rating: 10, active: false} }
     let(:updated_columns) { params.keys.map(&:to_s) }
 
     describe "insert" do
@@ -352,7 +353,7 @@ describe "Logidze triggers", :db do
 
       it "does not log blacklisted columns", :aggregate_failures do
         changes = post.log_data.current_version.changes
-        expect(changes.keys).to match_array Post.column_names - @blacklist - ['log_data']
+        expect(changes.keys).to match_array Post.column_names - @blacklist - ["log_data"]
       end
     end
 
@@ -369,7 +370,7 @@ describe "Logidze triggers", :db do
       end
 
       context "when only blacklisted columns are updated" do
-        let(:params) { { active: false } }
+        let(:params) { {active: false} }
 
         it "does not create new log entry", :aggregate_failures do
           old_log_size = post.log_data.size
@@ -382,16 +383,16 @@ describe "Logidze triggers", :db do
     end
   end
 
-  context 'with whitelist' do
+  context "with whitelist" do
     include_context "cleanup migrations"
 
     before(:all) do
-      @whitelist = %w(title rating)
+      @whitelist = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
-                     "--whitelist=#{@whitelist.join(' ')}"
+                     "--whitelist=#{@whitelist.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -403,7 +404,7 @@ describe "Logidze triggers", :db do
       Post.instance_variable_set(:@attribute_names, nil)
     end
 
-    let(:params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:params) { {title: "Triggers", rating: 10, active: false} }
 
     describe "insert" do
       let(:post) { Post.create!(params).reload }
@@ -432,12 +433,12 @@ describe "Logidze triggers", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      @whitelist = %w(title rating)
+      @whitelist = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
-                     "--whitelist=#{@whitelist.join(' ')}"
+                     "--whitelist=#{@whitelist.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -449,7 +450,7 @@ describe "Logidze triggers", :db do
       Post.instance_variable_set(:@attribute_names, nil)
     end
 
-    let(:params) { { title: 'Triggers', rating: 10, active: false } }
+    let(:params) { {title: "Triggers", rating: 10, active: false} }
 
     it "logs with new params", :aggregate_failures do
       post = Post.create!(params).reload
@@ -471,7 +472,7 @@ describe "Logidze triggers", :db do
       post2 = Post.create!(params).reload
 
       changes2 = post2.log_data.current_version.changes
-      expect(changes2.keys).to match_array Post.column_names - %w(updated_at log_data)
+      expect(changes2.keys).to match_array Post.column_names - %w[updated_at log_data]
     end
   end
 
@@ -493,10 +494,10 @@ describe "Logidze triggers", :db do
       Post.instance_variable_set(:@attribute_names, nil)
     end
 
-    it 'does not merge the logs outside debounce_time' do
+    it "does not merge the logs outside debounce_time" do
       post = nil
       Timecop.freeze(Time.at(1_000_000)) do
-        post = Post.create!(title: 'Triggers', rating: 10)
+        post = Post.create!(title: "Triggers", rating: 10)
       end
       Timecop.freeze(Time.at(1_000_100)) do
         post.update!(rating: 100)
@@ -504,13 +505,13 @@ describe "Logidze triggers", :db do
       expect(post.reload.log_version).to eq 2
       expect(post.log_size).to eq 2
       expect(post.log_data.versions.last.changes)
-        .to_not include("title" => 'Triggers')
+        .to_not include("title" => "Triggers")
     end
 
-    it 'merges the logs within debounce_time' do
+    it "merges the logs within debounce_time" do
       post = nil
       Timecop.freeze(Time.at(1_000_000)) do
-        post = Post.create!(title: 'Triggers', rating: 10)
+        post = Post.create!(title: "Triggers", rating: 10)
       end
       Timecop.freeze(Time.at(1_000_001)) do
         post.update!(rating: 100)
@@ -524,7 +525,7 @@ describe "Logidze triggers", :db do
     it "merges the logs within timeline", :aggregate_failures do
       post = nil
       Timecop.freeze(Time.at(1_000_000)) do
-        post = Post.create!(title: 'Triggers', rating: 10)
+        post = Post.create!(title: "Triggers", rating: 10)
       end
       Timecop.freeze(Time.at(1_000_100)) do
         post.update!(rating: 100)

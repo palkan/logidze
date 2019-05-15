@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Logidze
   # Contains helpers for handling different PG versions
   module Migration

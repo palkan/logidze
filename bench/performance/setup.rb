@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 begin
-  require 'bundler/inline'
+  require "bundler/inline"
 rescue LoadError => e
-  $stderr.puts 'Bundler version 1.10 or later is required. Please update your Bundler'
+  warn "Bundler version 1.10 or later is required. Please update your Bundler"
   raise e
 end
 
 gemfile(true) do
-  source 'https://rubygems.org'
-  gem 'activerecord', '~>4.2'
-  gem 'pg'
-  gem 'paper_trail', '~>4.2', require: false
-  gem 'pry-byebug'
-  gem 'faker'
-  gem 'benchmark-ips'
-  gem 'memory_profiler'
+  source "https://rubygems.org"
+  gem "activerecord", "~>4.2"
+  gem "pg"
+  gem "paper_trail", "~>4.2", require: false
+  gem "pry-byebug"
+  gem "faker"
+  gem "benchmark-ips"
+  gem "memory_profiler"
 end
 
-DB_NAME = ENV['DB_NAME'] || 'logidze_query_bench'
+DB_NAME = ENV["DB_NAME"] || "logidze_query_bench"
 
 begin
   system("createdb #{DB_NAME}")
@@ -24,24 +26,25 @@ rescue
   $stdout.puts "DB already exists"
 end
 
-$LOAD_PATH.unshift File.expand_path('../../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path("../../../lib", __FILE__)
 
-require 'active_record'
-require 'logger'
-require 'logidze'
+require "active_record"
+require "logger"
+require "logidze"
 
 ActiveRecord::Base.send :include, Logidze::HasLogidze
 
-ActiveRecord::Base.establish_connection(adapter: 'postgresql', database: DB_NAME)
+ActiveRecord::Base.establish_connection(adapter: "postgresql", database: DB_NAME)
 
 at_exit do
   ActiveRecord::Base.connection.disconnect!
 end
 
-require 'paper_trail'
+require "paper_trail"
 
 module LogidzeBench
   module_function
+
   def setup_db
     ActiveRecord::Schema.define do
       # PaperTrail setup
@@ -171,7 +174,7 @@ module LogidzeBench
                   jsonb_set(
                     NEW.log_data->'h',
                     '{1}',
-                    merged 
+                    merged
                   ) - 0
                 );
               END IF;
@@ -198,7 +201,7 @@ module LogidzeBench
         t.string :name
         t.text :bio
         t.integer :age
-        t.jsonb :log_data, default: '{}', null: false
+        t.jsonb :log_data, default: "{}", null: false
         t.timestamps
       end
 
@@ -212,6 +215,7 @@ module LogidzeBench
   end
 
   module_function
+
   def populate(n = 1_000)
     n.times do
       params = fake_params
@@ -221,6 +225,7 @@ module LogidzeBench
   end
 
   module_function
+
   def cleanup
     LogidzeUser.delete_all
     User.delete_all
@@ -228,8 +233,9 @@ module LogidzeBench
   end
 
   module_function
+
   def generate_versions(num = 1)
-    num.times do 
+    num.times do
       User.find_each do |u|
         u.update!(fake_params(sample: true))
       end
@@ -245,6 +251,7 @@ module LogidzeBench
   end
 
   module_function
+
   def fake_params(sample: false)
     params = {
       email: Faker::Internet.email,
@@ -254,14 +261,14 @@ module LogidzeBench
       bio: Faker::Lorem.paragraph
     }
 
-    return params.slice(%i(email position name age bio).sample) if sample
+    return params.slice(%i[email position name age bio].sample) if sample
     params
   end
 end
 
 module ARandom
   def random(num = 1)
-    rel = order('random()')
+    rel = order("random()")
     num == 1 ? rel.first : rel.limit(num)
   end
 end
@@ -271,11 +278,11 @@ class User < ActiveRecord::Base
   has_paper_trail
 
   def self.diff_from(ts)
-    includes(:versions).map { |u| { 'id' => u.id, 'changes' => u.diff_from(ts) } }
+    includes(:versions).map { |u| {"id" => u.id, "changes" => u.diff_from(ts)} }
   end
 
   def self.diff_from_joined(ts)
-    eager_load(:versions).map { |u| { 'id' => u.id, 'changes' => u.diff_from(ts) } }
+    eager_load(:versions).map { |u| {"id" => u.id, "changes" => u.diff_from(ts)} }
   end
 
   def diff_from(ts)
@@ -290,11 +297,11 @@ class User < ActiveRecord::Base
   private
 
   def merge_changeset(acc, data)
-    data.each do |k,v|
+    data.each do |k, v|
       unless acc.key?(k)
-        acc[k] = { 'old' => v[0] }
+        acc[k] = {"old" => v[0]}
       end
-      acc[k]['new'] = v[1]
+      acc[k]["new"] = v[1]
     end
   end
 end
@@ -305,4 +312,4 @@ class LogidzeUser < ActiveRecord::Base
 end
 
 # Run migration only if neccessary
-LogidzeBench.setup_db if ENV['FORCE'].present? || !ActiveRecord::Base.connection.tables.include?('logidze_users')
+LogidzeBench.setup_db if ENV["FORCE"].present? || !ActiveRecord::Base.connection.tables.include?("logidze_users")

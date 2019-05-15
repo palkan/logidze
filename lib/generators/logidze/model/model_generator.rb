@@ -1,12 +1,12 @@
-# rubocop:disable Metrics/BlockLength
 # frozen_string_literal: true
+
 require "rails/generators"
 require "rails/generators/active_record/migration/migration_generator"
 
 module Logidze
   module Generators
     class ModelGenerator < ::ActiveRecord::Generators::Base # :nodoc:
-      source_root File.expand_path('templates', __dir__)
+      source_root File.expand_path("templates", __dir__)
 
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
@@ -77,17 +77,17 @@ module Logidze
 
         def columns_blacklist
           array = if !options[:whitelist]
-                    options[:blacklist]
-                  else
-                    class_name.constantize.column_names - options[:whitelist]
-                  end
+            options[:blacklist]
+          else
+            class_name.constantize.column_names - options[:whitelist]
+          end
 
           format_pgsql_array(array)
         end
 
         def timestamp_column
-          value = options[:timestamp_column] || 'updated_at'
-          return if %w(nil null false).include?(value)
+          value = options[:timestamp_column] || "updated_at"
+          return if %w[nil null false].include?(value)
 
           escape_pgsql_string(value)
         end
@@ -101,13 +101,13 @@ module Logidze
         end
 
         def logidze_snapshot_parameters
-          format_pgsql_args('to_jsonb(t)', timestamp_column, columns_blacklist)
+          format_pgsql_args("to_jsonb(t)", timestamp_column, columns_blacklist)
         end
 
         def format_pgsql_array(ruby_array)
           return if ruby_array.blank?
 
-          "'{" + ruby_array.join(', ') + "}'"
+          "'{" + ruby_array.join(", ") + "}'"
         end
 
         def escape_pgsql_string(string)
@@ -124,10 +124,10 @@ module Logidze
         def format_pgsql_args(*values)
           args = []
           values.reverse_each do |value|
-            formatted_value = value.presence || (args.any? && 'null')
+            formatted_value = value.presence || (args.any? && "null")
             args << formatted_value if formatted_value
           end
-          args.compact.reverse.join(', ')
+          args.compact.reverse.join(", ")
         end
       end
 

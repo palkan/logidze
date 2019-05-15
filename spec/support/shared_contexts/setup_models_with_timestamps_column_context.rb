@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 shared_context "setup models with timestamp column" do |timestamp_column|
   include_context "cleanup migrations"
 

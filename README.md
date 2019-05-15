@@ -24,7 +24,7 @@ Other requirements:
 Add Logidze to your application's Gemfile:
 
 ```ruby
-gem 'logidze'
+gem "logidze"
 ```
 
 Install required DB extensions and create trigger function:
@@ -142,13 +142,13 @@ post.log_version #=> 3
 post.log_size #=> 3
 
 # Get copy of a record at a given time
-old_post = post.at(time: 2.days.ago)
+post.at(time: 2.days.ago)
 
 # or revert the record itself to the previous state (without committing to DB)
-post.at!(time: '2018-04-15 12:00:00')
+post.at!(time: "2018-04-15 12:00:00")
 
 # If no version found
-post.at(time: '1945-05-09 09:00:00') #=> nil
+post.at(time: "1945-05-09 09:00:00") #=> nil
 ```
 
 You can also get revision by version number:
@@ -197,8 +197,8 @@ longer possible. However, you can provide an `append: true` option to `#undo!` o
 create a new version with old data. Caveat: when switching to a newer version, `append` will have no effect.
 
 ```ruby
-post = Post.create!(title: 'first post') # v1
-post.update!(title: 'new title')         # v2
+post = Post.create!(title: "first post") # v1
+post.update!(title: "new title")         # v2
 post.undo!(append: true)                 # v3 (with same attributes as v1)
 ```
 
@@ -298,9 +298,9 @@ And in your controller:
 
 ```ruby
 class ApplicationController < ActionController::Base
-  around_action :set_logidze_responsible, only: %i[create update]
+  around_action :use_logidze_responsible, only: %i[create update]
 
-  def set_logidze_responsible(&block)
+  def use_logidze_responsible(&block)
     Logidze.with_responsible(current_user&.id, &block)
   end
 end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "acceptance_helper"
 
 describe "Logidze meta", :db do
@@ -15,12 +16,12 @@ describe "Logidze meta", :db do
     end
   end
 
-  let(:meta) { { 'some_key' => 'some_val' } }
-  let(:meta_alt) { { 'some_key' => 'some_val2' } }
-  let(:meta2) { { 'other_key' => 'other_val' } }
+  let(:meta) { {"some_key" => "some_val"} }
+  let(:meta_alt) { {"some_key" => "some_val2"} }
+  let(:meta2) { {"other_key" => "other_val"} }
 
   describe ".with_meta" do
-    subject { User.create!(name: 'test', age: 10, active: false) }
+    subject { User.create!(name: "test", age: 10, active: false) }
 
     context "insert" do
       it "doesn't set meta if it's not provided" do
@@ -106,11 +107,11 @@ describe "Logidze meta", :db do
               ensure
                 expect(Thread.current[:meta]).to eq([meta])
               end
-            end.to raise_error /error inside the nested block/
+            end.to raise_error(/error inside the nested block/)
 
             raise "error inside the block"
           end
-        end.to raise_error /error inside the block/
+        end.to raise_error(/error inside the block/)
 
         expect(Thread.current[:meta]).to eq([])
       end
@@ -163,7 +164,7 @@ describe "Logidze meta", :db do
         subject.update!(active: true)
 
         Logidze.with_meta(meta2) do
-          subject.update!(name: 'updated')
+          subject.update!(name: "updated")
         end
 
         expect(subject.reload.meta).to eq meta2
@@ -190,12 +191,12 @@ describe "Logidze meta", :db do
           # version 3
           subject.update!(active: true)
           # version 4
-          subject.update!(name: 'updated')
+          subject.update!(name: "updated")
           # version 5
           subject.update!(age: 100)
         end
 
-        subject.update!(name: 'compacted')
+        subject.update!(name: "compacted")
 
         expect(subject.reload.log_size).to eq 5
 
@@ -215,9 +216,9 @@ describe "Logidze meta", :db do
   end
 
   describe ".with_responsible" do
-    let(:responsible) { User.create!(name: 'owner') }
+    let(:responsible) { User.create!(name: "owner") }
 
-    subject { User.create!(name: 'test', age: 10, active: false) }
+    subject { User.create!(name: "test", age: 10, active: false) }
 
     context "insert" do
       it "doesn't set responsible user if it's not provided" do
@@ -275,7 +276,7 @@ describe "Logidze meta", :db do
     end
 
     context "update" do
-      let(:responsible2) { User.create!(name: 'tester') }
+      let(:responsible2) { User.create!(name: "tester") }
 
       it "sets responsible" do
         Logidze.with_responsible(responsible.id) do
@@ -293,7 +294,7 @@ describe "Logidze meta", :db do
         subject.update!(active: true)
 
         Logidze.with_responsible(responsible2.id) do
-          subject.update!(name: 'updated')
+          subject.update!(name: "updated")
         end
 
         expect(subject.reload.whodunnit).to eq responsible2
@@ -320,12 +321,12 @@ describe "Logidze meta", :db do
           # version 3
           subject.update!(active: true)
           # version 4
-          subject.update!(name: 'updated')
+          subject.update!(name: "updated")
           # version 5
           subject.update!(age: 100)
         end
 
-        subject.update!(name: 'compacted')
+        subject.update!(name: "compacted")
 
         expect(subject.reload.log_size).to eq 5
 
