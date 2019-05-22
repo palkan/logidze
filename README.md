@@ -13,6 +13,7 @@ Currently, only PostgreSQL 9.5+ is supported (for PostgreSQL 9.4 try [jsonbx](ht
 [How is Logidze pronounced?](https://github.com/palkan/logidze/issues/73)
 
 Other requirements:
+
 - Ruby ~> 2.1
 - Rails >= 4.2 (**Rails 6 is supported**)
 
@@ -73,9 +74,9 @@ You can log only particular columns changes. There are mutually exclusive `black
 
 ```sh
 # track all columns, except `created_at` and `active`
-rails generate logidze:model Post --blacklist=created_at active
+rails generate logidze:model Post --blacklist=created_at,active
 # track only `title` and `body` columns
-rails generate logidze:model Post --whitelist=title body
+rails generate logidze:model Post --whitelist=title,body
 ```
 
 By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case, you should specify the path explicitly:
@@ -98,7 +99,7 @@ rails generate logidze:model Post --timestamp_column nil # "null" and "false" wi
 If you want to update Logidze settings for the model, run migration with `--update` flag:
 
 ```sh
-rails generate logidze:model Post --update --whitelist=title body rating
+rails generate logidze:model Post --update --whitelist=title,body,rating
 ```
 
 Logidze also supports associations versioning. It is an experimental feature and disabled by default. You can learn more
@@ -114,7 +115,6 @@ Here is a quick and straightforward [workaround](https://github.com/palkan/logid
 **NOTE**: if you're using PostgreSQL >= 9.6 you need neither the workaround nor owner privileges because Logidze (>= 0.3.1) can work without `ALTER DATABASE ...`.
 
 Nevertheless, you still need super-user privileges to enable `hstore` extension (or you can use [PostgreSQL Extension Whitelisting](https://github.com/dimitri/pgextwlist)).
-
 
 ## Upgrade from previous versions
 
