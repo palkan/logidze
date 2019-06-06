@@ -605,4 +605,14 @@ describe Logidze::Model, :db do
       is_expected.to be_zero
     end
   end
+
+  context "with ignore_log_data: true" do
+    describe ".with_log_data" do
+      it "generates the same query as model with ignore_log_data: false" do
+        expect(NotLoggedPost.with_log_data.to_sql).to eq(
+          Post.all.to_sql
+        )
+      end
+    end
+  end
 end
