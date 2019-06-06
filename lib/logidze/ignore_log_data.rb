@@ -25,11 +25,7 @@ module Logidze
       self.ignored_columns += ["log_data"]
 
       scope :with_log_data, lambda {
-        if ignored_columns == ["log_data"]
-          select("*")
-        else
-          select(column_names + ["log_data"])
-        end
+        select(column_names + [arel_table[:log_data]])
       }
     end
 
