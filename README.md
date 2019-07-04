@@ -230,7 +230,7 @@ end
 If you want Logidze always to behave this way - you can set up a global configuration option:
 
 ```ruby
-Rails.application.config.logidze.ignore_log_data_by_default = true
+Logidze.ignore_log_data_by_default = true
 ```
 
 However, you can override it by explicitly passing `ignore_log_data: false` to the `ignore_log_data`. Also, it's possible to change it temporary inside the block:
