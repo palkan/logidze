@@ -43,33 +43,6 @@ describe Logidze::IgnoreLogData, :db do
       end
     end
 
-    context "when Logidze.ignore_log_data_by_default = true" do
-      before(:all) { Logidze.ignore_log_data_by_default = true }
-      after(:all) { Logidze.ignore_log_data_by_default = false }
-
-      subject { Post.create! }
-
-      include_examples "test raises error when #log_data is called"
-
-      context "when inside Logidze.with_log_data block" do
-        it "loads log_data" do
-          Logidze.with_log_data do
-            expect(subject.reload.log_data).not_to be_nil
-          end
-        end
-      end
-    end
-
-    context "when model is configured with has_logidze(ignore_log_data: false)" do
-      context "when Logidze.ignore_log_data_by_default = true" do
-        before(:all) { Logidze.ignore_log_data_by_default = true }
-        after(:all) { Logidze.ignore_log_data_by_default = false }
-
-        subject { AlwaysLoggedPost.find(post.id) }
-        include_examples "test loads #log_data"
-      end
-    end
-
     context "when model is configured with has_logidze(ignore_log_data: true)" do
       shared_context "test #reload_log_data" do
         context "#reload_log_data" do
@@ -102,19 +75,6 @@ describe Logidze::IgnoreLogData, :db do
 
         include_examples "test raises error when #log_data is called"
         include_context "test #reload_log_data"
-      end
-    end
-
-    describe "associations" do
-      context "when owner has loaded log_data" do
-        before { post.comments.create(content: "New comment") }
-
-        subject do
-          loaded = NotLoggedPost.with_log_data.find(post.id)
-          loaded.comments[0]
-        end
-
-        include_examples "test loads #log_data"
       end
     end
   end
