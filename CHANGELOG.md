@@ -2,6 +2,13 @@
 
 ## master (unreleased)
 
+- **Breaking** Only allow specifying `ignore_log_data` at boot time without runtime modifications. ([@palkan][])
+
+Playing with ActiveRecord default scopes wasn't a good idea. We fallback to a more explicit way of _telling_ AR
+when to load or ignore the `log_data` column.
+
+This change removes `Logidze.with_log_data` method.
+
 ## 0.10.0 (2019-05-15)
 
 - **Ruby >= 2.4 is required**

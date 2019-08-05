@@ -227,29 +227,21 @@ class User < ActiveRecord::Base
 end
 ```
 
-If you want Logidze always to behave this way - you can set up a global configuration option:
+If you want Logidze to behave this way by default, configure the global option:
 
 ```ruby
 Logidze.ignore_log_data_by_default = true
 ```
 
-However, you can override it by explicitly passing `ignore_log_data: false` to the `ignore_log_data`. Also, it's possible to change it temporary inside the block:
-
-```ruby
-Logidze.with_log_data do
-  Post.find(params[:id]).log_data
-end
-```
-
-When `ignore_log_data` is turned on, each time you use `User.all` (or any other Relation method) `log_data` won't be loaded from the DB.
+However, you can override it by explicitly passing `ignore_log_data: false` to the `ignore_log_data`.
+You can also enforce loading `log_data` in-place by using the `.with_log_data` scope, e.g. `User.all.with_log_data` loads all
+the _users_ with `log_data` included.
 
 The chart below shows the difference in PG query time before and after turning `ignore_log_data` on. (Special thanks to [@aderyabin](https://github.com/aderyabin) for sharing it.)
 
 ![](./assets/pg_log_data_chart.png)
 
 If you try to call `#log_data` on the model loaded in such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g., during the console debugging) - use **`user.reload_log_data`**, which forces loading the column from the DB.
-
-If you need to select `log_data` during the initial load-use a special scope `User.with_log_data`.
 
 ## Track meta information
 

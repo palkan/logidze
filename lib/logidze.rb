@@ -33,12 +33,6 @@ module Logidze
       @ignore_log_data_by_default || false
     end
 
-    attr_writer :force_load_log_data
-
-    def force_load_log_data
-      @force_load_log_data || false
-    end
-
     # Temporary disable DB triggers.
     #
     # @example
@@ -50,17 +44,6 @@ module Logidze
         ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO DEFAULT;"
         res
       end
-    end
-
-    # Temporary turn off ignore_log_data_by_default config
-    #
-    # @example
-    #   Logidze.with_log_data { Post.update_all(active: true) }
-    def with_log_data
-      Logidze.force_load_log_data = true
-      yield
-    ensure
-      Logidze.force_load_log_data = false
     end
   end
 end
