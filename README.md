@@ -247,7 +247,7 @@ The chart below shows the difference in PG query time before and after turning `
 
 ![](./assets/pg_log_data_chart.png)
 
-If you try to call `#log_data` on the model loaded in such way, you'll get `ActiveModel::MissingAttributeError`, but if you really need it (e.g., during the console debugging) - use **`user.reload_log_data`**, which forces loading the column from the DB.
+If you try to call `#log_data` on the model loaded in such way, you'll get `nil`. If you want to fetch log data (e.g., during the console debugging)–use **`user.reload_log_data`**, which forces loading this column from the DB.
 
 ## Track meta information
 

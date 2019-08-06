@@ -2,6 +2,11 @@
 
 ## master (unreleased)
 
+- **Breaking** Return `nil` when `log_data` is not loaded instead of raising an exception. ([@palkan][])
+
+We cannot distinguish between not loaded `log_data` and not-yet-created (i.e. for new records).
+The latter could be used in frameworks/gems ([example](https://github.com/palkan/logidze/issues/127#issuecomment-518798640)).
+
 - **Breaking** Only allow specifying `ignore_log_data` at boot time without runtime modifications. ([@palkan][])
 
 Playing with ActiveRecord default scopes wasn't a good idea. We fallback to a more explicit way of _telling_ AR

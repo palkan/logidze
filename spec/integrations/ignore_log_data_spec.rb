@@ -37,21 +37,11 @@ describe Logidze::IgnoreLogData, :db do
       end
     end
 
-    shared_examples "test raises error when #log_data is called" do
-      it "raises error when #log_data is called" do
-        expect { subject.reload.log_data }.to raise_error(ActiveModel::MissingAttributeError)
-      end
-    end
-
     context "when model is configured with has_logidze(ignore_log_data: true)" do
       shared_context "test #reload_log_data" do
         context "#reload_log_data" do
           it "loads data from DB" do
             expect(subject.reload_log_data).not_to be_nil
-            expect(subject.log_data).not_to be_nil
-          end
-
-          it "deserializes log_data properly" do
             expect(subject.reload_log_data).to be_a(Logidze::History)
           end
         end
@@ -60,7 +50,6 @@ describe Logidze::IgnoreLogData, :db do
       context "with default scope" do
         subject { NotLoggedPost.find(post.id) }
 
-        include_examples "test raises error when #log_data is called"
         include_context "test #reload_log_data"
       end
 
@@ -73,7 +62,6 @@ describe Logidze::IgnoreLogData, :db do
       describe ".eager_load" do
         subject(:model) { User.eager_load(:not_logged_posts).last.not_logged_posts.last }
 
-        include_examples "test raises error when #log_data is called"
         include_context "test #reload_log_data"
       end
     end
