@@ -198,8 +198,8 @@ create a new version with old data. Caveat: when switching to a newer version, `
 
 ```ruby
 post = Post.create!(title: "first post") # v1
-post.update!(title: "new title")         # v2
-post.undo!(append: true)                 # v3 (with same attributes as v1)
+post.update!(title: "new title") # v2
+post.undo!(append: true) # v3 (with same attributes as v1)
 ```
 
 Note that `redo!` will not work after `undo!(append: true)` because the latter will create a new version

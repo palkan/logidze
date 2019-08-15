@@ -46,7 +46,7 @@ describe Logidze::History do
   end
 
   describe "#version" do
-    specify { expect(subject.version).to eq 5  }
+    specify { expect(subject.version).to eq 5 }
   end
 
   describe "#versions" do
