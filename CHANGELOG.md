@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## 0.11.0 (2019-08-15)
+
 - **Breaking** Return `nil` when `log_data` is not loaded instead of raising an exception. ([@palkan][])
 
 We cannot distinguish between not loaded `log_data` and not-yet-created (i.e. for new records).
