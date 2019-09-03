@@ -261,6 +261,8 @@ end
 
 Meta expects a hash to be passed so you won't need to encode and decode JSON manually.
 
+**NOTE**: `.with_meta` wraps the block into a DB transaction (see https://github.com/palkan/logidze/issues/136).
+
 ## Track responsibility (aka _whodunnit_)
 
 A special application of meta information is storing the author of the change, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
@@ -303,6 +305,8 @@ class ApplicationController < ActionController::Base
   end
 end
 ```
+
+**NOTE**: `.with_responsible` wraps the block into a DB transaction (see https://github.com/palkan/logidze/issues/136).
 
 ## Disable logging temporary
 
