@@ -30,6 +30,13 @@ module Logidze # :nodoc:
         @block = block
       end
 
+      def perform
+        return if block.nil?
+        return block.call if meta.nil?
+
+        call_block_in_meta_context
+      end
+
       def current_meta
         meta_stack.reduce(:merge) || {}
       end
@@ -42,29 +49,48 @@ module Logidze # :nodoc:
       def encode_meta(value)
         connection.quote(ActiveSupport::JSON.encode(value))
       end
+
+      def pg_reset_meta_param(prev_meta)
+        if prev_meta.empty?
+          pg_clear_meta_param
+        else
+          pg_set_meta_param(prev_meta)
+        end
+      end
     end
 
     class MetaWithTransaction < MetaWrapper # :nodoc:
-      def perform
-        return if block.nil?
-        return block.call if meta.nil?
-
-        ActiveRecord::Base.transaction { call_block_in_meta_context }
-      end
-
       private
+
+      def call_block_in_meta_context
+        ActiveRecord::Base.transaction do
+          begin
+            prev_meta = current_meta
+
+            meta_stack.push(meta)
+
+            pg_set_meta_param(current_meta)
+            result = block.call
+            pg_reset_meta_param(prev_meta)
+
+            result
+          ensure
+            meta_stack.pop
+          end
+        end
+      end
 
       def pg_set_meta_param(value)
         connection.execute("SET LOCAL logidze.meta = #{encode_meta(value)};")
       end
 
-      def pg_reset_meta_param(prev_meta)
-        if prev_meta.empty?
-          connection.execute("SET LOCAL logidze.meta TO DEFAULT;")
-        else
-          pg_set_meta_param(prev_meta)
-        end
+      def pg_clear_meta_param
+        connection.execute("SET LOCAL logidze.meta TO DEFAULT;")
       end
+    end
+
+    class MetaWithoutTransaction < MetaWrapper # :nodoc:
+      private
 
       def call_block_in_meta_context
         prev_meta = current_meta
@@ -73,47 +99,19 @@ module Logidze # :nodoc:
 
         pg_set_meta_param(current_meta)
         result = block.call
-        pg_reset_meta_param(prev_meta)
 
         result
       ensure
+        pg_reset_meta_param(prev_meta)
         meta_stack.pop
       end
-    end
-
-    class MetaWithoutTransaction < MetaWrapper # :nodoc:
-      def perform
-        raise ArgumentError, "Block must be given" unless block
-
-        call_block_in_meta_context
-      end
-
-      private
 
       def pg_set_meta_param(value)
         connection.execute("SET logidze.meta = #{encode_meta(value)};")
       end
 
-      def pg_reset_meta_param(prev_meta)
-        if prev_meta.empty?
-          connection.execute("SET logidze.meta TO DEFAULT;")
-        else
-          pg_set_meta_param(prev_meta)
-        end
-      end
-
-      def call_block_in_meta_context
-        prev_meta = current_meta
-
-        meta_stack.push(meta)
-
-        pg_set_meta_param(current_meta)
-        result = block.call
-
-        result
-      ensure
-        pg_reset_meta_param(prev_meta)
-        meta_stack.pop
+      def pg_clear_meta_param
+        connection.execute("SET logidze.meta TO DEFAULT;")
       end
     end
 
