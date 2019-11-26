@@ -213,6 +213,28 @@ describe "Logidze meta", :db do
         expect(subject.at_version(3).meta).to eq meta2
       end
     end
+
+    context "when transactional:false" do
+      it "resets meta setting after block finishes" do
+        # subject is a newly created user
+        Logidze.with_meta(meta, transactional: false) do
+          expect(subject.reload.meta).to eq meta
+        end
+
+        # create another one and check that meta is nil here
+        expect(User.create!(name: "test", age: 10, active: false).reload.meta).to be_nil
+      end
+
+      it "recovers after exception" do
+        ignore_exceptions do
+          Logidze.with_meta(meta, transactional: false) do
+            CustomUser.create!
+          end
+        end
+
+        expect(subject.reload.meta).to be_nil
+      end
+    end
   end
 
   describe ".with_responsible" do
