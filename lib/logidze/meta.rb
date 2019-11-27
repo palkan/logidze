@@ -30,7 +30,7 @@ module Logidze # :nodoc:
       end
 
       def perform
-        raise ArgumentError, 'Block must be given' unless block
+        raise ArgumentError, "Block must be given" unless block
         return block.call if meta.nil?
 
         call_block_in_meta_context
