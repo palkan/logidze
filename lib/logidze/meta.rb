@@ -4,9 +4,8 @@ module Logidze # :nodoc:
   # Provide methods to attach meta information
   module Meta
     def with_meta(meta, transactional: true, &block)
-      return MetaWithTransaction.wrap_with(meta, &block) if transactional
-
-      MetaWithoutTransaction.wrap_with(meta, &block)
+      wrapper = transactional ? MetaWithTransaction : MetaWithoutTransaction
+      wrapper.wrap_with(meta, &block)
     end
 
     def with_responsible(responsible_id, transactional: true, &block)
