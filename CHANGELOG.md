@@ -302,3 +302,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@dmitrytsepelev]: https://github.com/DmitryTsepelev
 [@zocoi]: https://github.com/zocoi
 [@duderman]: https://github.com/duderman
+[@oleg-kiviljov]: https://github.com/oleg-kiviljov
