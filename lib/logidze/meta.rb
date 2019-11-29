@@ -36,6 +36,19 @@ module Logidze # :nodoc:
         call_block_in_meta_context
       end
 
+      def call_block_in_meta_context
+        prev_meta = current_meta
+
+        meta_stack.push(meta)
+
+        pg_set_meta_param(current_meta)
+        result = block.call
+        result
+      ensure
+        pg_reset_meta_param(prev_meta)
+        meta_stack.pop
+      end
+
       def current_meta
         meta_stack.reduce(:merge) || {}
       end
@@ -62,21 +75,7 @@ module Logidze # :nodoc:
       private
 
       def call_block_in_meta_context
-        ActiveRecord::Base.transaction do
-          begin
-            prev_meta = current_meta
-
-            meta_stack.push(meta)
-
-            pg_set_meta_param(current_meta)
-            result = block.call
-            pg_reset_meta_param(prev_meta)
-
-            result
-          ensure
-            meta_stack.pop
-          end
-        end
+        connection.transaction { super }
       end
 
       def pg_set_meta_param(value)
@@ -90,20 +89,6 @@ module Logidze # :nodoc:
 
     class MetaWithoutTransaction < MetaWrapper # :nodoc:
       private
-
-      def call_block_in_meta_context
-        prev_meta = current_meta
-
-        meta_stack.push(meta)
-
-        pg_set_meta_param(current_meta)
-        result = block.call
-
-        result
-      ensure
-        pg_reset_meta_param(prev_meta)
-        meta_stack.pop
-      end
 
       def pg_set_meta_param(value)
         connection.execute("SET logidze.meta = #{encode_meta(value)};")
