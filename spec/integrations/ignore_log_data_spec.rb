@@ -30,39 +30,32 @@ describe Logidze::IgnoreLogData, :db do
   end
 
   describe "#log_data" do
-    shared_examples "test loads #log_data" do
-      it "loads log_data" do
-        expect(subject.log_data).not_to be_nil
-        expect(subject.log_data).to be_a(Logidze::History)
-      end
-    end
-
     context "when model is configured with has_logidze(ignore_log_data: true)" do
-      shared_context "test #reload_log_data" do
-        context "#reload_log_data" do
-          it "loads data from DB" do
-            expect(subject.reload_log_data).not_to be_nil
-            expect(subject.reload_log_data).to be_a(Logidze::History)
-          end
-        end
-      end
-
       context "with default scope" do
         subject { NotLoggedPost.find(post.id) }
 
-        include_context "test #reload_log_data"
+        it "loads data from DB" do
+          expect(subject.reload_log_data).not_to be_nil
+          expect(subject.reload_log_data).to be_a(Logidze::History)
+        end
       end
 
       context ".with_log_data" do
         subject { NotLoggedPost.with_log_data.find(post.id) }
 
-        include_examples "test loads #log_data"
+        it "loads log_data" do
+          expect(subject.log_data).not_to be_nil
+          expect(subject.log_data).to be_a(Logidze::History)
+        end
       end
 
       describe ".eager_load" do
         subject(:model) { User.eager_load(:not_logged_posts).last.not_logged_posts.last }
 
-        include_context "test #reload_log_data"
+        it "loads data from DB" do
+          expect(subject.reload_log_data).not_to be_nil
+          expect(subject.reload_log_data).to be_a(Logidze::History)
+        end
       end
     end
   end

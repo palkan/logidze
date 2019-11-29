@@ -11,8 +11,8 @@ module Logidze
       # Include methods to work with history.
       #
       def has_logidze(ignore_log_data: Logidze.ignore_log_data_by_default)
-        include Logidze::Model
         include Logidze::IgnoreLogData
+        include Logidze::Model
 
         @ignore_log_data = ignore_log_data
 
