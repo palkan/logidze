@@ -1,6 +1,24 @@
+
 # Change log
 
 ## master (unreleased)
+- PR [#143](https://github.com/palkan/logidze/pull/143) Add `:transactional` option to `#with_meta` and `#with_responsible` ([@oleg-kiviljov][])
+
+Now it's possible to set meta and responsible without wrapping the block into a DB transaction. For backward compatibility  `:transactional` option by default is set to `true`.
+
+Usage:
+
+```ruby
+Logidze.with_meta({ip: request.ip}, transactional: false) do
+  post.save!
+end
+```
+or
+```ruby
+Logidze.with_responsible(user.id, transactional: false) do
+  post.save!
+end
+```
 
 ## 0.11.0 (2019-08-15)
 
