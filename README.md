@@ -261,7 +261,13 @@ end
 
 Meta expects a hash to be passed so you won't need to encode and decode JSON manually.
 
-**NOTE**: `.with_meta` wraps the block into a DB transaction (see https://github.com/palkan/logidze/issues/136).
+By default `.with_meta` wraps the block into a DB transaction. That could lead to an unexpected behavior, especially, when using `.with_meta` within an around_action. To avoid wrapping the block into a DB transaction use `transactional: false` option.
+
+```ruby
+Logidze.with_meta({ip: request.ip}, transactional: false) do
+  post.save!
+end
+```
 
 ## Track responsibility (aka _whodunnit_)
 
@@ -306,8 +312,13 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-**NOTE**: `.with_responsible` wraps the block into a DB transaction (see https://github.com/palkan/logidze/issues/136).
+By default `.with_responsible` wraps the block into a DB transaction. That could lead to an unexpected behavior, especially, when using `.with_responsible` within an around_action. To avoid wrapping the block into a DB transaction use `transactional: false` option.
 
+```ruby
+Logidze.with_responsible(user.id, transactional: false) do
+  post.save!
+end
+```
 ## Disable logging temporary
 
 If you want to make update without logging (e.g., mass update), you can turn it off the following way:
