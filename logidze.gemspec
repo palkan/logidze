@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "http://github.com/palkan/logidze"
   }
 
-  spec.add_dependency "rails", ">= 4.2"
+  spec.add_dependency "rails", "6.0.2"
 
   spec.add_development_dependency "ammeter", "~> 1.1.3"
   spec.add_development_dependency "bundler", ">= 1.10"
