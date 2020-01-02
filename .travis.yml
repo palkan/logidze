@@ -21,6 +21,10 @@ before_script:
   - psql -U postgres -d logidze -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
   - RAILS_ENV=test bundle exec rake dummy:db:create dummy:db:migrate
 
+before_install:
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
+
 matrix:
   include:
     - rvm: ruby-head
