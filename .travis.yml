@@ -25,11 +25,11 @@ matrix:
   include:
     - rvm: ruby-head
       gemfile: gemfiles/railsmaster.gemfile
-    - rvm: 2.6.2
+    - rvm: 2.7.0
       gemfile: gemfiles/rails6.gemfile
-    - rvm: 2.6.2
+    - rvm: 2.6.5
       gemfile: gemfiles/rails5.gemfile
-    - rvm: 2.5.1
+    - rvm: 2.5.3
       gemfile: gemfiles/rails52.gemfile
     - rvm: 2.4.1
       gemfile: gemfiles/rails5.gemfile
