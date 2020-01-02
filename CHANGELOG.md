@@ -2,6 +2,9 @@
 # Change log
 
 ## master (unreleased)
+
+## 0.12.0 (2020-01-02)
+
 - PR [#143](https://github.com/palkan/logidze/pull/143) Add `:transactional` option to `#with_meta` and `#with_responsible` ([@oleg-kiviljov][])
 
 Now it's possible to set meta and responsible without wrapping the block into a DB transaction. For backward compatibility  `:transactional` option by default is set to `true`.
