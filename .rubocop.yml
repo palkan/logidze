@@ -28,7 +28,7 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: no_comma
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   EnforcedStyle: with_first_parameter
 
 Lint/Void:

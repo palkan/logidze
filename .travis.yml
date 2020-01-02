@@ -25,18 +25,18 @@ matrix:
   include:
     - rvm: ruby-head
       gemfile: gemfiles/railsmaster.gemfile
-    - rvm: 2.7.0
+    - rvm: 2.7
       gemfile: gemfiles/rails6.gemfile
-    - rvm: 2.6.5
+    - rvm: 2.6
       gemfile: gemfiles/rails5.gemfile
-    - rvm: 2.5.3
+    - rvm: 2.5
       gemfile: gemfiles/rails52.gemfile
-    - rvm: 2.4.1
+    - rvm: 2.4
       gemfile: gemfiles/rails5.gemfile
-    - rvm: 2.4.1
+    - rvm: 2.4
       gemfile: gemfiles/rails42.gemfile
   allow_failures:
     - rvm: ruby-head
       gemfile: gemfiles/railsmaster.gemfile
-    - rvm: 2.5.0
+    - rvm: 2.5
       gemfile: gemfiles/railsmaster.gemfile
