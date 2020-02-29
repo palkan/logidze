@@ -36,6 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", ">= 10.0"
   spec.add_development_dependency "rspec-rails", ">= 3.4"
   spec.add_development_dependency "rubocop-md", "~> 0.2.0"
-  spec.add_development_dependency "standard", "~> 0.1.2"
+  spec.add_development_dependency "standard", "~> 0.2.0"
   spec.add_development_dependency "timecop", "~> 0.8"
 end
