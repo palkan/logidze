@@ -12,7 +12,7 @@ require "timecop"
 
 require File.expand_path("dummy/config/environment", __dir__)
 
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
