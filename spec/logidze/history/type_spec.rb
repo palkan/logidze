@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe "Logidze::History::Type", :rails5 do
+describe Logidze::History::Type do
   subject { Logidze::History::Type.new }
 
   describe "#cast" do

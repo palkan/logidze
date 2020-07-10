@@ -17,15 +17,6 @@ module Logidze
     delegate :size, to: :versions
     delegate :responsible_id, :meta, to: :current_version
 
-    ### Rails 4 ###
-    def self.dump(object)
-      ActiveSupport::JSON.encode(object)
-    end
-
-    def self.load(json)
-      new(json) if json.present?
-    end
-
     def initialize(data)
       @data = data
     end

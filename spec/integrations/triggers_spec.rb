@@ -17,8 +17,6 @@ describe "triggers", :db do
     end
 
     Post.reset_column_information
-    # For Rails 4
-    Post.instance_variable_set(:@attribute_names, nil)
   end
 
   after(:all) { @old_post.destroy! }
@@ -143,6 +141,27 @@ describe "triggers", :db do
 
         Post.where(id: post.id).update_all(active: true)
         expect(post.reload.log_version).to eq 3
+      end
+    end
+
+    context "with unicode changes" do
+      let(:post) { Post.create! params }
+
+      it "handles unicode characters" do
+        post.update!(meta: {tags: %w[ロギング は楽しい]})
+        post.update!(title: "Spaß")
+
+        expect(post.reload.log_version).to eq 3
+        expect(post.log_size).to eq 3
+
+        post2 = post.at(version: 2)
+        expect(post2.title).to eq "Triggers"
+        expect(post2.meta["tags"]).to eq %w[ロギング は楽しい]
+
+        post1 = post.at(version: 1)
+
+        expect(post1.title).to eq "Triggers"
+        expect(post1.meta["tags"]).to eq %w[some tag]
       end
     end
   end

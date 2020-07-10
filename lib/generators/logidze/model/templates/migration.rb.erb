@@ -1,7 +1,4 @@
-class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VERSION::MAJOR < 5 ? '' : '[5.0]' %>
-  require 'logidze/migration'
-  include Logidze::Migration
-
+class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def up
     <% if update? %>
     execute "DROP TRIGGER logidze_on_<%= table_name %> on <%= table_name %>;"
@@ -12,7 +9,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
     execute <<-SQL
       CREATE TRIGGER logidze_on_<%= table_name %>
       BEFORE UPDATE OR INSERT ON <%= table_name %> FOR EACH ROW
-      WHEN (coalesce(#{current_setting('logidze.disabled')}, '') <> 'on')
+      WHEN (coalesce(current_setting('logidze.disabled', true), '') <> 'on')
       EXECUTE PROCEDURE logidze_logger(<%= logidze_logger_parameters %>);
     SQL
 
@@ -29,7 +26,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
     # NOTE: We have no idea on how to revert the migration
     # ('cause we don't know the previous trigger params),
     # but you can do that on your own.
-    # 
+    #
     # Uncomment this line if you want to raise an error.
     # raise ActiveRecord::IrreversibleMigration
     <% else %>

@@ -3,6 +3,8 @@
 
 ## master (unreleased)
 
+- **Drop support for Rails 4.2, Ruby 2.4 and PostgreSQL 9.5**. ([@palkan][])
+
 ## 0.12.0 (2020-01-02)
 
 - PR [#143](https://github.com/palkan/logidze/pull/143) Add `:transactional` option to `#with_meta` and `#with_responsible` ([@oleg-kiviljov][])

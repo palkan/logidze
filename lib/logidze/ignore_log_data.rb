@@ -5,10 +5,7 @@ module Logidze
     extend ActiveSupport::Concern
 
     included do
-      if Rails::VERSION::MAJOR == 4
-        require "logidze/ignore_log_data/ignored_columns"
-        attribute :log_data, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Jsonb.new
-      elsif Rails::VERSION::MAJOR == 5
+      if Rails::VERSION::MAJOR == 5
         require "logidze/ignore_log_data/cast_attribute_patch"
         include CastAttributePatch
       end

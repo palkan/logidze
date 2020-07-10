@@ -21,30 +21,6 @@ describe Logidze::History do
 
   subject { described_class.new data }
 
-  describe ".load" do
-    subject { described_class }
-
-    it "loads json" do
-      expect(subject.load(json_data)).to be_a described_class
-    end
-
-    it "handles nil" do
-      expect(subject.load(nil)).to be_nil
-    end
-
-    it "handles empty object" do
-      expect(subject.load({})).to be_nil
-    end
-  end
-
-  describe ".dump" do
-    subject { described_class }
-
-    it "returns json" do
-      expect(subject.dump(described_class.new(data))).to eq json_data
-    end
-  end
-
   describe "#version" do
     specify { expect(subject.version).to eq 5 }
   end
