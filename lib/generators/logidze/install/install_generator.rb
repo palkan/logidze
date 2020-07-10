@@ -2,13 +2,16 @@
 
 require "rails/generators"
 require "rails/generators/active_record"
+require_relative "../inject_sql"
 
 module Logidze
   module Generators
     class InstallGenerator < ::Rails::Generators::Base # :nodoc:
       include Rails::Generators::Migration
+      include InjectSql
 
       source_root File.expand_path("templates", __dir__)
+      source_paths << File.expand_path("functions", __dir__)
 
       class_option :update, type: :boolean, optional: true,
                             desc: "Define whether this is an update migration"

@@ -2,11 +2,15 @@
 
 require "rails/generators"
 require "rails/generators/active_record/migration/migration_generator"
+require_relative "../inject_sql"
 
 module Logidze
   module Generators
     class ModelGenerator < ::ActiveRecord::Generators::Base # :nodoc:
+      include InjectSql
+
       source_root File.expand_path("templates", __dir__)
+      source_paths << File.expand_path("triggers", __dir__)
 
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 

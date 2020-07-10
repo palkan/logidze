@@ -1,40 +1,37 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def up
-    <% if update? %>
+    <%- if update? -%>
     execute "DROP TRIGGER logidze_on_<%= table_name %> on <%= table_name %>;"
-    <% elsif !only_trigger? %>
+    <%- elsif !only_trigger? -%>
     add_column :<%= table_name %>, :log_data, :jsonb
-    <% end %>
+    <%- end -%>
 
     execute <<-SQL
-      CREATE TRIGGER logidze_on_<%= table_name %>
-      BEFORE UPDATE OR INSERT ON <%= table_name %> FOR EACH ROW
-      WHEN (coalesce(current_setting('logidze.disabled', true), '') <> 'on')
-      EXECUTE PROCEDURE logidze_logger(<%= logidze_logger_parameters %>);
+      <%= inject_sql("logidze.sql") %>
     SQL
 
-    <% if backfill? %>
+    <%- if backfill? -%>
     execute <<-SQL
       UPDATE <%= table_name %> as t
       SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
     SQL
-    <% end %>
+    <%- end -%>
   end
 
   def down
-    <% if update? %>
+    <%- if update? -%>
     # NOTE: We have no idea on how to revert the migration
     # ('cause we don't know the previous trigger params),
     # but you can do that on your own.
     #
     # Uncomment this line if you want to raise an error.
     # raise ActiveRecord::IrreversibleMigration
-    <% else %>
+    <%- else -%>
     execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
 
-    <% if !only_trigger? %>
+    <%- if !only_trigger? -%>
     remove_column :<%= table_name %>, :log_data
-    <% end %>
-    <% end %>
+    <%- end -%>
+    <%- end -%>
   end
 end
