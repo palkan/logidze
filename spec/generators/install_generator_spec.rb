@@ -20,7 +20,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to exist
       is_expected.to contain(/create or replace function logidze_logger()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
-      is_expected.to contain(/create or replace function logidze_exclude_keys/i)
+      is_expected.to contain(/create or replace function logidze_filter_keys/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
     end
   end
@@ -47,7 +47,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to exist
       is_expected.to contain(/create or replace function logidze_logger()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
-      is_expected.to contain(/create or replace function logidze_exclude_keys/i)
+      is_expected.to contain(/create or replace function logidze_filter_keys/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
     end
   end

@@ -72,13 +72,13 @@ To backfill table data (i.e., create initial snapshots) add `backfill` option:
 rails generate logidze:model Post --backfill
 ```
 
-You can log only particular columns changes. There are mutually exclusive `blacklist` and `whitelist` options for this:
+You can log only particular columns changes. There are mutually exclusive `except` and `only` options for this:
 
 ```sh
 # track all columns, except `created_at` and `active`
-rails generate logidze:model Post --blacklist=created_at,active
+rails generate logidze:model Post --except=created_at,active
 # track only `title` and `body` columns
-rails generate logidze:model Post --whitelist=title,body
+rails generate logidze:model Post --only=title,body
 ```
 
 By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case, you should specify the path explicitly:
@@ -101,7 +101,7 @@ rails generate logidze:model Post --timestamp_column nil # "null" and "false" wi
 If you want to update Logidze settings for the model, run migration with `--update` flag:
 
 ```sh
-rails generate logidze:model Post --update --whitelist=title,body,rating
+rails generate logidze:model Post --update --only=title,body,rating
 ```
 
 Logidze also supports associations versioning. It is an experimental feature and disabled by default. You can learn more

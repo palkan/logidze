@@ -3,7 +3,14 @@
 
 ## master (unreleased)
 
-- **Drop support for Rails 4.2, Ruby 2.4 and PostgreSQL 9.5**. ([@palkan][])
+- Refactored columns filtering. ([@palkan][])
+
+Renamed `--whitelist/--blacklist` to `--only/--except` correspondingly.
+
+The _only_-logic has been changed: previously we collected the list of columns to ignore at the migration generation time,
+now we filter the columns within the trigger function (thus, schema changes do not affect the columns being tracked).
+
+- **Dropped support for Rails 4.2, Ruby 2.4 and PostgreSQL 9.5**. ([@palkan][])
 
 ## 0.12.0 (2020-01-02)
 

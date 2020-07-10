@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text, blacklist text[] DEFAULT '{}') RETURNS jsonb AS $body$
+CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text DEFAULT NULL, columns text[] DEFAULT NULL, include_columns boolean DEFAULT false) RETURNS jsonb AS $body$
   DECLARE
     ts timestamp with time zone;
   BEGIN
@@ -7,10 +7,15 @@ CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text, blacklis
     ELSE
       ts := coalesce((item->>ts_column)::timestamp with time zone, statement_timestamp());
     END IF;
+
+    IF columns IS NOT NULL THEN
+      item := logidze_filter_keys(item, columns, include_columns);
+    END IF;
+
     return json_build_object(
       'v', 1,
       'h', jsonb_build_array(
-              logidze_version(1, item, ts, blacklist)
+              logidze_version(1, item, ts)
             )
       );
   END;

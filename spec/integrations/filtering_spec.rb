@@ -3,23 +3,23 @@
 require "acceptance_helper"
 
 describe "columns filtering", :db do
-  it "cannot be used with both whitelist and blacklist options" do
+  it "cannot be used with both only and except options" do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post "\
-                     "--whitelist=title --blacklist=created_at"
+                     "--only=title --except=created_at"
     end
   end
 
-  context "with blacklist" do
+  context "with except" do
     include_context "cleanup migrations"
 
     before(:all) do
-      @blacklist = %w[updated_at created_at active]
+      @except = %w[updated_at created_at active]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
-                     "--blacklist=#{@blacklist.join(" ")}"
+                     "--except=#{@except.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -35,9 +35,9 @@ describe "columns filtering", :db do
     describe "insert" do
       let(:post) { Post.create!(params).reload }
 
-      it "does not log blacklisted columns", :aggregate_failures do
+      it "does not log excepted columns", :aggregate_failures do
         changes = post.log_data.current_version.changes
-        expect(changes.keys).to match_array Post.column_names - @blacklist - ["log_data"]
+        expect(changes.keys).to match_array Post.column_names - @except - ["log_data"]
       end
     end
 
@@ -47,13 +47,13 @@ describe "columns filtering", :db do
 
       let(:post) { @post.reload }
 
-      it "does not log blacklisted columns", :aggregate_failures do
+      it "does not log excepted columns", :aggregate_failures do
         post.update!(params)
         changes = post.reload.log_data.current_version.changes
-        expect(changes.keys).to match_array(updated_columns - @blacklist)
+        expect(changes.keys).to match_array(updated_columns - @except)
       end
 
-      context "when only blacklisted columns are updated" do
+      context "when only excepted columns are updated" do
         let(:params) { {active: false} }
 
         it "does not create new log entry", :aggregate_failures do
@@ -67,16 +67,16 @@ describe "columns filtering", :db do
     end
   end
 
-  context "with whitelist" do
+  context "with only" do
     include_context "cleanup migrations"
 
     before(:all) do
-      @whitelist = %w[title rating]
+      @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
-                     "--whitelist=#{@whitelist.join(" ")}"
+                     "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -91,9 +91,9 @@ describe "columns filtering", :db do
     describe "insert" do
       let(:post) { Post.create!(params).reload }
 
-      it "logs only whitelisted columns", :aggregate_failures do
+      it "logs only onlyed columns", :aggregate_failures do
         changes = post.log_data.current_version.changes
-        expect(changes.keys).to match_array @whitelist
+        expect(changes.keys).to match_array @only
       end
     end
 
@@ -103,10 +103,10 @@ describe "columns filtering", :db do
 
       let(:post) { @post.reload }
 
-      it "logs only whitelisted columns", :aggregate_failures do
+      it "logs only onlyed columns", :aggregate_failures do
         post.update!(params)
         changes = post.log_data.current_version.changes
-        expect(changes.keys).to match_array @whitelist
+        expect(changes.keys).to match_array @only
       end
     end
   end
@@ -115,12 +115,12 @@ describe "columns filtering", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      @whitelist = %w[title rating]
+      @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
-                     "--whitelist=#{@whitelist.join(" ")}"
+                     "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -136,12 +136,12 @@ describe "columns filtering", :db do
       post = Post.create!(params).reload
 
       changes = post.log_data.current_version.changes
-      expect(changes.keys).to match_array @whitelist
+      expect(changes.keys).to match_array @only
 
       ActiveRecord::Base.connection_pool.disconnect!
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post --blacklist=updated_at --update"
+        successfully "rails generate logidze:model post --except=updated_at --update"
         successfully "rake db:migrate"
 
         ActiveRecord::Base.connection_pool.disconnect!

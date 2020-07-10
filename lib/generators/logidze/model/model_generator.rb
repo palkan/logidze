@@ -25,8 +25,8 @@ module Logidze
 
       class_option :path, type: :string, optional: true, desc: "Specify path to the model file"
 
-      class_option :blacklist, type: :array, optional: true
-      class_option :whitelist, type: :array, optional: true
+      class_option :except, type: :array, optional: true
+      class_option :only, type: :array, optional: true
 
       class_option :timestamp_column, type: :string, optional: true,
                                       desc: "Specify timestamp column"
@@ -35,8 +35,8 @@ module Logidze
                             desc: "Define whether this is an update migration"
 
       def generate_migration
-        if options[:blacklist] && options[:whitelist]
-          warn "Use only one: --whitelist or --blacklist"
+        if options[:except] && options[:only]
+          warn "Use only one: --only or --except"
           exit(1)
         end
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
@@ -79,14 +79,13 @@ module Logidze
           options[:update]
         end
 
-        def columns_blacklist
-          array = if !options[:whitelist]
-            options[:blacklist]
-          else
-            class_name.constantize.column_names - options[:whitelist]
-          end
+        def filtered_columns
+          format_pgsql_array(options[:only] || options[:except])
+        end
 
-          format_pgsql_array(array)
+        def include_columns
+          return unless options[:only] || options[:except]
+          options[:only].present?
         end
 
         def timestamp_column
@@ -101,11 +100,11 @@ module Logidze
         end
 
         def logidze_logger_parameters
-          format_pgsql_args(limit, timestamp_column, columns_blacklist, debounce_time)
+          format_pgsql_args(limit, timestamp_column, filtered_columns, include_columns, debounce_time)
         end
 
         def logidze_snapshot_parameters
-          format_pgsql_args("to_jsonb(t)", timestamp_column, columns_blacklist)
+          format_pgsql_args("to_jsonb(t)", timestamp_column, filtered_columns, include_columns)
         end
 
         def format_pgsql_array(ruby_array)

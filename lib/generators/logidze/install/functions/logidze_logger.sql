@@ -11,15 +11,24 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     merged jsonb;
     iterator integer;
     item record;
-    columns_blacklist text[];
+    columns text[];
+    include_columns boolean;
     ts timestamp with time zone;
     ts_column text;
   BEGIN
     ts_column := NULLIF(TG_ARGV[1], 'null');
-    columns_blacklist := COALESCE(NULLIF(TG_ARGV[2], 'null'), '{}');
+    columns := NULLIF(TG_ARGV[2], 'null');
+    include_columns := NULLIF(TG_ARGV[3], 'null');
 
     IF TG_OP = 'INSERT' THEN
-      snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
+      -- always exclude log_data column
+      changes := to_jsonb(NEW.*) - 'log_data';
+
+      IF columns IS NOT NULL THEN
+        snapshot = logidze_snapshot(changes, ts_column, columns, include_columns);
+      ELSE
+        snapshot = logidze_snapshot(changes, ts_column);
+      END IF;
 
       IF snapshot#>>'{h, -1, c}' != '{}' THEN
         NEW.log_data := snapshot;
@@ -28,7 +37,15 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     ELSIF TG_OP = 'UPDATE' THEN
 
       IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
-        snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns_blacklist);
+        -- always exclude log_data column
+        changes := to_jsonb(NEW.*) - 'log_data';
+
+        IF columns IS NOT NULL THEN
+          snapshot = logidze_snapshot(changes, ts_column, columns, include_columns);
+        ELSE
+          snapshot = logidze_snapshot(changes, ts_column);
+        END IF;
+
         IF snapshot#>>'{h, -1, c}' != '{}' THEN
           NEW.log_data := snapshot;
         END IF;
@@ -36,7 +53,7 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       END IF;
 
       history_limit := NULLIF(TG_ARGV[0], 'null');
-      debounce_time := NULLIF(TG_ARGV[3], 'null');
+      debounce_time := NULLIF(TG_ARGV[4], 'null');
 
       current_version := (NEW.log_data->>'v')::int;
 
@@ -70,16 +87,20 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
 
       changes := hstore_to_jsonb_loose(
         hstore(NEW.*) - hstore(OLD.*)
-      );
+      ) - 'log_data';
+
+      IF columns IS NOT NULL THEN
+        changes := logidze_filter_keys(changes, columns, include_columns);
+      END IF;
+
+      IF changes = '{}' THEN
+        RETURN NEW;
+      END IF;
 
       new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
 
       size := jsonb_array_length(NEW.log_data->'h');
-      version := logidze_version(new_v, changes, ts, columns_blacklist);
-
-      IF version->>'c' = '{}' THEN
-        RETURN NEW;
-      END IF;
+      version := logidze_version(new_v, changes, ts);
 
       IF (
         debounce_time IS NOT NULL AND
@@ -87,7 +108,7 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       ) THEN
         -- merge new version with the previous one
         new_v := (NEW.log_data#>>'{h,-1,v}')::int;
-        version := logidze_version(new_v, (NEW.log_data#>'{h,-1,c}')::jsonb || changes, ts, columns_blacklist);
+        version := logidze_version(new_v, (NEW.log_data#>'{h,-1,c}')::jsonb || changes, ts);
         -- remove the previous version from log
         NEW.log_data := jsonb_set(
           NEW.log_data,

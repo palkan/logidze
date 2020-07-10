@@ -58,17 +58,28 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
         it "creates trigger with debounce_time" do
           is_expected.to exist
-          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, 5000\);/i)
+          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, null, 5000\);/i)
         end
       end
 
-      context "with columns blacklist" do
-        let(:args) { ["user", "--blacklist", "age", "active"] }
+      context "with except" do
+        let(:args) { ["user", "--except", "age", "active"] }
 
-        it "creates trigger with columns blacklist" do
+        it "creates trigger with columns exclusion" do
           is_expected.to exist
           is_expected.to contain(
             /execute procedure logidze_logger\(null, 'updated_at', '\{age, active\}'\);/i
+          )
+        end
+      end
+
+      context "with only" do
+        let(:args) { ["user", "--only", "age", "active"] }
+
+        it "creates trigger with columns inclusion" do
+          is_expected.to exist
+          is_expected.to contain(
+            /execute procedure logidze_logger\(null, 'updated_at', '\{age, active\}', true\);/i
           )
         end
       end

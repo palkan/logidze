@@ -16,6 +16,8 @@ describe "ignore log columns", :db do
       # Close active connections to handle db variables
       ActiveRecord::Base.connection_pool.disconnect!
     end
+
+    Post.reset_column_information
   end
 
   let(:user) { User.create! }
