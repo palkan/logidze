@@ -6,11 +6,15 @@ on:
     - master
     paths:
     - "*.md"
+    - "*.yml"
     - "**/*.md"
+    - "gemfiles/rubocop.gemfile"
   pull_request:
     paths:
     - "*.md"
+    - "*.yml"
     - "**/*.md"
+    - "gemfiles/rubocop.gemfile"
 
 jobs:
   markdownlint:
