@@ -145,6 +145,27 @@ describe "triggers", :db do
         expect(post.reload.log_version).to eq 3
       end
     end
+
+    context "with unicode changes" do
+      let(:post) { Post.create! params }
+
+      it "handles unicode characters" do
+        post.update!(meta: {tags: %w[ロギング は楽しい]})
+        post.update!(title: "Spaß")
+
+        expect(post.reload.log_version).to eq 3
+        expect(post.log_size).to eq 3
+
+        post2 = post.at(version: 2)
+        expect(post2.title).to eq "Triggers"
+        expect(post2.meta["tags"]).to eq %w[ロギング は楽しい]
+
+        post1 = post.at(version: 1)
+
+        expect(post1.title).to eq "Triggers"
+        expect(post1.meta["tags"]).to eq %w[some tag]
+      end
+    end
   end
 
   describe "undo/redo" do
