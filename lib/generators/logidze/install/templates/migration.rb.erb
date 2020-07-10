@@ -1,20 +1,5 @@
-class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VERSION::MAJOR < 5 ? '' : '[5.0]' %>
-  require 'logidze/migration'
-  include Logidze::Migration
-
+class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def up
-    unless current_setting_missing_supported?
-      execute <<-SQL
-        DO $$
-          BEGIN
-          EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.disabled=' || quote_literal('');
-          EXECUTE 'ALTER DATABASE ' || quote_ident(current_database()) || ' SET logidze.meta=' || quote_literal('');
-          END;
-        $$
-        LANGUAGE plpgsql;
-      SQL
-    end
-
     <% if update? %>
     execute <<-SQL
       DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb);
@@ -37,8 +22,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration<%= ActiveRecord::VE
                     'c',
                     logidze_exclude_keys(data, VARIADIC array_append(blacklist, 'log_data'))
                    );
-          IF coalesce(#{current_setting('logidze.meta')}, '') <> '' THEN
-            buf := jsonb_set(buf, ARRAY['m'], current_setting('logidze.meta')::jsonb);
+          IF coalesce(current_setting('logidze.meta', true), '') <> '' THEN
+            buf := jsonb_insert(buf, '{m}', current_setting('logidze.meta')::jsonb);
           END IF;
           RETURN buf;
         END;

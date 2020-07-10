@@ -27,8 +27,6 @@ describe "columns filtering", :db do
       end
 
       Post.reset_column_information
-      # For Rails 4
-      Post.instance_variable_set(:@attribute_names, nil)
     end
 
     let(:params) { {title: "Triggers", rating: 10, active: false} }
@@ -86,8 +84,6 @@ describe "columns filtering", :db do
       end
 
       Post.reset_column_information
-      # For Rails 4
-      Post.instance_variable_set(:@attribute_names, nil)
     end
 
     let(:params) { {title: "Triggers", rating: 10, active: false} }
@@ -132,8 +128,6 @@ describe "columns filtering", :db do
       end
 
       Post.reset_column_information
-      # For Rails 4
-      Post.instance_variable_set(:@attribute_names, nil)
     end
 
     let(:params) { {title: "Triggers", rating: 10, active: false} }

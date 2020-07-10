@@ -22,7 +22,6 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to contain(/create or replace function logidze_snapshot/i)
       is_expected.to contain(/create or replace function logidze_exclude_keys/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
-      is_expected.to contain(/alter database .* set logidze\.disabled/i)
     end
   end
 

@@ -14,16 +14,12 @@ module Logidze
 
   # Extends model with methods to browse history
   module Model
-    require "logidze/history/type" if Rails::VERSION::MAJOR >= 5
+    require "logidze/history/type"
 
     extend ActiveSupport::Concern
 
     included do
-      if Rails::VERSION::MAJOR < 5
-        serialize :log_data, Logidze::History
-      else
-        attribute :log_data, Logidze::History::Type.new
-      end
+      attribute :log_data, Logidze::History::Type.new
 
       delegate :version, to: :log_data, prefix: "log"
     end

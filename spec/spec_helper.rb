@@ -19,8 +19,6 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
-  config.filter_run_excluding(rails5: true) if Rails::VERSION::MAJOR < 5
-
   config.example_status_persistence_file_path = "tmp/rspec_examples.txt"
   config.filter_run :focus
   config.run_all_when_everything_filtered = true

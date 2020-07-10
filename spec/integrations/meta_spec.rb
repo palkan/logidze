@@ -99,14 +99,12 @@ describe "logs metadata", :db do
             expect(Thread.current[:meta]).to eq([meta])
 
             expect do
-              begin
-                Logidze.with_meta(meta2) do
-                  expect(Thread.current[:meta]).to eq([meta, meta2])
-                  raise "error inside the nested block"
-                end
-              ensure
-                expect(Thread.current[:meta]).to eq([meta])
+              Logidze.with_meta(meta2) do
+                expect(Thread.current[:meta]).to eq([meta, meta2])
+                raise "error inside the nested block"
               end
+            ensure
+              expect(Thread.current[:meta]).to eq([meta])
             end.to raise_error(/error inside the nested block/)
 
             raise "error inside the block"

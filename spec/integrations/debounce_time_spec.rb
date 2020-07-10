@@ -16,8 +16,6 @@ describe "trigger debounce", :db do
     end
 
     Post.reset_column_information
-    # For Rails 4
-    Post.instance_variable_set(:@attribute_names, nil)
   end
 
   it "does not merge the logs outside debounce_time" do

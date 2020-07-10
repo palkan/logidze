@@ -17,8 +17,6 @@ describe "triggers", :db do
     end
 
     Post.reset_column_information
-    # For Rails 4
-    Post.instance_variable_set(:@attribute_names, nil)
   end
 
   after(:all) { @old_post.destroy! }
