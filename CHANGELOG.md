@@ -16,7 +16,9 @@ Logidze.with_meta({ip: request.ip}, transactional: false) do
   post.save!
 end
 ```
+
 or
+
 ```ruby
 Logidze.with_responsible(user.id, transactional: false) do
   post.save!
@@ -122,7 +124,7 @@ Please run `rails generate logidze:install --update` to regenerate stored functi
 This feature checks if several logs came in within a debounce time period then only keep the latest one
 by merging the latest in previous others.
 
-The concept is similar to https://underscorejs.org/#debounce
+The concept is similar to [https://underscorejs.org/#debounce](https://underscorejs.org/#debounce).
 
 without `debounce_time`
 
@@ -251,7 +253,7 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 
 ## 0.5.1 (2017-06-15)
 
-- _(Fix)_ Drop _all_ created functions upon rolling back (https://github.com/palkan/logidze/commit/b8e150cc18b3316a8cf0c78f7117339481fb49c6). ([@vassilevsky][])
+- _(Fix)_ Drop _all_ created functions upon rolling back ([commit](https://github.com/palkan/logidze/commit/b8e150cc18b3316a8cf0c78f7117339481fb49c6)). ([@vassilevsky][])
 
 ## 0.5.0 (2017-03-28)
 

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-lib = File.expand_path("../lib", __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "logidze/version"
+require_relative "lib/logidze/version"
 
 Gem::Specification.new do |spec|
   spec.name = "logidze"
@@ -10,12 +8,12 @@ Gem::Specification.new do |spec|
   spec.authors = ["palkan"]
   spec.email = ["dementiev.vm@gmail.com"]
 
-  spec.summary = "PostgreSQL JSON-based auditing"
-  spec.description = "PostgreSQL JSON-based auditing"
+  spec.summary = "PostgreSQL JSONB-based model changes tracking"
+  spec.description = "PostgreSQL JSONB-based model changes tracking"
   spec.homepage = "http://github.com/palkan/logidze"
   spec.license = "MIT"
 
-  spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files = Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = ">= 2.4.0"

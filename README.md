@@ -319,6 +319,7 @@ Logidze.with_responsible(user.id, transactional: false) do
   post.save!
 end
 ```
+
 ## Disable logging temporary
 
 If you want to make update without logging (e.g., mass update), you can turn it off the following way:
@@ -377,12 +378,7 @@ For development setup run `./bin/setup`. This runs `bundle install` and creates 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/palkan/logidze.
-
-## Future ideas
-
-- Enhance update_all to support mass-logging.
-- Other DB adapters.
+Bug reports and pull requests are welcome on GitHub at [https://github.com/palkan/logidze](https://github.com/palkan/logidze).
 
 ## License
 

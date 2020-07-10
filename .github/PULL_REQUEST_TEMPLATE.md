@@ -10,9 +10,9 @@
   Fixes #xxx
 -->
 
-
 <!--
-  Otherwise, describe the changes: 
+  Otherwise, describe the changes:
+-->
 
 ### What is the purpose of this pull request?
 
@@ -25,5 +25,3 @@
 - [ ] I've added tests for this change
 - [ ] I've added a Changelog entry
 - [ ] I've updated a documentation (Readme)
-
--->
