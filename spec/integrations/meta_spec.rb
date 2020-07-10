@@ -2,7 +2,7 @@
 
 require "acceptance_helper"
 
-describe "Logidze meta", :db do
+describe "logs metadata", :db do
   include_context "cleanup migrations"
 
   before(:all) do

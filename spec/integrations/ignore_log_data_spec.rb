@@ -3,7 +3,7 @@
 require "spec_helper"
 require "acceptance_helper"
 
-describe Logidze::IgnoreLogData, :db do
+describe "ignore log columns", :db do
   include_context "cleanup migrations"
 
   before(:all) do

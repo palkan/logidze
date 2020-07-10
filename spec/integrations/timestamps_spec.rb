@@ -2,7 +2,7 @@
 
 require "acceptance_helper"
 
-describe "Logidze timestamps", :db do
+describe "log timestamps", :db do
   include_context "cleanup migrations"
 
   before(:all) do
