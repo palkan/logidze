@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require "rspec/core/rake_task"
-require "rubocop/rake_task"
 
-RuboCop::RakeTask.new
+begin
+  require "rubocop/rake_task"
+  RuboCop::RakeTask.new
+rescue LoadError
+  task(:rubocop) {}
+end
+
 RSpec::Core::RakeTask.new(:spec)
 
 namespace :dummy do

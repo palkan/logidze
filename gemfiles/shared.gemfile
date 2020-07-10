@@ -1,0 +1,1 @@
+gem 'rspec-github', require: false

@@ -31,25 +31,7 @@ Style/TrailingCommaInHashLiteral:
 Layout/ParameterAlignment:
   EnforcedStyle: with_first_parameter
 
-Lint/Void:
-  Exclude:
-    - '**/*.md'
-
-# See https://github.com/rubocop-hq/rubocop/issues/4222
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - 'spec/**/*'
-    - '**/*.md'
-
-Lint/DuplicateMethods:
-  Exclude:
-    - '**/*.md'
-
 Naming/FileName:
   Exclude:
     - 'lib/test-prof.rb'
     - '**/*.md'
-
-Layout/InitialIndentation:
-  Exclude:
-    - 'CHANGELOG.md'

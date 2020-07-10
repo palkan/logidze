@@ -185,7 +185,7 @@ with `debounce_time` of `10ms`
 
 ## 0.7.0 (2018-08-29)
 
-- [Fixes [#75](https://github.com/palkan/logidze/issues/70)] Fix association versioning with an optional belongs to ([@ankursethi-uscis][])
+- [Fixes [#75](https://github.com/palkan/logidze/issues/70)] Fix association versioning with an optional belongs to ([@amalagaura][])
 
 - [PR [#79](https://github.com/palkan/logidze/pull/13)] Allow adding meta information to versions using `with_meta` (addressed [Issue [#60]](https://github.com/palkan/logidze/issues/60)). ([@DmitryTsepelev][])
 
@@ -303,7 +303,7 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@charlie-wasp]: https://github.com/charlie-wasp
 [@akxcv]: https://github.com/akxcv
 [@vassilevsky]: https://github.com/vassilevsky
-[@ankursethi-uscis]: https://github.com/ankursethi-uscis
+[@amalagaura]: https://github.com/amalagaura
 [@dmitrytsepelev]: https://github.com/DmitryTsepelev
 [@zocoi]: https://github.com/zocoi
 [@duderman]: https://github.com/duderman

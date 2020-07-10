@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 6.0'
-gem 'rspec-rails', '>= 3.5'
+gem 'rspec-rails', '>= 4.0'
+
+eval_gemfile './shared.gemfile'
 
 gemspec path: '..'

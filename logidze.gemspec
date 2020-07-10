@@ -33,7 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pg", ">= 0.18"
   spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "rspec-rails", ">= 3.4"
-  spec.add_development_dependency "rubocop-md", "~> 0.3.0"
-  spec.add_development_dependency "standard", "~> 0.2.0"
   spec.add_development_dependency "timecop", "~> 0.8"
 end

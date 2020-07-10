@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'arel', github: 'rails/arel'
 gem 'rails', github: 'rails/rails'
-gem 'rspec-rails', '>= 3.5'
+gem 'rspec-rails', '>= 4.0'
+
+eval_gemfile './shared.gemfile'
 
 gemspec path: '..'
