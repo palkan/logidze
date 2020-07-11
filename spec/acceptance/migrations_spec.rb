@@ -6,13 +6,8 @@ describe "Logidze migrations" do
   describe "#install" do
     include_context "cleanup migrations"
 
-    it "creates migration" do
-      successfully "rails generate logidze:install"
-
-      successfully "rake db:migrate"
-
-      successfully "rake db:rollback"
-
+    # Install migration has been already applied at the test suite start
+    it "rollbacks" do
       successfully "rake db:rollback"
     end
 
@@ -30,9 +25,6 @@ describe "Logidze migrations" do
     include_context "cleanup models"
 
     before do
-      successfully "rails generate logidze:install"
-      successfully "rake db:migrate"
-
       successfully "rails generate model Movie"
       successfully "rake db:migrate"
     end

@@ -1,14 +1,8 @@
 # frozen_string_literal: true
 
+require "acceptance_helper"
+
 describe "logidze_version" do
-  before(:all) do
-    declare_function "logidze_version"
-  end
-
-  after(:all) do
-    drop_function "logidze_version(bigint, jsonb, timestamp with time zone)"
-  end
-
   let(:data) { %q('{"title": "Feel me", "rating": 42, "name": "Jack"}'::jsonb) }
 
   specify do

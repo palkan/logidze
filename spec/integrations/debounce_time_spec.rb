@@ -7,7 +7,6 @@ describe "trigger debounce", :db do
 
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:install"
       successfully "rails generate logidze:model post --debounce_time=5000"
       successfully "rake db:migrate"
 

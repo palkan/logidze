@@ -7,7 +7,6 @@ describe "logs metadata", :db do
 
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:install"
       successfully "rails generate logidze:model user --only-trigger --limit=5"
       successfully "rake db:migrate"
 

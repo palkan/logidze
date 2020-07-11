@@ -17,7 +17,6 @@ describe "columns filtering", :db do
       @except = %w[updated_at created_at active]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
                      "--except=#{@except.join(" ")}"
         successfully "rake db:migrate"
@@ -74,7 +73,6 @@ describe "columns filtering", :db do
       @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
                      "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
@@ -118,7 +116,6 @@ describe "columns filtering", :db do
       @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:install"
         successfully "rails generate logidze:model post "\
                      "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"

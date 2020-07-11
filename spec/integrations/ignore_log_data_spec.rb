@@ -8,7 +8,6 @@ describe "ignore log columns", :db do
 
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:install"
       successfully "rails generate logidze:model post"
       successfully "rails generate logidze:model post_comment"
       successfully "rake db:migrate"

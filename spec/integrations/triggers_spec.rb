@@ -8,7 +8,6 @@ describe "triggers", :db do
   before(:all) do
     @old_post = Post.create!(title: "First", rating: 100, active: true)
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:install"
       successfully "rails generate logidze:model post --limit 4 --backfill"
       successfully "rake db:migrate"
 

@@ -11,15 +11,38 @@ RSpec.configure do |config|
     end
   end
 
-  config.after(:suite) do
+  migrations_to_delete = []
+
+  config.before(:suite) do
     Dir.chdir("#{File.dirname(__FILE__)}/dummy") do
       ActiveRecord::Base.connection_pool.disconnect!
 
+      start = Time.now
+
+      $stdout.print "⌛️  Creating database and installing Logidze... "
+
       Logidze::AcceptanceHelpers.suppress_output do
         system <<-CMD
-          rake db:drop db:create db:migrate
+          rails db:drop db:create
+          rails generate logidze:install
+          rails db:migrate
         CMD
       end
+
+      $stdout.puts "Done in #{Time.now - start}s"
+
+      migrations_to_delete << Dir.glob("db/migrate/*_enable_hstore.rb").first
+      migrations_to_delete << Dir.glob("db/migrate/*_logidze_install.rb").first
+
+      ActiveRecord::Base.connection_pool.disconnect!
+
+      $stdout.puts ""
+    end
+  end
+
+  config.after(:suite) do
+    Dir.chdir("#{File.dirname(__FILE__)}/dummy") do
+      migrations_to_delete.each { |path| File.delete(path) }
     end
   end
 end

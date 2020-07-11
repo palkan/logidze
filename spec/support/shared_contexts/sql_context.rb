@@ -8,18 +8,6 @@ module Logidze
       result = ::ActiveRecord::Base.connection.execute query
       result.values.first&.first
     end
-
-    # Loads the function from the install generator templates
-    def declare_function(name)
-      path = File.join(__dir__, "../../../lib/generators/logidze/install/functions", "#{name}.sql")
-      raise "Unknown function: #{name}" unless File.file?(path)
-
-      sql File.read(path)
-    end
-
-    def drop_function(signature)
-      sql "DROP FUNCTION #{signature} CASCADE"
-    end
   end
 end
 

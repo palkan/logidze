@@ -1,16 +1,8 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "acceptance_helper"
 
 describe "logidze_filter_keys" do
-  before(:all) do
-    declare_function "logidze_filter_keys"
-  end
-
-  after(:all) do
-    drop_function "logidze_filter_keys(jsonb, text[], boolean)"
-  end
-
   let(:data) { %q('{"title": "Feel me", "rating": 42, "name": "Jack"}'::jsonb) }
 
   specify "only filter" do

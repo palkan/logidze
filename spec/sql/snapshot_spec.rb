@@ -1,20 +1,8 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require "acceptance_helper"
 
 describe "logidze_snapshot" do
-  before(:all) do
-    declare_function "logidze_filter_keys"
-    declare_function "logidze_version"
-    declare_function "logidze_snapshot"
-  end
-
-  after(:all) do
-    drop_function "logidze_snapshot(jsonb, text, text[], boolean)"
-    drop_function "logidze_version(bigint, jsonb, timestamp with time zone)"
-    drop_function "logidze_filter_keys(jsonb, text[], boolean)"
-  end
-
   let(:now) { Time.local(1989, 7, 10, 18, 23, 33) }
 
   let(:data) { %('{"title": "Feel me", "rating": 42, "name": "Jack", "updated_at": "#{now.to_s(:db)}"}'::jsonb) }

@@ -3,15 +3,6 @@
 require "acceptance_helper"
 
 describe "log timestamps", :db do
-  include_context "cleanup migrations"
-
-  before(:all) do
-    Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:install"
-      ActiveRecord::Base.connection_pool.disconnect!
-    end
-  end
-
   before do
     Timecop.freeze(Time.at(1_000_000)) do
       post.update!(rating: 100)
