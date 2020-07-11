@@ -44,7 +44,7 @@ make T=1000000
 
 # Results
 
-The benchmark shows that hstore variant is the most efficient (running on MacPro 2013, 2.4 GHz Core i5, 4GB, SSD, 1 million transactions per test):
+The benchmark shows that hstore variant is the most efficient (running on Macbook Pro 2013, 2.4 GHz Core i5, 4GB, SSD, 1 million transactions per test):
 
 |Mode    | TPS  | Statement latency (ms) |
 |--------|------|------------------------|
@@ -56,3 +56,13 @@ The benchmark shows that hstore variant is the most efficient (running on MacPro
 | keys2  | 2542 | 0.210                  |
 
 _Logidze_ uses hstore variant.
+
+**UPD 2020**: Running the same benchmarks in Docker environment (on Macbook Pro 2019, 2.8 GHz Intel Core i7, 16 GB (Docker limited to 8GB), 100_000 transactions per test):
+|Mode    | TPS  | Statement latency (ms) |
+|--------|------|------------------------|
+| plain  | 1203 | 0.831                  |
+| hstore | 1091 | 0.916                  |
+| jsonb  | 948  | 1.055                  |
+| jsonb2 | 1053 | 0.949                  |
+| keys   | 1039 | 0.962                  |
+| keys2  | 1026 | 0.974                  |
