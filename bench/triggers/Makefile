@@ -8,6 +8,16 @@ ifndef T
 	T = 10000
 endif
 
+DIP := $(shell command -v dip 2> /dev/null)
+
+COMMAND_PREFIX :=
+FILE_PREFIX :=
+
+ifdef DIP
+	COMMAND_PREFIX = dip
+	FILE_PREFIX = bench/triggers/
+endif
+
 all: plain hstore jsonb jsonb2 keys keys2
 
 setup:
@@ -17,40 +27,40 @@ setup:
 plain:
 	$(info )
 	$(info ======  [START] Update without triggers ======)
-	pgbench -i -q $(DB)
-	pgbench -f bench.sql -t $(T) -r $(DB)
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
 
 hstore:
 	$(info )
 	$(info ======  [START] Update with hstore-based triggers ======)
-	pgbench -i -q $(DB)
-	psql -q -d $(DB) -f hstore_trigger_setup.sql 
-	pgbench -f bench.sql -t $(T) -r $(DB)
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)hstore_trigger_setup.sql
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
 
 jsonb:
 	$(info )
 	$(info ======  [START] Update with jsonb-minus triggers ======)
-	pgbench -i -q $(DB)
-	psql -q -d $(DB) -f jsonb_minus_setup.sql 
-	pgbench -f bench.sql -t $(T) -r $(DB)
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)jsonb_minus_setup.sql
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
 
 jsonb2:
 	$(info )
 	$(info ======  [START] Update with jsonb-minus triggers ======)
-	pgbench -i -q $(DB)
-	psql -q -d $(DB) -f jsonb_minus_2_setup.sql 
-	pgbench -f bench.sql -t $(T) -r $(DB)
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)jsonb_minus_2_setup.sql
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
 
 keys:
 	$(info )
 	$(info ======  [START] Update with loop thru keys triggers (v1) ======)
-	pgbench -i -q $(DB)
-	psql -q -d $(DB) -f keys_trigger_setup.sql
-	pgbench -f bench.sql -t $(T) -r $(DB) 
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)keys_trigger_setup.sql
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
 
 keys2:
 	$(info )
 	$(info ======  [START] Update with loop thru keys triggers (v2) ======)
-	pgbench -i -q $(DB)
-	psql -q -d $(DB) -f keys2_trigger_setup.sql
-	pgbench -f bench.sql -t $(T) -r $(DB)  
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)keys2_trigger_setup.sql
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)

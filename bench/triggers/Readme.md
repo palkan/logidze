@@ -5,7 +5,7 @@ We consider several approaches for calculating records diff: one uses _hstore_ e
 
 # Usage
 
-Create database:
+Create database (required only if not using Dip):
 
 ```sh
 make setup

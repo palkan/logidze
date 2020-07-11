@@ -1,0 +1,46 @@
+version: '2.4'
+
+services:
+  dev:
+    command: bash
+    image: ruby:2.7.1
+    volumes:
+      - ..:/${PWD}:cached
+      - bundler_data:/usr/local/bundle
+      - history:/usr/local/hist
+      - ./.bashrc:/root/.bashrc:ro
+      - ./.irbrc:/root/.irbrc:ro
+      - ./.pryrc:/root/.pryrc:ro
+    environment:
+      HISTFILE: /usr/local/hist/.bash_history
+      LANG: C.UTF-8
+      PROMPT_DIRTRIM: 2
+      PS1: '[\W]\! '
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432
+    working_dir: ${PWD}
+    tmpfs:
+      - /tmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:11.7
+    volumes:
+      - ../bench:/bench:cached
+      - history:/usr/local/hist
+      - ./.psqlrc:/root/.psqlrc:ro
+      - postgres:/var/lib/postgresql/data
+    environment:
+      PSQL_HISTFILE: /usr/local/hist/.psql_history
+      POSTGRES_PASSWORD: postgres
+      PGPASSWORD: postgres
+    ports:
+      - 5432
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+
+volumes:
+  bundler_data:
+  postgres:
+  history:

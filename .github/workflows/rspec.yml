@@ -14,7 +14,7 @@ jobs:
       BUNDLE_RETRY: 3
       CI: true
       RAILS_ENV: test
-      LOGIDZE_DB_URL: postgres://postgres:postgres@localhost:5432
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432
     strategy:
       fail-fast: false
       matrix:
