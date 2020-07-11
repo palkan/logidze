@@ -1,69 +1,39 @@
 # frozen_string_literal: true
 
-require "acceptance_helper"
-
-describe "logidze_version", :db do
-  include_context "cleanup migrations"
-
+describe "logidze_version" do
   before(:all) do
-    Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:install"
-
-      migration "add_logidze_version_trigger", <<~RUBY
-        def up
-          add_column :posts, :logidze_version, :jsonb
-
-          execute %q(
-            CREATE OR REPLACE FUNCTION logidze_test_trigger() RETURNS TRIGGER AS $body$
-              BEGIN
-                NEW.logidze_version := logidze_version(1, to_jsonb(NEW.*), statement_timestamp());
-              RETURN NEW;
-            END;
-            $body$
-            LANGUAGE plpgsql;
-          )
-
-          execute %q(
-            CREATE TRIGGER logidze_test
-            BEFORE UPDATE OR INSERT ON posts FOR EACH ROW
-            EXECUTE PROCEDURE logidze_test_trigger();
-          )
-        end
-
-        def down
-          execute "DROP FUNCTION logidze_test_trigger() CASCADE;"
-
-          remove_column :posts, :logidze_version
-        end
-      RUBY
-
-      successfully "rake db:migrate"
-
-      # Close active connections to handle db variables
-      ActiveRecord::Base.connection_pool.disconnect!
-    end
-
-    Post.reset_column_information
+    declare_function "logidze_version"
   end
 
+  after(:all) do
+    drop_function "logidze_version(bigint, jsonb, timestamp with time zone)"
+  end
+
+  let(:data) { %q('{"title": "Feel me", "rating": 42, "name": "Jack"}'::jsonb) }
+
   specify do
-    post = Post.create!(title: "Feel me", rating: 42, meta: {some: "test"})
-    version = post.reload.logidze_version
+    res = sql "select logidze_version(23, #{data}, statement_timestamp())"
+
+    version = JSON.parse(res)
+
     expect(version).to match({
       "ts" => an_instance_of(Integer),
-      "v" => 1,
-      "c" => a_hash_including({"title" => "Feel me", "rating" => 42})
+      "v" => 23,
+      "c" => {"title" => "Feel me", "rating" => 42, "name" => "Jack"}
     })
   end
 
   specify "with meta" do
-    post = Logidze.with_meta({cat: "matroskin"}) { Post.create!(title: "Feel me", meta: {some: "test"}) }
+    res = Logidze.with_meta({cat: "matroskin"}) do
+      sql "select logidze_version(43, #{data}, statement_timestamp())"
+    end
 
-    version = post.reload.logidze_version
+    version = JSON.parse(res)
+
     expect(version).to match({
       "ts" => an_instance_of(Integer),
-      "v" => 1,
-      "c" => a_hash_including({"title" => "Feel me"}),
+      "v" => 43,
+      "c" => {"title" => "Feel me", "rating" => 42, "name" => "Jack"},
       "m" => {"cat" => "matroskin"}
     })
   end

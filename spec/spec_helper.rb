@@ -26,6 +26,10 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand config.seed
 
+  config.define_derived_metadata(file_path: %r{/spec/sql/}) do |metadata|
+    metadata[:type] = :sql
+  end
+
   config.include Logidze::TestHelpers
 
   config.before(:each, db: true) do
