@@ -376,7 +376,9 @@ If you specify the limit in the trigger definition, then log size will not excee
 
 ## Development
 
-For development setup run `./bin/setup`. This runs `bundle install` and creates test DB.
+We use [Dip](https://github.com/bibendi/dip) for development. Provision the project by running `dip provision` and then use `dip bundle`, `dip rspec` or `dip bash` to interact with a Docker development environment.
+
+If you prefer developing on your local machine, make user you have Postgres installed and run `./bin/setup`.
 
 ## Contributing
 

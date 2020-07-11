@@ -1,7 +1,6 @@
 test:
   adapter: postgresql
   encoding: unicode
-  username: <%= ENV['LOGIDZE_DB_USER'] %>
-  url: <%= ENV['LOGIDZE_DB_URL'] %>
+  url: <%= ENV['DATABASE_URL'] %>
   pool: 5
-  database: <%= ENV['LOGIDZE_DB_NAME'] || 'logidze_test' %>
+  database: logidze_test
