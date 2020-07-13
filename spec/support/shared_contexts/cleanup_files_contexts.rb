@@ -8,11 +8,7 @@ shared_context "cleanup migrations" do
   end
 
   after(:all) do
-    all_versions = if ActiveRecord::Migrator.respond_to?(:get_all_versions)
-      ActiveRecord::Migrator.get_all_versions
-    else
-      ActiveRecord::Base.connection.migration_context.get_all_versions
-    end
+    all_versions = ActiveRecord::Base.connection.migration_context.get_all_versions
 
     (Dir["spec/dummy/db/migrate/*"] - @old_migrations).each do |path|
       version = path.match(%r{\/(\d+)\_[^\.]+\.rb$})[1]
