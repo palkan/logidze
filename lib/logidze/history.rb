@@ -99,7 +99,7 @@ module Logidze
 
     # Return nearest (from the bottom) version to the specified time
     def find_by_time(time)
-      versions.reverse.find { |v| v.time <= time }
+      versions.reverse_each.find { |v| v.time <= time }
     end
 
     def dup
