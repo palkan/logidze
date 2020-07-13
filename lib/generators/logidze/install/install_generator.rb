@@ -3,6 +3,7 @@
 require "rails/generators"
 require "rails/generators/active_record"
 require_relative "../inject_sql"
+require_relative "../fx_helper"
 
 using RubyNext
 
@@ -11,14 +12,13 @@ module Logidze
     class InstallGenerator < ::Rails::Generators::Base # :nodoc:
       include Rails::Generators::Migration
       include InjectSql
+      include FxHelper
 
       class FuncDef < Struct.new(:name, :version, :signature); end
 
       source_root File.expand_path("templates", __dir__)
       source_paths << File.expand_path("functions", __dir__)
 
-      class_option :fx, type: :boolean, optional: true,
-                        desc: "Define whether to use fx gem functionality"
       class_option :update, type: :boolean, optional: true,
                             desc: "Define whether this is an update migration"
 
@@ -58,10 +58,6 @@ module Logidze
 
         def update?
           options[:update]
-        end
-
-        def fx?
-          options[:fx] || (options[:fx] != false && defined?(::Fx::SchemaDumper))
         end
 
         def previous_version_for(name)

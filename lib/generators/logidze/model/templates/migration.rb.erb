@@ -1,37 +1,59 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
-  def up
-    <%- if update? -%>
-    execute "DROP TRIGGER logidze_on_<%= table_name %> on <%= table_name %>;"
-    <%- elsif !only_trigger? -%>
+  def change
+<%- unless update? || only_trigger? -%>
     add_column :<%= table_name %>, :log_data, :jsonb
-    <%- end -%>
+<%- end -%>
 
-    execute <<-SQL
-      <%= inject_sql("logidze.sql") %>
-    SQL
+<%- if fx? -%>
+  <%- if previous_version -%>
+    update_trigger :logidze_on_<%= table_name %>, on: :<%= table_name %>, version: <%= next_version %>, revert_to_version: <%= previous_version %>
+  <%- else -%>
+    reversible do |dir|
+      dir.up do
+        create_trigger :logidze_on_<%= table_name %>, on: :<%= table_name %>
+      end
 
-    <%- if backfill? -%>
-    execute <<-SQL
-      UPDATE <%= table_name %> as t
-      SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
-    SQL
-    <%- end -%>
-  end
+      dir.down do
+        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+      end
+    end
+  <%- end -%>
+<%- else -%>
+    reversible do |dir|
+      dir.up do
+  <%- if update? -%>
+        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
 
-  def down
-    <%- if update? -%>
-    # NOTE: We have no idea on how to revert the migration
-    # ('cause we don't know the previous trigger params),
-    # but you can do that on your own.
-    #
-    # Uncomment this line if you want to raise an error.
-    # raise ActiveRecord::IrreversibleMigration
-    <%- else -%>
-    execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+  <%- end -%>
+        execute <<-SQL
+          <%= inject_sql("logidze.sql") %>
+        SQL
+      end
 
-    <%- if !only_trigger? -%>
-    remove_column :<%= table_name %>, :log_data
-    <%- end -%>
-    <%- end -%>
+      dir.down do
+  <%- if update? -%>
+        # NOTE: We have no idea on how to revert the migration
+        # ('cause we don't know the previous trigger params),
+        # but you can do that on your own.
+        #
+        # Uncomment this line if you want to raise an error.
+        # raise ActiveRecord::IrreversibleMigration
+  <%- else -%>
+        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+  <%- end -%>
+      end
+    end
+<%- end -%>
+<%- if backfill? -%>
+
+    reversible do |dir|
+      dir.up do
+        execute <<~SQL
+          UPDATE <%= table_name %> as t
+          SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
+        SQL
+      end
+    end
+<%- end -%>
   end
 end

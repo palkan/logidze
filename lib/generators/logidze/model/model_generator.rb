@@ -3,11 +3,15 @@
 require "rails/generators"
 require "rails/generators/active_record/migration/migration_generator"
 require_relative "../inject_sql"
+require_relative "../fx_helper"
+
+using RubyNext
 
 module Logidze
   module Generators
     class ModelGenerator < ::ActiveRecord::Generators::Base # :nodoc:
       include InjectSql
+      include FxHelper
 
       source_root File.expand_path("templates", __dir__)
       source_paths << File.expand_path("triggers", __dir__)
@@ -40,6 +44,12 @@ module Logidze
           exit(1)
         end
         migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
+      end
+
+      def generate_fx_trigger
+        return unless fx?
+
+        template "logidze.sql", "db/triggers/logidze_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
       end
 
       def inject_logidze_to_model
@@ -97,6 +107,29 @@ module Logidze
 
         def debounce_time
           options[:debounce_time]
+        end
+
+        def previous_version
+          @previous_version ||= all_triggers.filter_map { |path| Regexp.last_match[1].to_i if path =~ %r{logidze_on_#{table_name}_v(\d+).sql} }.max
+        end
+
+        def next_version
+          previous_version&.next || 1
+        end
+
+        def all_triggers
+          @all_triggers ||=
+            begin
+              res = nil
+              in_root do
+                res = if File.directory?("db/triggers")
+                  Dir.entries("db/triggers")
+                else
+                  []
+                end
+              end
+              res
+            end
         end
 
         def logidze_logger_parameters
