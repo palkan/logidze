@@ -85,4 +85,4 @@ jobs:
       env:
         USE_FX: ${{ matrix.fx }}
       run: |
-        bundle exec rspec --format RSpec::Github::Formatter
+        bundle exec rspec -f d
