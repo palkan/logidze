@@ -23,7 +23,7 @@ RSpec.configure do |config|
 
       Logidze::AcceptanceHelpers.suppress_output do
         system <<-CMD
-          rails db:drop db:create
+          rails db:drop db:create db:environment:set RAILS_ENV=test
           rails generate logidze:install
           rails db:migrate
         CMD
