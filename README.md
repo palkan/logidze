@@ -10,9 +10,7 @@ Logidze provides tools for logging DB records changes when using PostgreSQL (>=9
 Logidze allows you to create a DB-level log (using triggers) and gives you an API to browse this log.
 The log is stored with the record itself in JSONB column. No additional tables required.
 
-[Read the story behind Logidze](https://evilmartians.com/chronicles/introducing-logidze?utm_source=logidze)
-
-[How is Logidze pronounced?](https://github.com/palkan/logidze/issues/73)
+🤔 [How is Logidze pronounced?](https://github.com/palkan/logidze/issues/73)
 
 Other requirements:
 
@@ -21,6 +19,32 @@ Other requirements:
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
+
+## Links
+
+- [Logidze: for all those tired of versioning data](https://evilmartians.com/chronicles/introducing-logidze?utm_source=logidze)
+
+## Table of contents
+
+- [Main concepts](#main-concepts)
+- [Installation & Configuration](#installation)
+  - [Using with schema.rb](#using-with-schemarb)
+  - [Configuration models](#configuration-models)
+  - [Backfill data](#backfill-data)
+  - [Log size limit](#log-size-limit)
+  - [Tracking only selected columns](#tracking-only-selected-columns)
+  - [Logs timestamps](#logs-timestamps)
+- [Usage](#usage)
+  - [Basic API](#basic-api)
+  - [Track meta information](#track-meta-information)
+  - [Track responsibility](#track-responsibility)
+  - [Disable logging temporary](#disable-logging-temporary)
+  - [Reset log](#reset-log)
+  - [Associations versioning](#associations-versioning)
+- [Dealing with large logs](#dealing-with-large-logs)
+- [Upgrading](#upgrading)
+- [Log format](#log-format)
+- [Development](#development)
 
 ## Installation
 
@@ -33,7 +57,7 @@ gem "logidze"
 Install required DB extensions and create trigger function:
 
 ```sh
-rails generate logidze:install
+bundle exec rails generate logidze:install
 ```
 
 This creates a migration for adding trigger function and enabling the hstore extension.
@@ -41,94 +65,98 @@ This creates a migration for adding trigger function and enabling the hstore ext
 Run migrations:
 
 ```sh
-rake db:migrate
+bundle exec rails db:migrate
 ```
 
-**NOTE:** you **must** use SQL schema format since Logidze uses DB functions and triggers:
+**NOTE:** Logidze uses DB functions and triggers, hence you need to use SQL format for a schema dump:
 
 ```ruby
 # application.rb
 config.active_record.schema_format = :sql
 ```
 
-3. Add log column and triggers to the model:
+### Using with schema.rb
+
+Logidze seamlessly integrates with [fx][] gem to make it possible to continue using `schema.rb` for the database schema dump.
+
+Add `fx` gem to your Gemfile and run the same Logidze generators: `rails g logidze:install` or `rails g logidze:model`.
+
+If for some reason Logidze couldn't detect the presence of Fx in your bundle, you can enforce it by passing `--fx` option to generators.
+
+On the other hand, if you have `fx` gem but don't want Logidze to use it—pass `--no-fx` option.
+
+### Configuring models
+
+Run the following migration to enable changes tracking for an Active Record model and adding a `log_data::jsonb` column to the table:
 
 ```sh
-rails generate logidze:model Post
-rake db:migrate
+bundle exec rails generate logidze:model Post
+bundle exec rails db:migrate
 ```
 
 This also adds `has_logidze` line to your model, which adds methods for working with logs.
 
+By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case, you should specify the path explicitly:
+
+```sh
+bundle exec rails generate logidze:model Post --path "app/models/custom/post.rb"
+```
+
+### Backfill data
+
+To backfill table data (i.e., create initial snapshots) add `backfill` option to the generator:
+
+```sh
+bundle exec rails generate logidze:model Post --backfill
+```
+
+Now your migration should contain and `UPDATE ...` statement to populate the `log_data` column with the current state.
+
+Otherwise a full snapshot will be created the first time the record is updated.
+
+You can create a snapshot manually by performing the following query:
+
+```sql
+UPDATE <my_table> as t
+SET log_data = logidze_snapshot(to_jsonb(t))
+```
+
+### Log size limits
+
 You can provide the `limit` option to `generate` to limit the size of the log (by default it's unlimited):
 
 ```sh
-rails generate logidze:model Post --limit=10
+bundle exec rails generate logidze:model Post --limit=10
 ```
 
-To backfill table data (i.e., create initial snapshots) add `backfill` option:
-
-```sh
-rails generate logidze:model Post --backfill
-```
+### Tracking only selected columns
 
 You can log only particular columns changes. There are mutually exclusive `except` and `only` options for this:
 
 ```sh
 # track all columns, except `created_at` and `active`
-rails generate logidze:model Post --except=created_at,active
+bundle exec  rails generate logidze:model Post --except=created_at,active
 # track only `title` and `body` columns
-rails generate logidze:model Post --only=title,body
+bundle exec rails generate logidze:model Post --only=title,body
 ```
 
-By default, Logidze tries to infer the path to the model file from the model name and may fail, for example, if you have unconventional project structure. In that case, you should specify the path explicitly:
-
-```sh
-rails generate logidze:model Post --path "app/models/custom/post.rb"
-```
+### Logs timestamps
 
 By default, Logidze tries to get a timestamp for a version from record's `updated_at` field whenever appropriate. If
 your model does not have that column, Logidze will gracefully fall back to `statement_timestamp()`.
+
 To change the column name or disable this feature completely, you can use the `timestamp_column` option:
 
 ```sh
 # will try to get the timestamp value from `time` column
-rails generate logidze:model Post --timestamp_column time
+bundle exec rails generate logidze:model Post --timestamp_column time
 # will always set version timestamp to `statement_timestamp()`
-rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
+bundle exec rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
 ```
-
-If you want to update Logidze settings for the model, run migration with `--update` flag:
-
-```sh
-rails generate logidze:model Post --update --only=title,body,rating
-```
-
-Logidze also supports associations versioning. It is an experimental feature and disabled by default. You can learn more
-in the [wiki](https://github.com/palkan/logidze/wiki/Associations-versioning).
-
-## Troubleshooting
-
-The most common problem is `"permission denied to set parameter "logidze.xxx"` caused by `ALTER DATABASE ...` query.
-Logidze requires at least database owner privileges (which is not always possible).
-
-Here is a quick and straightforward [workaround](https://github.com/palkan/logidze/issues/11#issuecomment-260703464) by [@nobodyzzz](https://github.com/nobodyzzz).
-
-**NOTE**: if you're using PostgreSQL >= 9.6 you need neither the workaround nor owner privileges because Logidze (>= 0.3.1) can work without `ALTER DATABASE ...`.
-
-Nevertheless, you still need super-user privileges to enable `hstore` extension (or you can use [PostgreSQL Extension Whitelisting](https://github.com/dimitri/pgextwlist)).
-
-## Upgrade from previous versions
-
-We try to make an upgrade process as simple as possible. For now, the only required action is to create and run a migration:
-
-```sh
-rails generate logidze:install --update
-```
-
-This updates core `logdize_logger` DB function. No need to update tables or triggers.
 
 ## Usage
+
+### Basic API
 
 Your model now has `log_data` column, which stores changes log.
 
@@ -212,46 +240,7 @@ Alternatively, you can configure Logidze always to default to `append: true`.
 Logidze.append_on_undo = true
 ```
 
-### How to not load log data by default, or dealing with large logs
-
-By default, Active Record _selects_ all the table columns when no explicit `select` statement specified.
-
-That could slow down queries execution if you have field values which exceed the size of the data block (typically 8KB). PostgreSQL turns on its [TOAST](https://wiki.postgresql.org/wiki/TOAST) mechanism), which requires reading from multiple physical locations for fetching the row's data.
-
-If you do not use compaction (`generate logidze:model ... --limit N`) for `log_data`, you're likely to face this problem.
-
-Logidze provides a way to avoid loading `log_data` by default (and load it on demand):
-
-```ruby
-class User < ActiveRecord::Base
-  # Add `ignore_log_data` option to macros
-  has_logidze ignore_log_data: true
-end
-```
-
-If you want Logidze to behave this way by default, configure the global option:
-
-```ruby
-# config/initializers/logidze.rb
-Logidze.ignore_log_data_by_default = true
-
-# or
-
-# config/application.rb
-config.logidze.ignore_log_data_by_default = true
-```
-
-However, you can override it by explicitly passing `ignore_log_data: false` to the `ignore_log_data`.
-You can also enforce loading `log_data` in-place by using the `.with_log_data` scope, e.g. `User.all.with_log_data` loads all
-the _users_ with `log_data` included.
-
-The chart below shows the difference in PG query time before and after turning `ignore_log_data` on. (Special thanks to [@aderyabin](https://github.com/aderyabin) for sharing it.)
-
-![](./assets/pg_log_data_chart.png)
-
-If you try to call `#log_data` on the model loaded in such way, you'll get `nil`. If you want to fetch log data (e.g., during the console debugging)–use **`user.reload_log_data`**, which forces loading this column from the DB.
-
-## Track meta information
+### Track meta information
 
 You can store any meta information you want inside your version (it could be IP address, user agent, etc.). To add it you should wrap your code with a block:
 
@@ -271,7 +260,7 @@ Logidze.with_meta({ip: request.ip}, transactional: false) do
 end
 ```
 
-## Track responsibility (aka _whodunnit_)
+### Track responsibility
 
 A special application of meta information is storing the author of the change, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
 
@@ -322,7 +311,7 @@ Logidze.with_responsible(user.id, transactional: false) do
 end
 ```
 
-## Disable logging temporary
+### Disable logging temporary
 
 If you want to make update without logging (e.g., mass update), you can turn it off the following way:
 
@@ -334,7 +323,7 @@ Logidze.without_logging { Post.update_all(seen: true) }
 Post.without_logging { Post.update_all(seen: true) }
 ```
 
-## Reset log
+### Reset log
 
 Reset the history for a record (or records):
 
@@ -344,6 +333,68 @@ record.reset_log_data
 
 # for relation
 User.where(active: true).reset_log_data
+```
+
+### Associations versioning
+
+Logidze also supports associations versioning. This feature is disabled by default (due to the number of edge cases). You can learn more
+in the [wiki](https://github.com/palkan/logidze/wiki/Associations-versioning).
+
+## Dealing with large logs
+
+By default, Active Record _selects_ all the table columns when no explicit `select` statement specified.
+
+That could slow down queries execution if you have field values which exceed the size of the data block (typically 8KB). PostgreSQL turns on its [TOAST](https://wiki.postgresql.org/wiki/TOAST) mechanism), which requires reading from multiple physical locations for fetching the row's data.
+
+If you do not use compaction (`generate logidze:model ... --limit N`) for `log_data`, you're likely to face this problem.
+
+Logidze provides a way to avoid loading `log_data` by default (and load it on demand):
+
+```ruby
+class User < ActiveRecord::Base
+  # Add `ignore_log_data` option to macros
+  has_logidze ignore_log_data: true
+end
+```
+
+If you want Logidze to behave this way by default, configure the global option:
+
+```ruby
+# config/initializers/logidze.rb
+Logidze.ignore_log_data_by_default = true
+
+# or
+
+# config/application.rb
+config.logidze.ignore_log_data_by_default = true
+```
+
+However, you can override it by explicitly passing `ignore_log_data: false` to the `ignore_log_data`.
+You can also enforce loading `log_data` in-place by using the `.with_log_data` scope, e.g. `User.all.with_log_data` loads all
+the _users_ with `log_data` included.
+
+The chart below shows the difference in PG query time before and after turning `ignore_log_data` on. (Special thanks to [@aderyabin](https://github.com/aderyabin) for sharing it.)
+
+![](./assets/pg_log_data_chart.png)
+
+If you try to call `#log_data` on the model loaded in such way, you'll get `nil`. If you want to fetch log data (e.g., during the console debugging)–use **`user.reload_log_data`**, which forces loading this column from the DB.
+
+## Upgrading
+
+We try to make an upgrade process as simple as possible. For now, the only required action is to create and run a migration:
+
+```sh
+rails generate logidze:install --update
+```
+
+This updates core `logdize_logger` DB function. No need to update tables or triggers.
+
+**NOTE:** When using `fx`, you can omit the `--update` flag. The migration containing only the updated functions would be created.
+
+If you want to update Logidze settings for the model, run migration with `--update` flag:
+
+```sh
+rails generate logidze:model Post --update --only=title,body,rating
 ```
 
 ## Log format
@@ -387,3 +438,5 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/palka
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
+[fx]: https://github.com/teoljungberg/fx

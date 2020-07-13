@@ -3,6 +3,11 @@
 
 ## master (unreleased)
 
+- Add integration with `fx` gem. ([@palkan][])
+
+Now it's possible to use Logidze with `schema.rb`. Add `fx` gem to the project, and new migrations will be
+using Fx `create_function` / `create_trigger` functions.
+
 - Refactored columns filtering. ([@palkan][])
 
 Renamed `--whitelist/--blacklist` to `--only/--except` correspondingly.
