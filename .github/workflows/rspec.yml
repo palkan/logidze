@@ -41,6 +41,10 @@ jobs:
           postgres: "10"
           gemfile: "gemfiles/rails52.gemfile"
           fx: "false"
+        - ruby: "2.5"
+          postgres: "11"
+          gemfile: "gemfiles/rails52.gemfile"
+          fx: "true"
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -81,4 +85,4 @@ jobs:
       env:
         USE_FX: ${{ matrix.fx }}
       run: |
-        bundle exec rspec --color -f p --format RSpec::Github::Formatter
+        bundle exec rspec --format RSpec::Github::Formatter
