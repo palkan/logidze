@@ -80,7 +80,6 @@ jobs:
     - name: Prepare test database
       run: |
         bundle exec rake dummy:db:create
-        bundle exec rake dummy:db:migrate
     - name: Run RSpec
       env:
         USE_FX: ${{ matrix.fx }}
