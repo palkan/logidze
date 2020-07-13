@@ -4,6 +4,8 @@ require "rails/generators"
 require "rails/generators/active_record"
 require_relative "../inject_sql"
 
+using RubyNext
+
 module Logidze
   module Generators
     class InstallGenerator < ::Rails::Generators::Base # :nodoc:
