@@ -84,4 +84,4 @@ jobs:
       env:
         USE_FX: ${{ matrix.fx }}
       run: |
-        bundle exec rspec -f d
+        bundle exec rspec -f d --force-color

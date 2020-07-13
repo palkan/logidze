@@ -8,6 +8,12 @@ describe "Logidze migrations" do
 
     include_context "cleanup migrations"
 
+    after(:all) do
+      Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
+        successfully "rake db:migrate"
+      end
+    end
+
     # Install migration has been already applied at the test suite start
     it "rollbacks" do
       successfully %(
