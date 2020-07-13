@@ -4,17 +4,33 @@ require "acceptance_helper"
 
 describe "Logidze migrations" do
   describe "#install" do
+    let(:check_logidze_command) { "ActiveRecord::Base.connection.execute %q{select logidze_version(1, '{}'::jsonb, statement_timestamp())}" }
+
     include_context "cleanup migrations"
 
     # Install migration has been already applied at the test suite start
     it "rollbacks" do
+      successfully %(
+        rails runner "#{check_logidze_command}"
+      )
+
+      # Rollback twice to remove both hstore and logidze
       successfully "rake db:rollback"
+      successfully "rake db:rollback"
+
+      unsuccessfully %(
+        rails runner "#{check_logidze_command}"
+      )
     end
 
     it "creates update migration" do
       successfully "rails generate logidze:install --update"
 
       successfully "rake db:migrate"
+
+      successfully %(
+        rails runner "#{check_logidze_command}"
+      )
 
       successfully "rake db:rollback"
     end
@@ -24,8 +40,10 @@ describe "Logidze migrations" do
     include_context "cleanup migrations"
     include_context "cleanup models"
 
+    let(:check_logidze_command) { "movie = Movie.create!(title: 'Elm street'); movie.reload.log_version == 1 || raise('Fail')" }
+
     before do
-      successfully "rails generate model Movie"
+      successfully "rails generate model Movie title:text"
       successfully "rake db:migrate"
     end
 
@@ -36,7 +54,15 @@ describe "Logidze migrations" do
 
       successfully "rake db:migrate"
 
+      successfully %(
+        rails runner "#{check_logidze_command}"
+      )
+
       successfully "rake db:rollback"
+
+      unsuccessfully %(
+        rails runner "#{check_logidze_command}"
+      )
     end
   end
 end
