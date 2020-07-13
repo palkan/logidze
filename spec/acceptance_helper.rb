@@ -43,6 +43,11 @@ RSpec.configure do |config|
   config.after(:suite) do
     Dir.chdir("#{File.dirname(__FILE__)}/dummy") do
       migrations_to_delete.each { |path| File.delete(path) }
+
+      next unless USE_FX
+
+      FileUtils.rm_rf("db/functions") if File.directory?("db/functions")
+      FileUtils.rm_rf("db/triggers") if File.directory?("db/triggers")
     end
   end
 end

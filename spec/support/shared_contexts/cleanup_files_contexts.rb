@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 shared_context "cleanup migrations" do
-  before(:all) { @old_migrations = Dir["spec/dummy/db/migrate/*"] }
+  before(:all) do
+    @old_migrations = Dir["spec/dummy/db/migrate/*"]
+    @old_functions = Dir["spec/dummy/db/functions/*"]
+    @old_triggers = Dir["spec/dummy/db/triggers/*"]
+  end
+
   after(:all) do
     all_versions = if ActiveRecord::Migrator.respond_to?(:get_all_versions)
       ActiveRecord::Migrator.get_all_versions
@@ -22,6 +27,11 @@ shared_context "cleanup migrations" do
       end
       FileUtils.rm(path)
     end
+
+    (
+      (Dir["spec/dummy/db/functions/*"] - @old_functions) +
+      (Dir["spec/dummy/db/triggers/*"] - @old_triggers)
+    ).each { |path| File.delete(path) }
   end
 end
 
