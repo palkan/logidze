@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
+require "open3"
+
 module Logidze
   module AcceptanceHelpers #:nodoc:
     def successfully(command)
-      expect(suppress_output { system("RAILS_ENV=test #{command}") })
-        .to eq(true), "'#{command}' was unsuccessful"
+      status, out, err = run_command command, env: {"RAILS_ENV" => "test"}
+      expect(status).to be_success, "'#{command}' expected to succeed but failed\nOut: #{out}\nErr: #{err}\n"
     end
 
     def unsuccessfully(command)
-      expect(suppress_output { system("RAILS_ENV=test #{command}") })
-        .to eq(false), "'#{command}' was successful"
+      status, out, err = run_command command, env: {"RAILS_ENV" => "test"}
+      expect(status).not_to be_success, "'#{command}' expected to fail but succeed\nOut: #{out}\nErr: #{err}\n"
     end
 
     def verify_file_contains(path, statement)
@@ -20,6 +22,20 @@ module Logidze
     def verify_file_not_contain(path, statement)
       expect(File.readlines(path).grep(/#{statement}/))
         .to be_empty, "File #{path} should not contain '#{statement}'"
+    end
+
+    def run_command(cmd, env: {}, success: true)
+      output, err, status =
+        Open3.capture3(
+          env,
+          cmd
+        )
+
+      if ENV["LOG"]
+        puts "\n\nCOMMAND:\n#{command}\n\nOUTPUT:\n#{output}\nERROR:\n#{err}\n"
+      end
+
+      [status, output, err]
     end
 
     def suppress_output
