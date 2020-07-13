@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "ammeter", "~> 1.1.3"
   spec.add_development_dependency "bundler", ">= 1.10"
+  spec.add_development_dependency "fx", "~> 0.5"
   spec.add_development_dependency "pg", ">= 0.18"
   spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "rspec-rails", ">= 3.4"

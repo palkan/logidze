@@ -1,3 +1,4 @@
+-- version: 1
 CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb, ts timestamp with time zone) RETURNS jsonb AS $body$
   DECLARE
     buf jsonb;

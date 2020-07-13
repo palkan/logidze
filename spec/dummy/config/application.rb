@@ -8,7 +8,14 @@ require "active_record/railtie"
 
 Bundler.require(*Rails.groups)
 
+# Conditionally load fx
+USE_FX = ENV["USE_FX"] == "true"
+
 require "logidze"
+if USE_FX
+  require "fx"
+  $stdout.puts "🔩 Fx is loaded"
+end
 
 unless ActiveRecord::Migration.respond_to?(:[])
   ActiveRecord::Migration.singleton_class.send(:define_method, :[]) { |_| self }

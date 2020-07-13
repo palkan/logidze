@@ -1,23 +1,19 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def up
     execute <<-SQL
-<%= inject_sql("logidze_version.sql") %>
-<%= inject_sql("logidze_snapshot.sql") %>
-<%= inject_sql("logidze_filter_keys.sql") %>
-<%= inject_sql("logidze_compact_history.sql") %>
-<%= inject_sql("logidze_logger.sql") %>
+<%- function_definitions.each do |f| %>
+  <%= inject_sql("#{f.name}.sql") %>
+<%- end -%>
     SQL
   end
 
   def down
-    <%- unless update? -%>
+<%- unless update? -%>
     execute <<~SQL
-      DROP FUNCTION logidze_version(bigint, jsonb, timestamp with time zone) CASCADE;
-      DROP FUNCTION logidze_filter_keys(jsonb, text[], boolean) CASCADE;
-      DROP FUNCTION logidze_compact_history(jsonb) CASCADE;
-      DROP FUNCTION logidze_snapshot(jsonb, text, text[], boolean) CASCADE;
-      DROP FUNCTION logidze_logger() CASCADE;
+  <%- function_definitions.each do |f| %>
+      DROP FUNCTION <%= f.name %>(<%= f.signature %>) CASCADE;
+  <%- end -%>
     SQL
-    <%- end -%>
+<%- end -%>
   end
 end

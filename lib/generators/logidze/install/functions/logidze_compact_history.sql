@@ -1,3 +1,4 @@
+-- version: 1
 CREATE OR REPLACE FUNCTION logidze_compact_history(log_data jsonb) RETURNS jsonb AS $body$
   DECLARE
     merged jsonb;

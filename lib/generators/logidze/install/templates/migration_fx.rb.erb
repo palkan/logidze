@@ -1,0 +1,22 @@
+class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
+  def change
+  <%- function_definitions.each do |f| -%>
+    <%- previous_version = previous_version_for(f.name) -%>
+    <%- if previous_version -%>
+      <%- if previous_version != f.version -%>
+    update_function :<%= f.name %>, version: <%= f.version %>, revert_to_version: <%= previous_version %>
+      <%- end -%>
+    <%- else -%>
+    reversible do |dir|
+      dir.up do
+        create_function :<%= f.name %>, version: <%= f.version %>
+      end
+
+      dir.down do
+        execute "DROP FUNCTION <%= f.name %>(<%= f.signature %>) CASCADE"
+      end
+    end
+    <%- end -%>
+  <%- end -%>
+  end
+end

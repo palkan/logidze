@@ -1,7 +1,12 @@
 Description:
   Generates the necessary files to get you up and running with Logidze gem
-  
+
 Examples:
   rails generate logidze:install
 
     This will generate the core migration file with trigger function defined.
+
+  rails generate logidze:install --fx
+
+    This will generate schema.rb compatible migration with `create_function` definitions and separate SQL files.
+    The fx gem must be installed.

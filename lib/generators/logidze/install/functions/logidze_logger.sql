@@ -1,3 +1,4 @@
+-- version: 1
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
   DECLARE
     changes jsonb;
