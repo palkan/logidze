@@ -16,7 +16,20 @@ describe "log timestamps", :db do
   let(:user) { User.create!(time: Time.at(0)).reload }
 
   context "timestamp_column is not set" do
-    include_context "setup models with timestamp column", nil
+    include_context "cleanup migrations"
+
+    before(:all) do
+      Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
+        # Post has an 'updated_at' column
+        successfully "rails generate logidze:model post"
+        # User has a 'time' column
+        successfully "rails generate logidze:model user --only-trigger"
+        successfully "rake db:migrate"
+
+        # Close active connections to handle db variables
+        ActiveRecord::Base.connection_pool.disconnect!
+      end
+    end
 
     it "uses 'updated_at' column if it exists", :aggregate_failures do
       expect(post).to use_timestamp(:updated_at)
@@ -34,7 +47,21 @@ describe "log timestamps", :db do
   end
 
   context "timestamp_column is set to 'time'" do
-    include_context "setup models with timestamp column", "time"
+    include_context "cleanup migrations"
+
+    before(:all) do
+      param = "--timestamp_column time"
+      Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
+        # Post has an 'updated_at' column
+        successfully "rails generate logidze:model post #{param}"
+        # User has a 'time' column
+        successfully "rails generate logidze:model user --only-trigger #{param}"
+        successfully "rake db:migrate"
+
+        # Close active connections to handle db variables
+        ActiveRecord::Base.connection_pool.disconnect!
+      end
+    end
 
     it "uses 'time' column if it exists", :aggregate_failures do
       expect(post).to use_statement_timestamp
@@ -43,8 +70,22 @@ describe "log timestamps", :db do
   end
 
   context "timestamp_column is 'nil'" do
-    # 'nil', 'null' and 'false' are identical
-    include_context "setup models with timestamp column", "nil"
+    include_context "cleanup migrations"
+
+    before(:all) do
+      # 'nil', 'null' and 'false' are identical
+      param = "--timestamp_column nil"
+      Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
+        # Post has an 'updated_at' column
+        successfully "rails generate logidze:model post #{param}"
+        # User has a 'time' column
+        successfully "rails generate logidze:model user --only-trigger #{param}"
+        successfully "rake db:migrate"
+
+        # Close active connections to handle db variables
+        ActiveRecord::Base.connection_pool.disconnect!
+      end
+    end
 
     it "uses statement_timestamp()", :aggregate_failures do
       expect(user).to use_statement_timestamp
