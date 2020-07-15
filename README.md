@@ -121,6 +121,26 @@ UPDATE <my_table> as t
 SET log_data = logidze_snapshot(to_jsonb(t))
 ```
 
+Or by using the following methods:
+
+```ruby
+Model.create_logidze_snapshot
+
+# specify the timestamp column to use for the initial version (by default the current time is used)
+Model.create_logidze_snapshot(timestamp: :created_at)
+
+# filter columns
+Model.create_logidze_snapshot(only: %[name])
+Model.create_logidze_snapshot(except: %[password])
+
+# or call a similar method (but with !) on a record
+
+my_model = Model.find(params[:id])
+my_model.create_logidze_snapshot!(timestamp: :created_at)
+```
+
+A snapshot is only created if `log_data` is null.
+
 ### Log size limits
 
 You can provide the `limit` option to `generate` to limit the size of the log (by default it's unlimited):
