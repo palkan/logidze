@@ -38,6 +38,11 @@ describe Logidze::Model, :db do
       expect(user.at(time: time(401))).to be_equal(user)
     end
 
+    it "returns self if log_data is nil" do
+      user.log_data = nil
+      expect(user.at(time: time(100))).to be_equal(user)
+    end
+
     it "returns dup", :aggregate_failures do
       user_old = user.at(time: time(100))
       expect(user_old).not_to be_equal(user)
@@ -90,6 +95,11 @@ describe Logidze::Model, :db do
 
       expect(user.changes).to include("age" => [10, 0], "active" => [false, true])
     end
+
+    it "raises ArgumentError if log_data is nil" do
+      user.log_data = nil
+      expect { user.at!(time: time(100)) }.to raise_error(ArgumentError)
+    end
   end
 
   describe "#diff_from" do
@@ -103,6 +113,11 @@ describe Logidze::Model, :db do
               "active" => {"old" => true, "new" => false}
             }
         )
+    end
+
+    it "returns empty hash if log_data is nil" do
+      user.log_data = nil
+      expect(user.diff_from(time: time(350))).to eq({"id" => user.id, "changes" => {}})
     end
   end
 

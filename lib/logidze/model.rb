@@ -79,6 +79,8 @@ module Logidze
 
       time = parse_time(time)
 
+      return self unless log_data
+
       return nil unless log_data.exists_ts?(time)
 
       if log_data.current_ts?(time)
@@ -95,6 +97,8 @@ module Logidze
     # Revert record to the version at specified time (without saving to DB)
     def at!(time: nil, version: nil)
       return at_version!(version) if version
+
+      raise ArgumentError, "#log_data is empty" unless log_data
 
       time = parse_time(time)
 
@@ -118,6 +122,8 @@ module Logidze
 
     # Revert record to the specified version (without saving to DB)
     def at_version!(version)
+      raise ArgumentError, "#log_data is empty" unless log_data
+
       return self if log_data.version == version
       return false unless log_data.find_by_version(version)
 
@@ -132,9 +138,9 @@ module Logidze
     #   #=> { "id" => 1, "changes" => { "title" => { "old" => "Hello!", "new" => "World" } } }
     def diff_from(version: nil, time: nil)
       time = parse_time(time) if time
-      changes = log_data.diff_from(time: time, version: version).tap do |v|
+      changes = log_data&.diff_from(time: time, version: version)&.tap do |v|
         deserialize_changes!(v)
-      end
+      end || {}
 
       changes.delete_if { |k, _v| deleted_column?(k) }
 
