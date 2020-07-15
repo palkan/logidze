@@ -3,15 +3,6 @@
 require "active_support"
 
 module Logidze
-  module Deprecations # :nodoc:
-    def self.show_ts_deprecation_for(meth)
-      warn(
-        "[Deprecation] Usage of #{meth}(time) will be removed in the future releases, "\
-        "use #{meth}(time: ts) instead"
-      )
-    end
-  end
-
   # Extends model with methods to browse history
   module Model
     require "logidze/history/type"
@@ -26,16 +17,12 @@ module Logidze
 
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
-      def at(ts = nil, time: nil, version: nil)
-        Deprecations.show_ts_deprecation_for(".at") if ts
-        time ||= ts
+      def at(time: nil, version: nil)
         all.map { |record| record.at(time: time, version: version) }.compact
       end
 
       # Return changes made to records since specified time
-      def diff_from(ts = nil, time: nil, version: nil)
-        Deprecations.show_ts_deprecation_for(".diff_from") if ts
-        time ||= ts
+      def diff_from(time: nil, version: nil)
         all.map { |record| record.diff_from(time: time, version: version) }
       end
 
@@ -87,12 +74,9 @@ module Logidze
     # If time/version is less then the first version, then return nil.
     # If time/version is greater then the last version, then return self.
     # rubocop: disable Metrics/MethodLength
-    def at(ts = nil, time: nil, version: nil)
-      Deprecations.show_ts_deprecation_for("#at") if ts
-
+    def at(time: nil, version: nil)
       return at_version(version) if version
 
-      time ||= ts
       time = parse_time(time)
 
       return nil unless log_data.exists_ts?(time)
@@ -109,12 +93,9 @@ module Logidze
     # rubocop: enable Metrics/MethodLength
 
     # Revert record to the version at specified time (without saving to DB)
-    def at!(ts = nil, time: nil, version: nil)
-      Deprecations.show_ts_deprecation_for("#at!") if ts
-
+    def at!(time: nil, version: nil)
       return at_version!(version) if version
 
-      time ||= ts
       time = parse_time(time)
 
       return self if log_data.current_ts?(time)
@@ -149,9 +130,7 @@ module Logidze
     #
     #   post.diff_from(time: 2.days.ago) # or post.diff_from(version: 2)
     #   #=> { "id" => 1, "changes" => { "title" => { "old" => "Hello!", "new" => "World" } } }
-    def diff_from(ts = nil, version: nil, time: nil)
-      Deprecations.show_ts_deprecation_for("#diff_from") if ts
-      time ||= ts
+    def diff_from(version: nil, time: nil)
       time = parse_time(time) if time
       changes = log_data.diff_from(time: time, version: version).tap do |v|
         deserialize_changes!(v)
