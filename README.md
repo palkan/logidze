@@ -44,6 +44,7 @@ Other requirements:
 - [Dealing with large logs](#dealing-with-large-logs)
 - [Upgrading](#upgrading)
 - [Log format](#log-format)
+- [Troubleshooting](#troubleshooting)
 - [Development](#development)
 
 ## Installation
@@ -130,8 +131,8 @@ Model.create_logidze_snapshot
 Model.create_logidze_snapshot(timestamp: :created_at)
 
 # filter columns
-Model.create_logidze_snapshot(only: %[name])
-Model.create_logidze_snapshot(except: %[password])
+Model.create_logidze_snapshot(only: %(name))
+Model.create_logidze_snapshot(except: %(password))
 
 # or call a similar method (but with !) on a record
 
@@ -444,6 +445,21 @@ The `log_data` column has the following format:
 ```
 
 If you specify the limit in the trigger definition, then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
+
+## Troubleshooting
+
+### `log_data` is nil when using Rails fixtures
+
+Rails fixtures are populated with triggers disabled. Thus, `log_data` is null initially for all records.
+You can use `#create_logidze_snapshot` manually to build initial snapshots.
+
+### How to make this work with Apartment 🤔
+
+First, read [Apartment docs](https://github.com/influitive/apartment#installing-extensions-into-persistent-schemas) on installing PostgreSQL extensions. You need to use the described approach to install Hstore (and drop the migration provided by Logidze during installation).
+
+Secondly, set `config.use_sql = true` in the Apartment configuration.
+
+Related issues: [#50](https://github.com/palkan/logidze/issues/50).
 
 ## Development
 
