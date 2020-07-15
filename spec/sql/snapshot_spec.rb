@@ -23,7 +23,7 @@ describe "logidze_snapshot" do
       "c" => a_hash_including({"title" => "Feel me", "rating" => 42, "name" => "Jack"})
     })
 
-    expect(Time.at(version["ts"]) - now).to be > 1.year
+    expect(Time.at(version["ts"] / 1000) - now).to be > 1.year
   end
 
   specify "with timestamp column" do
@@ -59,7 +59,7 @@ describe "logidze_snapshot" do
       "c" => {"name" => "Jack"}
     })
 
-    expect(Time.at(version["ts"]) - now).to be > 1.year
+    expect(Time.at(version["ts"] / 1000) - now).to be > 1.year
   end
 
   specify "with columns filtering and timestamp column" do

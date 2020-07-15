@@ -3,6 +3,8 @@
 
 ## master (unreleased)
 
+- Add `#create_logidze_snapshot!` and `.create_logidze_snapshot` methods. ([@palkan][])
+
 - Add integration with `fx` gem. ([@palkan][])
 
 Now it's possible to use Logidze with `schema.rb`. Add `fx` gem to the project, and new migrations will be

@@ -54,6 +54,28 @@ module Logidze
       def reset_log_data
         without_logging { update_all(log_data: nil) }
       end
+
+      # Initialize log_data with the current state if it's null
+      def create_logidze_snapshot(timestamp: nil, only: nil, except: nil)
+        args = ["'null'"]
+
+        args[0] = "'#{timestamp}'" if timestamp
+
+        columns = only || except
+
+        if columns
+          args[1] = "'{#{columns.join(",")}}'"
+          args[2] = only ? "true" : "false"
+        end
+
+        without_logging do
+          where(log_data: nil).update_all(
+            <<~SQL
+              log_data = logidze_snapshot(to_jsonb(#{quoted_table_name}), #{args.join(", ")})
+            SQL
+          )
+        end
+      end
     end
 
     # Use this to convert Ruby time to milliseconds
@@ -208,6 +230,12 @@ module Logidze
     # Nullify log_data column for a single record
     def reset_log_data
       self.class.without_logging { update_column(:log_data, nil) }
+    end
+
+    def create_logidze_snapshot!(**opts)
+      self.class.where(self.class.primary_key => id).create_logidze_snapshot(**opts)
+
+      reload_log_data
     end
 
     protected
