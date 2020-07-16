@@ -80,8 +80,14 @@ jobs:
     - name: Prepare test database
       run: |
         bundle exec rake dummy:db:create
-    - name: Run RSpec
+    - name: Run RSpec (unit, integrations)
       env:
         USE_FX: ${{ matrix.fx }}
       run: |
-        bundle exec rspec -f d --force-color
+        bundle exec rspec --exclude-pattern=spec/acceptance/**/* -f d --force-color
+    - name: Run RSpec (acceptance)
+      env:
+        USE_FX: ${{ matrix.fx }}
+      run: |
+        bundle exec rspec spec/acceptance/ -f d --force-color
+
