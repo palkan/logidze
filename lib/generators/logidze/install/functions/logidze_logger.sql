@@ -131,8 +131,8 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         to_jsonb(new_v)
       );
 
-      IF history_limit IS NOT NULL AND history_limit = size THEN
-        NEW.log_data := logidze_compact_history(NEW.log_data);
+      IF history_limit IS NOT NULL AND history_limit <= size THEN
+        NEW.log_data := logidze_compact_history(NEW.log_data, size - history_limit + 1);
       END IF;
     END IF;
 
