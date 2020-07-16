@@ -42,6 +42,7 @@ Other requirements:
   - [Reset log](#reset-log)
   - [Associations versioning](#associations-versioning)
 - [Dealing with large logs](#dealing-with-large-logs)
+- [Handling records deletion](#handling-records-deletion)
 - [Upgrading](#upgrading)
 - [Log format](#log-format)
 - [Troubleshooting](#troubleshooting)
@@ -404,6 +405,14 @@ The chart below shows the difference in PG query time before and after turning `
 ![](./assets/pg_log_data_chart.png)
 
 If you try to call `#log_data` on the model loaded in such way, you'll get `nil`. If you want to fetch log data (e.g., during the console debugging)–use **`user.reload_log_data`**, which forces loading this column from the DB.
+
+## Handling records deletion
+
+Unlike, for example, PaperTrail, Logidze is designed to **only track changes**. If the record has been deleted, **everything is lost**.
+
+If you want to keep changes history after records deletion as well, consider using specialized tools for soft-delete, such as, [Discard](https://github.com/jhawthorn/discard) or [Paranoia](https://github.com/rubysherpas/paranoia).
+
+See also the discussion: [#61](https://github.com/palkan/logidze/issues/61).
 
 ## Upgrading
 
