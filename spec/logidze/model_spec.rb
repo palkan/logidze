@@ -74,6 +74,19 @@ describe Logidze::Model, :db do
       user_old = user.at(time: Date.new(2016, 0o4, 13))
       expect(user_old).to be_equal user
     end
+
+    context "when Logidze.return_self_if_log_data_is_empty = false" do
+      around do |ex|
+        Logidze.return_self_if_log_data_is_empty = false
+        ex.run
+        Logidze.return_self_if_log_data_is_empty = true
+      end
+
+      it "returns nil if log_data is nil" do
+        user.log_data = nil
+        expect(user.at(time: time(100))).to be_nil
+      end
+    end
   end
 
   describe "#at(version)" do

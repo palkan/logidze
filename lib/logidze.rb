@@ -20,19 +20,12 @@ module Logidze
   class << self
     # Determines if Logidze should append a version to the log after updating an old version.
     attr_accessor :append_on_undo
-
-    attr_writer :associations_versioning
-
-    def associations_versioning
-      @associations_versioning || false
-    end
-
+    # Determines whether associations versioning is enabled or not
+    attr_accessor :associations_versioning
     # Determines if Logidze should exclude log data from SELECT statements
-    attr_writer :ignore_log_data_by_default
-
-    def ignore_log_data_by_default
-      @ignore_log_data_by_default || false
-    end
+    attr_accessor :ignore_log_data_by_default
+    # Whether #at should return self or nil when log_data is nil
+    attr_accessor :return_self_if_log_data_is_empty
 
     # Temporary disable DB triggers.
     #
@@ -47,4 +40,9 @@ module Logidze
       end
     end
   end
+
+  self.append_on_undo = false
+  self.associations_versioning = false
+  self.ignore_log_data_by_default = false
+  self.return_self_if_log_data_is_empty = true
 end

@@ -208,6 +208,9 @@ You can also get revision by version number:
 post.at(version: 2)
 ```
 
+**NOTE:** If `log_data` is nil, `#at(time:)` returns self and `#at(version:)` returns `nil`.
+You can opt-in to return `nil` for time-based `#at` as well by setting `Logidze.return_self_if_log_data_is_empty = false`.
+
 It is also possible to get version for relations:
 
 ```ruby
@@ -223,6 +226,8 @@ post.diff_from(time: 1.hour.ago)
 # the same for relations
 Post.where(created_at: Time.zone.today.all_day).diff_from(time: 1.hour.ago)
 ```
+
+**NOTE:** If `log_data` is nil, `#diff_from` returns an empty Hash as `"changes"`.
 
 There are also `#undo!` and `#redo!` options (and more general `#switch_to!`):
 

@@ -79,7 +79,9 @@ module Logidze
 
       time = parse_time(time)
 
-      return self unless log_data
+      unless log_data
+        return Logidze.return_self_if_log_data_is_empty ? self : nil
+      end
 
       return nil unless log_data.exists_ts?(time)
 
