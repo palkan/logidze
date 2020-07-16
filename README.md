@@ -466,6 +466,13 @@ Secondly, set `config.use_sql = true` in the Apartment configuration.
 
 Related issues: [#50](https://github.com/palkan/logidze/issues/50).
 
+### `PG::UntranslatableCharacter: ERROR`
+
+That could happen when your row data contain null bytes. You should sanitize the data before writing to the database.
+From the [PostgreSQL docs](https://www.postgresql.org/docs/current/datatype-json.html): `jsonb type also rejects \u0000 (because that cannot be represented in PostgreSQL's text type)`.
+
+Related issues: [#155](https://github.com/palkan/logidze/issues/155).
+
 ## Development
 
 We use [Dip](https://github.com/bibendi/dip) for development. Provision the project by running `dip provision` and then use `dip bundle`, `dip rspec` or `dip bash` to interact with a Docker development environment.
