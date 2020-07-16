@@ -332,4 +332,37 @@ describe "triggers", :db do
         .to include("title" => "Triggers", "rating" => 22, "active" => true)
     end
   end
+
+  describe ".with_full_snapshot" do
+    before(:all) { @post = Post.create!(title: "Triggers", rating: 10) }
+    after(:all) { @post.destroy! }
+
+    let(:post) { @post.reload }
+
+    it "creates a new version with a full snapshot instead of a diff" do
+      expect(post.log_version).to eq 1
+      post.update!(title: "Full me")
+
+      expect(post.reload.log_version).to eq 2
+
+      Logidze.without_logging do
+        post.update!(active: true)
+        post.update!(rating: 22)
+      end
+
+      expect(post.reload.log_version).to eq 2
+
+      expect(post.log_data.versions.last.changes)
+        .to include("title" => "Full me")
+      expect(post.log_data.versions.last.changes.keys)
+        .not_to include("rating", "active")
+
+      Logidze.with_full_snapshot { post.touch }
+
+      expect(post.reload.log_version).to eq 3
+
+      expect(post.log_data.versions.last.changes)
+        .to include("title" => "Full me", "rating" => 22, "active" => true)
+    end
+  end
 end

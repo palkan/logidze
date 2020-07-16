@@ -3,6 +3,11 @@
 
 ## master (unreleased)
 
+- Add `.with_full_snapshot` to add full snapshots to the log instead of diffs. ([@palkan][])
+
+Useful in combination with `.without_logging`: first, you perform multiple updates without logging, then
+you do something like `with_full_snapshot { record.touch }` to create a log entry with the current state.
+
 - Add `#create_logidze_snapshot!` and `.create_logidze_snapshot` methods. ([@palkan][])
 
 - Add integration with `fx` gem. ([@palkan][])

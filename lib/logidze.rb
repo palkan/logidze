@@ -32,10 +32,24 @@ module Logidze
     # @example
     #   Logidze.without_logging { Post.update_all(active: true) }
     def without_logging
+      with_logidze_setting("logidze.disabled", "on") { yield }
+    end
+
+    # Instructure Logidze to create a full snapshot for the new versions, not a diff
+    #
+    # @example
+    #   Logidze.with_full_snapshot { post.touch }
+    def with_full_snapshot
+      with_logidze_setting("logidze.full_snapshot", "on") { yield }
+    end
+
+    private
+
+    def with_logidze_setting(name, value)
       ActiveRecord::Base.transaction do
-        ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO on;"
+        ActiveRecord::Base.connection.execute "SET LOCAL #{name} TO #{value};"
         res = yield
-        ActiveRecord::Base.connection.execute "SET LOCAL logidze.disabled TO DEFAULT;"
+        ActiveRecord::Base.connection.execute "SET LOCAL #{name} TO DEFAULT;"
         res
       end
     end

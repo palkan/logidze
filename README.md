@@ -40,6 +40,7 @@ Other requirements:
   - [Track responsibility](#track-responsibility)
   - [Disable logging temporary](#disable-logging-temporary)
   - [Reset log](#reset-log)
+  - [Creating full snapshot instead of diffs](#full-snapshots)
   - [Associations versioning](#associations-versioning)
 - [Dealing with large logs](#dealing-with-large-logs)
 - [Handling records deletion](#handling-records-deletion)
@@ -360,6 +361,25 @@ record.reset_log_data
 
 # for relation
 User.where(active: true).reset_log_data
+```
+
+### Full snapshots
+
+You can instruct Logidze to create a full snapshot instead of a diff for a particular log entry.
+
+It could be useful in combination with `.without_logging`: first, you perform multiple updates without logging, then
+you want to create a log entry with the current state. To do that, you should use the `Logidze.with_full_snapshot` method:
+
+```ruby
+record = Model.find(params[:id])
+
+Logidze.without_logging do
+  # perform multiple write operations with record
+end
+
+Logidze.with_full_snapshot do
+  record.touch
+end
 ```
 
 ### Associations versioning
