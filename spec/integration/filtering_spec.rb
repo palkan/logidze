@@ -70,7 +70,7 @@ describe "columns filtering", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      @only = %w[title rating]
+      @only = %w[title meta]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:model post "\
@@ -84,13 +84,13 @@ describe "columns filtering", :db do
       Post.reset_column_information
     end
 
-    let(:params) { {title: "Triggers", rating: 10, active: false} }
+    let(:params) { {title: "Triggers", rating: 10, active: false, meta: {some_id: "bla"}} }
 
     describe "insert" do
       let(:post) { Post.create!(params).reload }
 
       it "logs only onlyed columns", :aggregate_failures do
-        changes = post.log_data.current_version.changes
+        changes = post.reload.log_data.current_version.changes
         expect(changes.keys).to match_array @only
       end
     end
@@ -103,6 +103,18 @@ describe "columns filtering", :db do
 
       it "logs only onlyed columns", :aggregate_failures do
         post.update!(params)
+        changes = post.reload.log_data.current_version.changes
+        expect(changes.keys).to match_array @only
+      end
+
+      fit "handles jsonb fields updates", :aggregate_failures do
+        post.update!(params)
+
+        changes = post.reload.log_data.current_version.changes
+        expect(changes.keys).to match_array @only
+
+        post.update!(meta: {another: {id: "boom"}})
+
         changes = post.log_data.current_version.changes
         expect(changes.keys).to match_array @only
       end

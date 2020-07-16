@@ -86,18 +86,20 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         END LOOP;
       END IF;
 
+      changes := '{}';
+
       IF (coalesce(current_setting('logidze.full_snapshot', true), '') = 'on') THEN
-        changes := hstore_to_jsonb_loose(hstore(NEW.*));
+        changes = hstore_to_jsonb_loose(hstore(NEW.*));
       ELSE
-        changes := hstore_to_jsonb_loose(
+        changes = hstore_to_jsonb_loose(
           hstore(NEW.*) - hstore(OLD.*)
         );
       END IF;
 
-      changes := changes - 'log_data';
+      changes = changes - 'log_data';
 
       IF columns IS NOT NULL THEN
-        changes := logidze_filter_keys(changes, columns, include_columns);
+        changes = logidze_filter_keys(changes, columns, include_columns);
       END IF;
 
       IF changes = '{}' THEN

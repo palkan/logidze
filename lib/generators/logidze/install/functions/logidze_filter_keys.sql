@@ -4,17 +4,20 @@ CREATE OR REPLACE FUNCTION logidze_filter_keys(obj jsonb, keys text[], include_c
     res jsonb;
     key text;
   BEGIN
+    res := '{}';
+
     IF include_columns THEN
-      res := '{}';
       FOREACH key IN ARRAY keys
       LOOP
-        res := jsonb_insert(res, ARRAY[key], obj->key);
+        IF obj ? key THEN
+          res = jsonb_insert(res, ARRAY[key], obj->key);
+        END IF;
       END LOOP;
     ELSE
-      res := obj;
+      res = obj;
       FOREACH key IN ARRAY keys
       LOOP
-        res := res - key;
+        res = res - key;
       END LOOP;
     END IF;
 
