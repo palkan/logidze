@@ -32,6 +32,11 @@ spec/dummy/db/*.sqlite3
 spec/dummy/db/*.sqlite3-journal
 spec/dummy/tmp/
 
+spec/dummy/db/functions/
+spec/dummy/db/triggers/
+spec/dummy/db/migrate/*_enable_hstore.rb
+spec/dummy/db/migrate/*_logidze_install.rb
+
 Gemfile.lock
 Gemfile.local
 .rspec

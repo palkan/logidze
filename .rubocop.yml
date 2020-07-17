@@ -13,6 +13,8 @@ AllCops:
     - 'Gemfile'
     - 'vendor/**/*'
     - 'gemfiles/**/*'
+    - 'spec/dummy/db/migrate/*_enable_hstore.rb'
+    - 'spec/dummy/db/migrate/*_logidze_install.rb'
   DisplayCopNames: true
   TargetRubyVersion: 2.5
 
