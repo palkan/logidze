@@ -2,108 +2,139 @@
 
 We want to compare Logidze with the most popular versioning library for Rails – PaperTrail.
 
+To run this benchmarks, you need to first provision the example Rails app:
 
-## Insert ([source](insert_bench.rb))
-
+```sh
+bundle install
+bundle exec rails db:migrate
 ```
-PaperTrail INSERT    213.148  (± 8.9%) i/s -      1.060k in   5.018504s
-   Logidze INSERT    613.387  (±16.3%) i/s -      2.970k in   5.036127s
+
+To run a benchmark, run the corresponding script:
+
+```sh
+bundle exec ruby benchmarks/insert_bench.rb
 ```
 
+## Insert ([source](benchmarks/insert_bench.rb))
 
-## Update ([source](update_bench.rb))
+```sh
+Comparison:
+        Plain INSERT:      535.5 i/s
+      Logidze INSERT:      498.2 i/s - same-ish: difference falls within error
+   PaperTrail INSERT:      276.5 i/s - 1.94x  (± 0.00) slower
+```
+
+## Update ([source](benchmarks/update_bench.rb))
 
 When changeset has 2 fields:
 
-```
-PaperTrail UPDATE #1    256.651  (±26.5%) i/s -      1.206k in   5.002300s
-Logidze UPDATE #1    356.932  (±12.6%) i/s -      1.764k in   5.030560s
+```sh
+Comparison:
+     Plain UPDATE #1:      775.2 i/s
+   Logidze UPDATE #1:      518.6 i/s - 1.49x  (± 0.00) slower
+        PT UPDATE #1:      471.4 i/s - 1.64x  (± 0.00) slower
 ```
 
 When changeset has 5 fields:
 
-```
-PaperTrail UPDATE #2    246.281  (±24.0%) i/s -      1.168k in   5.008234s
-Logidze UPDATE #2    331.942  (±16.6%) i/s -      1.593k in   5.028135s
+```sh
+Comparison:
+     Plain UPDATE #2:      726.8 i/s
+   Logidze UPDATE #2:      468.0 i/s - 1.55x  (± 0.00) slower
+        PT UPDATE #2:      431.2 i/s - 1.69x  (± 0.00) slower
 ```
 
-## Getting diff ([source](diff_bench.rb))
+## Getting diff ([source](benchmarks/diff_bench.rb))
 
 PaperTrail doesn't have built-in method to calculate diff between not adjacent versions.
-We add `diff_from(ts)` and `diff_from_joined(ts)` (which uses SQL JOIN) methods to calculate diff from specified version using changesets.
+We added `#diff_from(ts)` and `#diff_from_joined(ts)` (which uses SQL JOIN) methods to calculate diff from specified version using changesets.
 
 When each record has 10 versions:
 
-```
-       PT DIFF     20.874  (± 4.8%) i/s -    106.000  in   5.091402s
-PT (join) DIFF     20.619  (± 4.8%) i/s -    104.000  in   5.070160s
-  Logidze DIFF    109.482  (±24.7%) i/s -    500.000  in   5.103534s
+```sh
+Comparison:
+        Logidze DIFF:      129.2 i/s
+      PT (join) DIFF:        4.5 i/s - 28.57x  (± 0.00) slower
+             PT DIFF:        3.9 i/s - 32.83x  (± 0.00) slower
 ```
 
 When each record has 100 versions:
 
-```
-       PT DIFF      2.998  (± 0.0%) i/s -     15.000  in   5.019494s
-PT (join) DIFF      3.193  (± 0.0%) i/s -     16.000  in   5.030155s
-  Logidze DIFF     19.627  (±25.5%) i/s -     88.000  in   5.035555s
-```
-
-And, finally, when each record has 1000 versions:
-
-```
-       PT DIFF      0.270  (± 0.0%) i/s -     17.000  in  63.038374s
-PT (join) DIFF      0.235  (± 0.0%) i/s -     14.000  in  60.350886s
-  Logidze DIFF      2.022  (± 0.0%) i/s -    120.000  in  60.142965s
+```sh
+Comparison:
+        Logidze DIFF:       32.8 i/s
+      PT (join) DIFF:        0.5 i/s - 69.48x  (± 0.00) slower
+             PT DIFF:        0.4 i/s - 88.81x  (± 0.00) slower
 ```
 
-## Select memory usage ([source](memory_profile.rb))
+## Getting version at the specified time ([source](benchmarks/version_at_bench.rb))
 
-Logidze loads more data (because it stores log in-place). But how much more?
-We consider two cases for PaperTrail: when we want to calculate diff (and thus loading versions) and when we don't need any history related data.
+Measuring the time to get the _middle_ version using the corresponding timestamp.
 
 When each record has 10 versions:
 
-```
-PT records
-Total Allocated:                 27.8 KB
-Total Retained:                  16.59 KB
-Retained memory (per record):    2.14 KB
+```sh
+Comparison:
+   Logidze AT single:      882.1 i/s
+        PT AT single:      336.7 i/s - 2.62x  (± 0.00) slower
 
-PT with versions
-Total Allocated:                 228.01 KB
-Total Retained:                  170.78 KB
-Retained memory (per record):    143.13 KB
-
-Logidze records
-Total Allocated:                 46.45 KB
-Total Retained:                  34.73 KB
-Retained memory (per record):    4.11 KB
+Comparison:
+     Logidze AT many:      265.0 i/s
+          PT AT many:       43.9 i/s - 6.04x  (± 0.00) slower
 ```
 
 When each record has 100 versions:
 
+```sh
+Comparison:
+   Logidze AT single:      543.0 i/s
+        PT AT single:      337.8 i/s - 1.61x  (± 0.00) slower
+
+Comparison:
+     Logidze AT many:       92.0 i/s
+          PT AT many:       45.3 i/s - 2.03x  (± 0.00) slower
 ```
+
+**NOTE:** PaperTrail has N+1 problem when loading multiple records at the specified time (due to the usage of the `versions.subsequent` method).
+
+## Select memory usage ([source](benchmarks/memory_profile.rb))
+
+Logidze stores logs in-place. But at what cost?
+
+When each record has 10 versions:
+
+```sh
+Plain records
+Total Allocated:                                15.24 KB
+Total Retained:                                 9.68 KB
+Retained_memsize memory (per record):           1.12 KB
+
 PT with versions
-Total Allocated:                 1.92 MB
-Total Retained:                  1.56 MB
-Retained memory (per record):    1.53 MB
+Total Allocated:                                124.38 KB
+Total Retained:                                 95.52 KB
+Retained_memsize memory (per record):           81.82 KB
 
 Logidze records
-Total Allocated:                 162.48 KB
-Total Retained:                  150.76 KB
-Retained memory (per record):    15.4 KB
+Total Allocated:                                38.68 KB
+Total Retained:                                 32.12 KB
+Retained_memsize memory (per record):           3.54 KB
 ```
 
-When each record has 1000 versions:
+When each record has 100 versions:
 
-```
+```sh
+Plain records
+Total Allocated:                                15.22 KB
+Total Retained:                                 9.66 KB
+Retained_memsize memory (per record):           1.11 KB
+
 PT with versions
-Total Allocated:                 18.23 MB
-Total Retained:                  14.86 MB
-Retained memory (per record):    14.83 MB
+Total Allocated:                                998.71 KB
+Total Retained:                                 864.26 KB
+Retained_memsize memory (per record):           850.6 KB
 
 Logidze records
-Total Allocated:                 1.32 MB
-Total Retained:                  1.31 MB
-Retained memory (per record):    131.59 KB
+Total Allocated:                                140.16 KB
+Total Retained:                                 133.6 KB
+Retained_memsize memory (per record):           13.91 KB
 ```

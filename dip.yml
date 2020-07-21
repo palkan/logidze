@@ -43,5 +43,6 @@ provision:
   - dip up -d postgres
   - dip compose run postgres createdb -h postgres -U postgres logidze_test
   - dip compose run postgres createdb -h postgres -U postgres logidze_bench
+  - dip compose run postgres createdb -h postgres -U postgres logidze_perf_bench
   - dip psql -d logidze_bench -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
   - dip bundle install

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "./setup"
-require "active_support/core_ext"
+require_relative "../config/environment"
+
 require "memory_profiler"
 
 # How many records do you want?
@@ -10,9 +10,9 @@ N = (ENV["N"] || "10").to_i
 # How many version each record has?
 V = (ENV["V"] || "10").to_i
 
-LogidzeBench.cleanup
-LogidzeBench.populate(N)
-LogidzeBench.generate_versions(V)
+Benchmarker.cleanup
+Benchmarker.populate(N)
+Benchmarker.generate_versions(V)
 
 module MemoryReport
   KILO_BYTE = 1024
@@ -35,7 +35,7 @@ module MemoryReport
     $stdout.puts msg
     $stdout.puts "Total Allocated:\t\t\t\t#{to_human_size(r1.total_allocated_memsize)}"
     $stdout.puts "Total Retained:\t\t\t\t\t#{to_human_size(r1.total_retained_memsize)}"
-    $stdout.puts "Retained_memsize memory (per record):\t\t#{to_human_size((r1.total_retained_memsize - r0.total_retained_memsize) / delta)}"
+    $stdout.puts "Retained_memsize memory (per record):\t\t#{to_human_size((r1.total_retained_memsize - r0.total_retained_memsize) / delta)}\n"
   end
 
   module_function
@@ -51,6 +51,6 @@ module MemoryReport
   end
 end
 
-MemoryReport.call("PT records", User.all)
-MemoryReport.call("PT with versions", User.joins(:versions).all)
+MemoryReport.call("Plain records", User.all)
+MemoryReport.call("PT with versions", PaperTrailUser.joins(:versions).all)
 MemoryReport.call("Logidze records", LogidzeUser.all)
