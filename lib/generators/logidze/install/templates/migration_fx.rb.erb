@@ -16,6 +16,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
         execute "DROP FUNCTION <%= f.name %>(<%= f.signature %>) CASCADE"
       end
     end
+
     <%- end -%>
   <%- end -%>
   end

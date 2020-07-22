@@ -25,8 +25,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
         execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
 
   <%- end -%>
-        execute <<-SQL
-          <%= inject_sql("logidze.sql") %>
+        execute <<~SQL
+<%= inject_sql("logidze.sql", indent: 10) %>
         SQL
       end
 

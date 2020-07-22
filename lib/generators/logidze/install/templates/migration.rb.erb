@@ -1,8 +1,8 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def up
-    execute <<-SQL
-<%- function_definitions.each do |f| %>
-  <%= inject_sql("#{f.name}.sql") %>
+    execute <<~SQL
+<%- function_definitions.each do |f| -%>
+<%= inject_sql("#{f.name}.sql", indent: 6) %>
 <%- end -%>
     SQL
   end
@@ -10,7 +10,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def down
 <%- unless update? -%>
     execute <<~SQL
-  <%- function_definitions.each do |f| %>
+  <%- function_definitions.each do |f| -%>
       DROP FUNCTION <%= f.name %>(<%= f.signature %>) CASCADE;
   <%- end -%>
     SQL
