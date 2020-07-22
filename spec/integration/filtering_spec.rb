@@ -107,7 +107,7 @@ describe "columns filtering", :db do
         expect(changes.keys).to match_array @only
       end
 
-      fit "handles jsonb fields updates", :aggregate_failures do
+      it "handles jsonb fields updates", :aggregate_failures do
         post.update!(params)
 
         changes = post.reload.log_data.current_version.changes
