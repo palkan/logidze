@@ -7,4 +7,8 @@ class NotLoggedPost < ActiveRecord::Base
 
   belongs_to :user
   has_many :comments, class_name: "NotLoggedPostComment", foreign_key: :post_id
+
+  class WithDefaultScope < self
+    default_scope { joins(:user) }
+  end
 end

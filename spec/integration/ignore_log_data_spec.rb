@@ -51,9 +51,7 @@ describe "ignore log columns", :db do
       end
 
       context "when model has default_scope with joined logidzed model" do
-        before do
-          allow(NotLoggedPost).to receive(:default_scope) { NotLoggedPost.joins(:user) }
-        end
+        subject { NotLoggedPost::WithDefaultScope.with_log_data.find(post.id) }
 
         it "returns log_data" do
           expect(post.reload_log_data).to be_a(Logidze::History)
