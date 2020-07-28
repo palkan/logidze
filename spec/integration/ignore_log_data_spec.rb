@@ -54,7 +54,7 @@ describe "ignore log columns", :db do
         subject { NotLoggedPost::WithDefaultScope.with_log_data.find(post.id) }
 
         it "returns log_data" do
-          expect(post.reload_log_data).to be_a(Logidze::History)
+          expect(subject.reload_log_data).to be_a(Logidze::History)
         end
       end
 
