@@ -41,10 +41,10 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.to contain("create_function :logidze_filter_keys, version: 1")
         is_expected.to contain("create_function :logidze_compact_history, version: 1")
 
-        is_expected.to contain("DROP FUNCTION logidze_logger")
-        is_expected.to contain("DROP FUNCTION logidze_snapshot")
-        is_expected.to contain("DROP FUNCTION logidze_filter_keys")
-        is_expected.to contain("DROP FUNCTION logidze_compact_history")
+        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_logger")
+        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_snapshot")
+        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_filter_keys")
+        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_compact_history")
       end
 
       it "creates function files" do

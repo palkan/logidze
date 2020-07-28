@@ -1,5 +1,23 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
   def change
+  <%- if update? -%>
+    reversible do |dir|
+      dir.up do
+        # Drop legacy functions (<1.0)
+        execute <<~SQL
+          DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb);
+          DROP FUNCTION IF EXISTS logidze_snapshot(jsonb);
+          DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb, text[]);
+          DROP FUNCTION IF EXISTS logidze_snapshot(jsonb, text[]);
+          DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb, timestamp with time zone, text[]);
+          DROP FUNCTION IF EXISTS logidze_snapshot(jsonb, text, text[]);
+          DROP FUNCTION IF EXISTS logidze_exclude_keys(jsonb, VARIADIC text[]);
+          DROP FUNCTION IF EXISTS logidze_compact_history(jsonb);
+        SQL
+      end
+    end
+
+  <%- end -%>
   <%- function_definitions.each do |f| -%>
     <%- previous_version = previous_version_for(f.name) -%>
     <%- if previous_version -%>
@@ -13,7 +31,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[5.0]
       end
 
       dir.down do
-        execute "DROP FUNCTION <%= f.name %>(<%= f.signature %>) CASCADE"
+        execute "DROP FUNCTION IF EXISTS <%= f.name %>(<%= f.signature %>) CASCADE"
       end
     end
 
