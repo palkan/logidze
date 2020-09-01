@@ -20,7 +20,7 @@ module Logidze
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
       def at(time: nil, version: nil)
-        all.filter_map { |record| record.at(time: time, version: version) }
+        all.to_a.filter_map { |record| record.at(time: time, version: version) }
       end
 
       # Return changes made to records since specified time
