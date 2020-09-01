@@ -1,7 +1,8 @@
-
 # Change log
 
 ## master (unreleased)
+
+## 1.0.0.rc1 (2020-09-01)
 
 - Add `.with_full_snapshot` to add full snapshots to the log instead of diffs. ([@palkan][])
 

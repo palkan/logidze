@@ -3,6 +3,8 @@
 require "active_support"
 
 module Logidze
+  using RubyNext
+
   # Extends model with methods to browse history
   module Model
     require "logidze/history/type"
@@ -18,7 +20,7 @@ module Logidze
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
       def at(time: nil, version: nil)
-        all.map { |record| record.at(time: time, version: version) }.compact
+        all.filter_map { |record| record.at(time: time, version: version) }
       end
 
       # Return changes made to records since specified time
