@@ -12,7 +12,7 @@ module Dummy
   class Application < Rails::Application
     config.eager_load = true
 
-    config.logger = ENV["LOG"] ? Logger.new(STDOUT) : Logger.new(IO::NULL)
+    config.logger = ENV["LOG"] ? Logger.new($stdout) : Logger.new(IO::NULL)
     config.active_record.dump_schema_after_migration = false
   end
 end

@@ -9,7 +9,7 @@ shared_context "cleanup migrations" do
 
   append_after(:all) do
     (Dir["spec/dummy/db/migrate/*"] - @old_migrations).each do |path|
-      version = path.match(%r{\/(\d+)\_[^\.]+\.rb$})[1]
+      version = path.match(%r{/(\d+)_[^.]+\.rb$})[1]
       Dir.chdir("#{File.dirname(__FILE__)}/../../dummy") do
         suppress_output do
           system <<-CMD
