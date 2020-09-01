@@ -48,7 +48,7 @@ Other requirements:
 - [Handling records deletion](#handling-records-deletion)
 - [Upgrading](#upgrading)
 - [Log format](#log-format)
-- [Troubleshooting](#troubleshooting)
+- [Troubleshooting 🚨](#troubleshooting)
 - [Development](#development)
 
 ## Installation
@@ -514,6 +514,9 @@ First, read [Apartment docs](https://github.com/influitive/apartment#installing-
 
 Secondly, set `config.use_sql = true` in the Apartment configuration.
 
+Finally, when using `fx` along with `schema.rb`, you might face a problem with duplicate trigger definitions (for different schemas).
+Here is a patch to fix this: [dump_triggers.rake](etc/dump_triggers.rake).
+
 Related issues: [#50](https://github.com/palkan/logidze/issues/50).
 
 ### `PG::UntranslatableCharacter: ERROR`
@@ -522,6 +525,12 @@ That could happen when your row data contain null bytes. You should sanitize the
 From the [PostgreSQL docs](https://www.postgresql.org/docs/current/datatype-json.html): `jsonb type also rejects \u0000 (because that cannot be represented in PostgreSQL's text type)`.
 
 Related issues: [#155](https://github.com/palkan/logidze/issues/155).
+
+### `pg_restore` fails to restore a dump
+
+First, when restoring data dumps you should consider using `--disable-triggers` option (unless you have a strong reason to invoke the triggers).
+
+When restoring data dumps for a particular PostgreSQL schema (e.g., when using Apartment), you may encounter the issue with non-existent Logidze functions. That happens because `pg_dump` adds `SELECT pg_catalog.set_config('search_path', '', false);`, and, thus, breaks our existing triggers/functions, because they live either in "public" or in a tenant's namespace (see [this thread](https://postgrespro.com/list/thread-id/2448092)).
 
 ## Development
 
