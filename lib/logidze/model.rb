@@ -253,14 +253,8 @@ module Logidze
       object_at
     end
 
-    if Rails::VERSION::MAJOR < 5
-      def deserialize_value(column, value)
-        @attributes[column].type.type_cast_from_database(value)
-      end
-    else
-      def deserialize_value(column, value)
-        @attributes[column].type.deserialize(value)
-      end
+    def deserialize_value(column, value)
+      @attributes[column].type.deserialize(value)
     end
 
     def deleted_column?(column)
