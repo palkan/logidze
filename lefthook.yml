@@ -7,7 +7,7 @@ pre-commit:
     liche:
       tags: links
       glob: "*.md"
-      run: liche README.md CHANGELOG.md && test {staged_files}
+      run: liche README.md CHANGELOG.md && test "{staged_files}"
     forspell:
       tags: grammar
       glob: "**/*.md"

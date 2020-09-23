@@ -31,7 +31,7 @@ Other requirements:
 - [Main concepts](#main-concepts)
 - [Installation & Configuration](#installation)
   - [Using with schema.rb](#using-with-schemarb)
-  - [Configuration models](#configuration-models)
+  - [Configuring models](#configuring-models)
   - [Backfill data](#backfill-data)
   - [Log size limit](#log-size-limit)
   - [Tracking only selected columns](#tracking-only-selected-columns)
@@ -452,6 +452,14 @@ If you want to update Logidze settings for the model, run migration with `--upda
 
 ```sh
 rails generate logidze:model Post --update --only=title,body,rating
+```
+
+You can also use the `--name` option to specify the migration name to avoid duplicate migration names:
+
+```sh
+$ rails generate logidze:model Post --update --only=title,body,rating --name add_only_filter_to_posts_log_data
+
+    create db/migrate/20202309142344_add_only_filter_to_posts_log_data.rb
 ```
 
 ### Upgrading from 0.x to 1.0 (edge)
