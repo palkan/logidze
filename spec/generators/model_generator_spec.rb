@@ -168,6 +168,21 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
             expect(file("db/triggers/logidze_on_users_v02.sql")).to exist
           end
         end
+
+        context "with custom name" do
+          subject { migration_file("db/migrate/logidzedize_users.rb") }
+
+          let(:base_args) { ["user", "--name", "logidzedize_users"] }
+
+          before do
+            run_generator(args)
+          end
+
+          it "creates migration", :aggregate_failures do
+            is_expected.to exist
+            is_expected.to contain "add_column :users, :log_data, :jsonb"
+          end
+        end
       end
 
       context "with timestamp_column" do

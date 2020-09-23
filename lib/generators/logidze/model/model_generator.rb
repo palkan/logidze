@@ -35,6 +35,8 @@ module Logidze
       class_option :timestamp_column, type: :string, optional: true,
                                       desc: "Specify timestamp column"
 
+      class_option :name, type: :string, optional: true, desc: "Migration name"
+
       class_option :update, type: :boolean, optional: true,
                             desc: "Define whether this is an update migration"
 
@@ -62,6 +64,8 @@ module Logidze
 
       no_tasks do
         def migration_name
+          return options[:name] if options[:name].present?
+
           if update?
             "update_logidze_for_#{plural_table_name}"
           else
