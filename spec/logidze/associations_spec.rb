@@ -127,7 +127,7 @@ describe Logidze::VersionedAssociation, :db do
         expect(very_old_article.comments.length).to eql(0)
       end
 
-      it "returns not versioned association #size, due to AR implementaion" do
+      it "returns not versioned association #size, due to AR implementation" do
         expect(very_old_article.comments.size).to eql(2)
       end
 
