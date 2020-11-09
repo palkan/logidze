@@ -1,12 +1,10 @@
 # Change log
 
-## master (unreleased)
+## 1.0.0 (2020-11-09)
 
 - Add `--name` option to model generator to specify the migration name. ([@palkan][])
 
 When you update Logidze installation for a model multiple times, you might hit the `DuplicateMigrationNameError` (see [#167](https://github.com/palkan/logidze/issues/167)).
-
-## 1.0.0.rc1 (2020-09-01)
 
 - Add `.with_full_snapshot` to add full snapshots to the log instead of diffs. ([@palkan][])
 

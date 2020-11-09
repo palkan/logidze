@@ -10,8 +10,6 @@ Logidze provides tools for logging DB records changes when using PostgreSQL (>=9
 Logidze allows you to create a DB-level log (using triggers) and gives you an API to browse this log.
 The log is stored with the record itself in JSONB column. No additional tables required.
 
-**❗️ IMPORTANT:** This page contains documentation for the upcoming v1.0. For the latest release documentation see the [0-stable branch](https://github.com/palkan/logidze/tree/0-stable). If you're just starting with Logidze, we recommend using the latest release candidate (`1.0.0.rc1`).
-
 🤔 [How is Logidze pronounced?](https://github.com/palkan/logidze/issues/73)
 
 Other requirements:
@@ -56,7 +54,7 @@ Other requirements:
 Add Logidze to your application's Gemfile:
 
 ```ruby
-gem "logidze", "1.0.0.rc1"
+gem "logidze", "~> 1.0.0"
 ```
 
 Install required DB extensions and create trigger function:
