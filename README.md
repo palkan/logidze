@@ -464,16 +464,18 @@ $ rails generate logidze:model Post --update --only=title,body,rating --name add
 
 #### Schema and migrations
 
-Most SQL functions definitions has changed without backward compatibility.
+Most SQL function definitions have changed without backward compatibility.
 Perform the following steps to upgrade:
 
 1. Re-install Logidze: `rails generate logidze:install --update`.
 
 1. Re-install Logidze triggers **for all models**: `rails generate logidze:model <model> --update`.
 
+   **NOTE:** If you had previously specified whitelist/blacklist attributes, you will need to include the `--only`/`--except` [option](#tracking-only-selected-columns) as appropriate. You can easily copy these column lists from the previous logidze migration for the model.
+
 1. Remove the `include Logidze::Migration` line from the old migration files (if any)—this module has been removed.
 
-Rewrite the migrations to not use the `#current_setting(name)` and `#current_setting_missing_supported?` methods or copy them from the latest [0.x release](https://github.com/palkan/logidze/blob/0-stable/lib/logidze/migration.rb).
+Rewrite legacy logidze migrations to not use the `#current_setting(name)` and `#current_setting_missing_supported?` methods, or copy them from the latest [0.x release](https://github.com/palkan/logidze/blob/0-stable/lib/logidze/migration.rb).
 
 #### API changes
 
