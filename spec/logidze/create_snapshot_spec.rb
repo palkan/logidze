@@ -16,7 +16,11 @@ describe "create logidze snapshot", :db do
   end
 
   let(:now) { Time.local(1989, 7, 10, 18, 23, 33) }
-  let(:user) { Logidze.without_logging { User.create!(time: now, name: "test", age: 10, active: false) } }
+  let(:user) do
+    Logidze.without_logging do
+      User.create!(time: now, name: "test", age: 10, active: false, extra: {gender: "X"})
+    end
+  end
 
   describe "#create_logidze_snapshot!" do
     specify "without arguments" do
@@ -27,7 +31,13 @@ describe "create logidze snapshot", :db do
       expect(user.log_data).not_to be_nil
       expect(user.log_data.version).to eq 1
       expect(Time.at(user.log_data.current_version.time / 1000) - now).to be > 1.year
-      expect(user.log_data.current_version.changes).to include({"name" => "test", "age" => 10, "active" => false})
+      expect(user.log_data.current_version.changes)
+        .to include({
+          "name" => "test",
+          "age" => 10,
+          "active" => false,
+          "extra" => '{"gender": "X"}'
+        })
     end
 
     specify "timestamp column" do
