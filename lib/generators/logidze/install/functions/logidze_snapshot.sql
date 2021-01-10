@@ -2,6 +2,7 @@
 CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text DEFAULT NULL, columns text[] DEFAULT NULL, include_columns boolean DEFAULT false) RETURNS jsonb AS $body$
   DECLARE
     ts timestamp with time zone;
+    k text;
   BEGIN
     IF ts_column IS NULL THEN
       ts := statement_timestamp();
@@ -12,6 +13,13 @@ CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text DEFAULT N
     IF columns IS NOT NULL THEN
       item := logidze_filter_keys(item, columns, include_columns);
     END IF;
+
+    FOR k IN (SELECT key FROM jsonb_each(item))
+    LOOP
+      IF jsonb_typeof(item->k) = 'object' THEN
+         item := jsonb_set(item, ARRAY[k], to_jsonb(item->>k));
+      END IF;
+    END LOOP;
 
     return json_build_object(
       'v', 1,
