@@ -37,7 +37,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
 
         is_expected.to exist
         is_expected.to contain("create_function :logidze_logger, version: 1")
-        is_expected.to contain("create_function :logidze_snapshot, version: 1")
+        is_expected.to contain("create_function :logidze_snapshot, version: 2")
         is_expected.to contain("create_function :logidze_filter_keys, version: 1")
         is_expected.to contain("create_function :logidze_compact_history, version: 1")
 
@@ -55,7 +55,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
           logidze_logger_v01.sql
           logidze_version_v01.sql
           logidze_filter_keys_v01.sql
-          logidze_snapshot_v01.sql
+          logidze_snapshot_v02.sql
           logidze_compact_history_v01.sql
         ].each do |path|
           expect(file("db/functions/#{path}")).to exist
@@ -127,7 +127,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
 
         is_expected.to exist
         is_expected.to contain("update_function :logidze_version, version: 1, revert_to_version: 2")
-        is_expected.to contain("update_function :logidze_snapshot, version: 1, revert_to_version: 3")
+        is_expected.to contain("update_function :logidze_snapshot, version: 2, revert_to_version: 3")
         is_expected.not_to contain("update_function :logidze_filter_keys")
         is_expected.to contain("update_function :logidze_compact_history, version: 1, revert_to_version: 5")
         is_expected.to contain("update_function :logidze_logger, version: 1, revert_to_version: 7")
@@ -140,7 +140,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         %w[
           logidze_logger_v01.sql
           logidze_version_v01.sql
-          logidze_snapshot_v01.sql
+          logidze_snapshot_v02.sql
           logidze_compact_history_v01.sql
         ].each do |path|
           expect(file("db/functions/#{path}")).to exist
