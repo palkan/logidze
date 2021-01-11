@@ -1,5 +1,9 @@
 # Change log
 
+## master (unreleased)
+
+- [Fixes [#171](https://github.com/palkan/logidze/issues/171)] Stringify jsonb column values within snapshots. ([@skryukov][])
+
 ## 1.0.0 (2020-11-09)
 
 - Add `--name` option to model generator to specify the migration name. ([@palkan][])
@@ -332,3 +336,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@zocoi]: https://github.com/zocoi
 [@duderman]: https://github.com/duderman
 [@oleg-kiviljov]: https://github.com/oleg-kiviljov
+[@skryukov]: https://github.com/skryukov
