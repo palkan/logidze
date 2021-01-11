@@ -17,6 +17,7 @@ AllCops:
     - 'spec/dummy/db/migrate/*_logidze_install.rb'
   DisplayCopNames: true
   TargetRubyVersion: 2.5
+  SuggestExtensions: false
 
 Standard/SemanticBlocks:
   Enabled: false

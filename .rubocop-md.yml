@@ -3,15 +3,6 @@ inherit_from: ".rubocop.yml"
 require:
   - rubocop-md
 
-
 AllCops:
   Include:
-    - '**/*.md'
-
-Lint/Void:
-  Exclude:
-    - '**/*.md'
-
-Lint/DuplicateMethods:
-  Exclude:
     - '**/*.md'
