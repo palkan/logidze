@@ -16,6 +16,11 @@ interaction:
     service: dev
     command: bundle
 
+  rake:
+    description: Run Rake
+    service: dev
+    command: bundle exec rake
+
   rspec:
     description: Run RSpec
     service: dev

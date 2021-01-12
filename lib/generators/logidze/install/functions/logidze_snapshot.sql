@@ -1,5 +1,5 @@
--- version: 2
 CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text DEFAULT NULL, columns text[] DEFAULT NULL, include_columns boolean DEFAULT false) RETURNS jsonb AS $body$
+  -- version: 2
   DECLARE
     ts timestamp with time zone;
     k text;

@@ -1,5 +1,5 @@
--- version: 1
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
+  -- version: 1
   DECLARE
     changes jsonb;
     version jsonb;

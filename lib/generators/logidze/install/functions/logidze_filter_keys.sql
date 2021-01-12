@@ -1,5 +1,5 @@
--- version: 1
 CREATE OR REPLACE FUNCTION logidze_filter_keys(obj jsonb, keys text[], include_columns boolean DEFAULT false) RETURNS jsonb AS $body$
+  -- version: 1
   DECLARE
     res jsonb;
     key text;

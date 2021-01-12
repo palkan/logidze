@@ -86,10 +86,10 @@ module Logidze
                 name = path.match(/([^\/]+)\.sql/)[1]
 
                 file = File.open(path)
-                header = file.readline
+                header, version_comment = file.readline, file.readline
 
-                version = header.match(/version:\s+(\d+)/)[1].to_i
-                parameters = file.readline.match(/CREATE OR REPLACE FUNCTION\s+[\w_]+\((.*)\)/)[1]
+                version = version_comment.match(/version:\s+(\d+)/)[1].to_i
+                parameters = header.match(/CREATE OR REPLACE FUNCTION\s+[\w_]+\((.*)\)/)[1]
                 signature = parameters.split(/\s*,\s*/).map { |param| param.split(/\s+/, 2).last.sub(/\s+DEFAULT .*$/, "") }.join(", ")
 
                 FuncDef.new(name, version, signature)
