@@ -439,7 +439,7 @@ See also the discussion: [#61](https://github.com/palkan/logidze/issues/61).
 We try to make an upgrade process as simple as possible. For now, the only required action is to create and run a migration:
 
 ```sh
-rails generate logidze:install --update
+bundle exec rails generate logidze:install --update
 ```
 
 This updates core `logdize_logger` DB function. No need to update tables or triggers.
@@ -449,16 +449,22 @@ This updates core `logdize_logger` DB function. No need to update tables or trig
 If you want to update Logidze settings for the model, run migration with `--update` flag:
 
 ```sh
-rails generate logidze:model Post --update --only=title,body,rating
+bundle exec rails generate logidze:model Post --update --only=title,body,rating
 ```
 
 You can also use the `--name` option to specify the migration name to avoid duplicate migration names:
 
 ```sh
-$ rails generate logidze:model Post --update --only=title,body,rating --name add_only_filter_to_posts_log_data
+$ bundle exec rails generate logidze:model Post --update --only=title,body,rating --name add_only_filter_to_posts_log_data
 
     create db/migrate/20202309142344_add_only_filter_to_posts_log_data.rb
 ```
+
+### Pending upgrade check
+
+By default, Logidze raises an error when an upgrade is needed. To use warning instead of raising an error set `Logidze.raise_on_pending_upgrade = false`.
+
+If you want to skip the check entirely, use `Logidze.check_pending_upgrade = false`.
 
 ### Upgrading from 0.x to 1.0 (edge)
 
@@ -467,9 +473,9 @@ $ rails generate logidze:model Post --update --only=title,body,rating --name add
 Most SQL function definitions have changed without backward compatibility.
 Perform the following steps to upgrade:
 
-1. Re-install Logidze: `rails generate logidze:install --update`.
+1. Re-install Logidze: `bundle exec rails generate logidze:install --update`.
 
-1. Re-install Logidze triggers **for all models**: `rails generate logidze:model <model> --update`.
+1. Re-install Logidze triggers **for all models**: `bundle exec rails generate logidze:model <model> --update`.
 
    **NOTE:** If you had previously specified whitelist/blacklist attributes, you will need to include the `--only`/`--except` [option](#tracking-only-selected-columns) as appropriate. You can easily copy these column lists from the previous logidze migration for the model.
 

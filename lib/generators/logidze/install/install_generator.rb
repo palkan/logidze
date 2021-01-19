@@ -2,6 +2,7 @@
 
 require "rails/generators"
 require "rails/generators/active_record"
+require_relative "function_definitions"
 require_relative "../inject_sql"
 require_relative "../fx_helper"
 
@@ -13,8 +14,6 @@ module Logidze
       include Rails::Generators::Migration
       include InjectSql
       include FxHelper
-
-      class FuncDef < Struct.new(:name, :version, :signature); end
 
       source_root File.expand_path("templates", __dir__)
       source_paths << File.expand_path("functions", __dir__)
@@ -80,21 +79,7 @@ module Logidze
         end
 
         def function_definitions
-          @function_definitions ||=
-            begin
-              Dir.glob(File.join(__dir__, "functions", "*.sql")).map do |path|
-                name = path.match(/([^\/]+)\.sql/)[1]
-
-                file = File.open(path)
-                header, version_comment = file.readline, file.readline
-
-                version = version_comment.match(/version:\s+(\d+)/)[1].to_i
-                parameters = header.match(/CREATE OR REPLACE FUNCTION\s+[\w_]+\((.*)\)/)[1]
-                signature = parameters.split(/\s*,\s*/).map { |param| param.split(/\s+/, 2).last.sub(/\s+DEFAULT .*$/, "") }.join(", ")
-
-                FuncDef.new(name, version, signature)
-              end
-            end
+          @function_definitions ||= FunctionDefinitions.from_fs
         end
       end
 

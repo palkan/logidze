@@ -26,6 +26,10 @@ module Logidze
     attr_accessor :ignore_log_data_by_default
     # Whether #at should return self or nil when log_data is nil
     attr_accessor :return_self_if_log_data_is_empty
+    # Determines if Logidze sholud check when upgrade is needed
+    attr_accessor :check_pending_upgrade
+    # Determines if Logidze should raise error when upgrade is needed
+    attr_accessor :raise_on_pending_upgrade
 
     # Temporary disable DB triggers.
     #
@@ -59,4 +63,6 @@ module Logidze
   self.associations_versioning = false
   self.ignore_log_data_by_default = false
   self.return_self_if_log_data_is_empty = true
+  self.check_pending_upgrade = true
+  self.raise_on_pending_upgrade = true
 end
