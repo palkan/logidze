@@ -462,9 +462,7 @@ $ bundle exec rails generate logidze:model Post --update --only=title,body,ratin
 
 ### Pending upgrade check
 
-By default, Logidze raises an error when an upgrade is needed. To use warning instead of raising an error set `Logidze.raise_on_pending_upgrade = false`.
-
-If you want to skip the check entirely, use `Logidze.check_pending_upgrade = false`.
+Logidze can check for a pending upgrade. Use `Logidze.pending_upgrade = :warn` to be notified by warning, or `Logidze.pending_upgrade = :error` if you want Logidze to raise an error.
 
 ### Upgrading from 0.x to 1.0 (edge)
 
