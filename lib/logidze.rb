@@ -26,10 +26,8 @@ module Logidze
     attr_accessor :ignore_log_data_by_default
     # Whether #at should return self or nil when log_data is nil
     attr_accessor :return_self_if_log_data_is_empty
-    # Determines if Logidze sholud check when upgrade is needed
-    attr_accessor :check_pending_upgrade
-    # Determines if Logidze should raise error when upgrade is needed
-    attr_accessor :raise_on_pending_upgrade
+    # Determines what Logidze should do when upgrade is needed (:raise | :warn | :ignore)
+    attr_reader :on_pending_upgrade
 
     # Temporary disable DB triggers.
     #
@@ -39,12 +37,19 @@ module Logidze
       with_logidze_setting("logidze.disabled", "on") { yield }
     end
 
-    # Instructure Logidze to create a full snapshot for the new versions, not a diff
+    # Instruct Logidze to create a full snapshot for the new versions, not a diff
     #
     # @example
     #   Logidze.with_full_snapshot { post.touch }
     def with_full_snapshot
       with_logidze_setting("logidze.full_snapshot", "on") { yield }
+    end
+
+    def on_pending_upgrade=(mode)
+      if %i[raise warn ignore].exclude? mode
+        raise ArgumentError, "Unknown on_pending_upgrade option `#{mode.inspect}`. Expecting :raise, :warn or :ignore"
+      end
+      @on_pending_upgrade = mode
     end
 
     private
@@ -63,6 +68,5 @@ module Logidze
   self.associations_versioning = false
   self.ignore_log_data_by_default = false
   self.return_self_if_log_data_is_empty = true
-  self.check_pending_upgrade = true
-  self.raise_on_pending_upgrade = true
+  self.on_pending_upgrade = :ignore
 end
