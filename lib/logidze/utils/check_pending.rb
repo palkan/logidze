@@ -1,26 +1,11 @@
 # frozen_string_literal: true
 
-require "rails/generators"
-require "generators/logidze/install/function_definitions"
+require_relative "./function_definitions"
+require_relative "./pending_migration_error"
 
 module Logidze
   module Utils
-    class PendingMigrationError < StandardError
-      if defined? ActiveSupport::ActionableError
-        include ActiveSupport::ActionableError
-
-        action "Upgrade Logidze" do
-          Rails::Generators.invoke("logidze:install", ["--update"])
-          ActiveRecord::Tasks::DatabaseTasks.migrate
-          if ActiveRecord::Base.dump_schema_after_migration
-            ActiveRecord::Tasks::DatabaseTasks.dump_schema(
-              ActiveRecord::Base.connection_db_config
-            )
-          end
-        end
-      end
-    end
-
+    # This Rack middleware is used to verify that all functions are up to date
     class CheckPending
       def initialize(app)
         @app = app
@@ -58,11 +43,11 @@ module Logidze
       end
 
       def pg_function_versions
-        Logidze::Generators::FunctionDefinitions.from_db.map { |func| [func.name, func.version] }
+        Logidze::Utils::FunctionDefinitions.from_db.map { |func| [func.name, func.version] }
       end
 
       def library_function_versions
-        @library_function_versions ||= Logidze::Generators::FunctionDefinitions.from_fs.map { |func| [func.name, func.version] }
+        @library_function_versions ||= Logidze::Utils::FunctionDefinitions.from_fs.map { |func| [func.name, func.version] }
       end
     end
   end

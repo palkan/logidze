@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module Logidze
-  module Generators
+  module Utils
     class FuncDef < Struct.new(:name, :version, :signature); end
 
     module FunctionDefinitions
       class << self
         def from_fs
-          Dir.glob(File.join(__dir__, "functions", "*.sql")).map do |path|
+          function_paths = Dir.glob(File.join(__dir__, "..", "..", "generators", "logidze", "install", "functions", "*.sql"))
+          function_paths.map do |path|
             name = path.match(/([^\/]+)\.sql/)[1]
 
             file = File.open(path)
