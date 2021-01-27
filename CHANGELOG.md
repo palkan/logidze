@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+- Add pending upgrade checks. ([@skryukov][])
+
+Now Logidze can check for a pending upgrade. Use `Logidze.pending_upgrade = :warn` to be notified by warning, or `Logidze.pending_upgrade = :error` if you want Logidze to raise an error.
+
 - [Fixes [#171](https://github.com/palkan/logidze/issues/171)] Stringify jsonb column values within snapshots. ([@skryukov][])
 
 ## 1.0.0 (2020-11-09)
