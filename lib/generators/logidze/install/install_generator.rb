@@ -2,7 +2,7 @@
 
 require "rails/generators"
 require "rails/generators/active_record"
-require_relative "function_definitions"
+require "logidze/utils/function_definitions"
 require_relative "../inject_sql"
 require_relative "../fx_helper"
 
@@ -79,7 +79,7 @@ module Logidze
         end
 
         def function_definitions
-          @function_definitions ||= FunctionDefinitions.from_fs
+          @function_definitions ||= Logidze::Utils::FunctionDefinitions.from_fs
         end
       end
 
