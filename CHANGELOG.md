@@ -2,7 +2,7 @@
 
 ## master (unreleased)
 
-- Add pending upgrade checks. ([@skryukov][])
+- Add pending upgrade checks [Experimental]. ([@skryukov][])
 
 Now Logidze can check for a pending upgrade. Use `Logidze.pending_upgrade = :warn` to be notified by warning, or `Logidze.pending_upgrade = :error` if you want Logidze to raise an error.
 
