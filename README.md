@@ -460,7 +460,7 @@ $ bundle exec rails generate logidze:model Post --update --only=title,body,ratin
     create db/migrate/20202309142344_add_only_filter_to_posts_log_data.rb
 ```
 
-### Pending upgrade check
+### Pending upgrade check [Experimental]
 
 Logidze can check for a pending upgrade. Use `Logidze.pending_upgrade = :warn` to be notified by warning, or `Logidze.pending_upgrade = :error` if you want Logidze to raise an error.
 
