@@ -45,7 +45,11 @@ describe Logidze::Utils::CheckPending do
       after(:all) { Logidze.on_pending_upgrade = :ignore }
 
       it "prints warning" do
-        expected_message = "Logidze needs upgrade. Run `bundle exec rails generate logidze:install --update`\n"
+        expected_message = "\n**************************************************\n"\
+                           "⛔️  WARNING: Logidze needs an upgrade and might not work correctly.\n"\
+                           "Please, make sure to run `bundle exec rails generate logidze:install --update` "\
+                           "and apply generated migration."\
+                           "\n**************************************************\n\n"
         expect { subject.call(env) }.to output(expected_message).to_stderr
       end
 
