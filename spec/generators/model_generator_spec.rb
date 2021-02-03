@@ -11,10 +11,12 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
   let(:base_args) { [] }
   let(:args) { base_args + fx_args }
+  let(:ar_version) { "6.0" }
 
   before do
     prepare_destination
     FileUtils.mkdir_p(File.dirname(path))
+    allow(ActiveRecord::Migration).to receive(:current_version).and_return(ar_version)
   end
 
   after { FileUtils.rm(path) }
@@ -41,6 +43,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
       it "creates migration", :aggregate_failures do
         is_expected.to exist
+        is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
         is_expected.to contain "add_column :users, :log_data, :jsonb"
         is_expected.to contain(/create trigger logidze_on_users/i)
         is_expected.to contain(/before update or insert on users for each row/i)

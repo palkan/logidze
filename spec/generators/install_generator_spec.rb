@@ -11,9 +11,11 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
 
   let(:base_args) { [] }
   let(:args) { base_args + fx_args }
+  let(:ar_version) { "6.0" }
 
   before do
     prepare_destination
+    allow(ActiveRecord::Migration).to receive(:current_version).and_return(ar_version)
   end
 
   describe "trigger migration" do
@@ -23,6 +25,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       run_generator(args)
 
       is_expected.to exist
+      is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
       is_expected.to contain(/create or replace function logidze_logger()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
       is_expected.to contain(/create or replace function logidze_filter_keys/i)
@@ -36,6 +39,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         run_generator(args)
 
         is_expected.to exist
+        is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
         is_expected.to contain("create_function :logidze_logger, version: 1")
         is_expected.to contain("create_function :logidze_snapshot, version: 2")
         is_expected.to contain("create_function :logidze_filter_keys, version: 1")
@@ -71,6 +75,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       run_generator(args)
 
       is_expected.to exist
+      is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
       is_expected.to contain(/enable_extension :hstore/i)
     end
   end

@@ -8,6 +8,8 @@ Now Logidze can check for a pending upgrade. Use `Logidze.pending_upgrade = :war
 
 - [Fixes [#171](https://github.com/palkan/logidze/issues/171)] Stringify jsonb column values within snapshots. ([@skryukov][])
 
+- [Fixes [#175](https://github.com/palkan/logidze/issues/175)] Set dynamic ActiveRecord version for migrations. ([@skryukov][])
+
 ## 1.0.0 (2020-11-09)
 
 - Add `--name` option to model generator to specify the migration name. ([@palkan][])
