@@ -1,6 +1,6 @@
 [![Cult Of Martians](http://cultofmartians.com/assets/badges/badge.svg)](http://cultofmartians.com)
 [![Gem Version](https://badge.fury.io/rb/logidze.svg)](https://rubygems.org/gems/logidze)
-![Build](https://github.com/palkan/logidze/workflows/Build/badge.svg)
+[![Build](https://github.com/palkan/logidze/workflows/Build/badge.svg)](https://github.com/palkan/logidze/actions)
 [![Open Source Helpers](https://www.codetriage.com/palkan/logidze/badges/users.svg)](https://www.codetriage.com/palkan/logidze)
 
 # Logidze
@@ -22,16 +22,16 @@ Other requirements:
 
 ## Links
 
+- [Logidze 1.0: Active Record, Postgres, Rails, and time travel](https://evilmartians.com/chronicles/logidze-1-0-active-record-postgresql-rails-and-time-travel?utm_source=logidze)
 - [Logidze: for all those tired of versioning data](https://evilmartians.com/chronicles/introducing-logidze?utm_source=logidze)
 
 ## Table of contents
 
-- [Main concepts](#main-concepts)
 - [Installation & Configuration](#installation)
   - [Using with schema.rb](#using-with-schemarb)
   - [Configuring models](#configuring-models)
   - [Backfill data](#backfill-data)
-  - [Log size limit](#log-size-limit)
+  - [Log size limits](#log-size-limits)
   - [Tracking only selected columns](#tracking-only-selected-columns)
   - [Logs timestamps](#logs-timestamps)
 - [Usage](#usage)
