@@ -26,7 +26,9 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "http://github.com/palkan/logidze"
   }
 
-  spec.add_dependency "rails", ">= 5.0"
+  rails_version = ">= 5.0"
+  spec.add_dependency "railties", rails_version
+  spec.add_dependency "activerecord", rails_version
   spec.add_dependency "ruby-next-core", "~> 0.9"
 
   spec.add_development_dependency "ammeter", "~> 1.1.3"
