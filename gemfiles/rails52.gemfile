@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.1'
+rails_version = '~> 5.2.1'
+gem 'railties', rails_version
+gem 'activerecord', rails_version
 gem 'rspec-rails', '~> 3.5'
 
 eval_gemfile './shared.gemfile'

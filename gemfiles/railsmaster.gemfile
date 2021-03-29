@@ -1,6 +1,9 @@
 source 'https://rubygems.org'
 
-gem 'rails', github: 'rails/rails'
+git 'https://github.com/rails/rails.git' do
+  gem 'railties'
+  gem 'activerecord'
+end
 gem 'rspec-rails', '>= 4.0'
 
 eval_gemfile './shared.gemfile'
