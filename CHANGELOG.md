@@ -347,3 +347,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@duderman]: https://github.com/duderman
 [@oleg-kiviljov]: https://github.com/oleg-kiviljov
 [@skryukov]: https://github.com/skryukov
+[@bf4]: https://github.com/bf4

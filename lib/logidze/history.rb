@@ -48,7 +48,7 @@ module Logidze
     end
 
     # Return diff from the initial state to specified time or version.
-    # Optional `data` paramater can be used as initial diff state.
+    # Optional `data` parameter can be used as initial diff state.
     def changes_to(time: nil, version: nil, data: {}, from: 0)
       raise ArgumentError, "Time or version must be specified" if time.nil? && version.nil?
 

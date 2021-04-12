@@ -54,7 +54,7 @@ Other requirements:
 Add Logidze to your application's Gemfile:
 
 ```ruby
-gem "logidze", "~> 1.0.0"
+gem "logidze", "~> 1.1"
 ```
 
 Install required DB extensions and create trigger function:
