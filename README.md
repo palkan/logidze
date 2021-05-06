@@ -544,6 +544,12 @@ First, when restoring data dumps you should consider using `--disable-triggers` 
 
 When restoring data dumps for a particular PostgreSQL schema (e.g., when using Apartment), you may encounter the issue with non-existent Logidze functions. That happens because `pg_dump` adds `SELECT pg_catalog.set_config('search_path', '', false);`, and, thus, breaks our existing triggers/functions, because they live either in "public" or in a tenant's namespace (see [this thread](https://postgrespro.com/list/thread-id/2448092)).
 
+### `PG::NumericValueOutOfRange: ERROR: value overflows numeric format`
+
+Due to the usage of `hstore_to_jsonb_loose` under the hood, there could be a situation when you have a string representing a number in the scientific notation (e.g., "557236406134e62000323100"). Postgres would try to convert it to a number (a pretty big one, for sure) and fail with the exception.
+
+Related issues: [#69](https://github.com/palkan/logidze/issues/69).
+
 ## Development
 
 We use [Dip](https://github.com/bibendi/dip) for development. Provision the project by running `dip provision` and then use `dip bundle`, `dip rspec` or `dip bash` to interact with a Docker development environment.
