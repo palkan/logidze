@@ -62,6 +62,22 @@ describe "triggers", :db do
       expect(diff["meta"]["new"].class).to eq diff["meta"]["old"].class
       expect(diff["meta"]).to eq expected_diff_meta
     end
+
+    it "generates the correct diff on fallback", :aggregate_failures do
+      post.update!(title: "3981465518e9665560300635", meta: {tags: ["other"]})
+      diff = post.reload.diff_from(version: (post.reload.log_version - 1))["changes"]
+      expected_diff_title = {
+        "old" => "Triggers",
+        "new" => "3981465518e9665560300635"
+      }
+      expected_diff_meta = {
+        "old" => {"tags" => %w[some tag]},
+        "new" => {"tags" => %w[other]}
+      }
+      expect(diff["meta"]["new"].class).to eq diff["meta"]["old"].class
+      expect(diff["meta"]).to eq expected_diff_meta
+      expect(diff["title"]).to eq expected_diff_title
+    end
   end
 
   describe "update" do
@@ -87,6 +103,13 @@ describe "triggers", :db do
 
       Post.where(id: post.id).update_all(active: true)
       expect(post.reload.log_version).to eq 4
+    end
+
+    it "does not raise exception on number overflow", :aggregate_failures do
+      post.update!(title: "3981465518e9665560300635")
+
+      expect(post.reload.log_version).to eq 2
+      expect(post.title).to eq "3981465518e9665560300635"
     end
 
     it "doesn't create new version if values not changed", :aggregate_failures do

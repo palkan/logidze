@@ -89,11 +89,25 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       changes := '{}';
 
       IF (coalesce(current_setting('logidze.full_snapshot', true), '') = 'on') THEN
-        changes = hstore_to_jsonb_loose(hstore(NEW.*));
+        BEGIN
+          changes = hstore_to_jsonb_loose(hstore(NEW.*));
+        EXCEPTION
+          WHEN NUMERIC_VALUE_OUT_OF_RANGE THEN
+            changes = row_to_json(NEW.*)::jsonb;
+        END;
       ELSE
-        changes = hstore_to_jsonb_loose(
-          hstore(NEW.*) - hstore(OLD.*)
-        );
+        BEGIN
+          changes = hstore_to_jsonb_loose(
+                hstore(NEW.*) - hstore(OLD.*)
+            );
+        EXCEPTION
+          WHEN NUMERIC_VALUE_OUT_OF_RANGE THEN
+            changes = (SELECT
+              COALESCE(json_object_agg(key, value), '{}')::jsonb
+              FROM
+              jsonb_each(row_to_json(NEW.*)::jsonb)
+              WHERE NOT jsonb_build_object(key, value) <@ row_to_json(OLD.*)::jsonb);
+        END;
       END IF;
 
       changes = changes - 'log_data';
