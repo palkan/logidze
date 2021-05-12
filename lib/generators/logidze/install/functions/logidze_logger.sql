@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     history_limit integer;
     debounce_time integer;
     current_version integer;
-    merged jsonb;
+    k text;
     iterator integer;
     item record;
     columns text[];
@@ -94,6 +94,12 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         EXCEPTION
           WHEN NUMERIC_VALUE_OUT_OF_RANGE THEN
             changes = row_to_json(NEW.*)::jsonb;
+            FOR k IN (SELECT key FROM jsonb_each(changes))
+            LOOP
+              IF jsonb_typeof(changes->k) = 'object' THEN
+                changes = jsonb_set(changes, ARRAY[k], to_jsonb(changes->>k));
+              END IF;
+            END LOOP;
         END;
       ELSE
         BEGIN
@@ -107,6 +113,12 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
               FROM
               jsonb_each(row_to_json(NEW.*)::jsonb)
               WHERE NOT jsonb_build_object(key, value) <@ row_to_json(OLD.*)::jsonb);
+            FOR k IN (SELECT key FROM jsonb_each(changes))
+            LOOP
+              IF jsonb_typeof(changes->k) = 'object' THEN
+                changes = jsonb_set(changes, ARRAY[k], to_jsonb(changes->>k));
+              END IF;
+            END LOOP;
         END;
       END IF;
 

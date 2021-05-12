@@ -77,6 +77,11 @@ describe "triggers", :db do
       expect(diff["meta"]["new"].class).to eq diff["meta"]["old"].class
       expect(diff["meta"]).to eq expected_diff_meta
       expect(diff["title"]).to eq expected_diff_title
+
+      snapshot = JSON.parse(post.read_attribute_before_type_cast(:log_data))
+      expect(snapshot["h"].first).to include({
+        "c" => a_hash_including({"meta" => '{"tags": ["some", "tag"]}'})
+      })
     end
   end
 
