@@ -18,7 +18,7 @@ ifdef DIP
 	FILE_PREFIX = bench/triggers/
 endif
 
-all: plain hstore jsonb jsonb2 keys keys2
+all: plain hstore hstore_fallback jsonb jsonb2 keys keys2
 
 setup:
 	createdb $(DB) -w
@@ -35,6 +35,13 @@ hstore:
 	$(info ======  [START] Update with hstore-based triggers ======)
 	$(COMMAND_PREFIX) pgbench -i -q $(DB)
 	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)hstore_trigger_setup.sql
+	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
+
+hstore_fallback:
+	$(info )
+	$(info ======  [START] Update with hstore-based triggers and exception handler ======)
+	$(COMMAND_PREFIX) pgbench -i -q $(DB)
+	$(COMMAND_PREFIX) psql -q -d $(DB) -f $(FILE_PREFIX)hstore_with_fallback_setup.sql
 	$(COMMAND_PREFIX) pgbench -f $(FILE_PREFIX)bench.sql -t $(T) -r $(DB)
 
 jsonb:

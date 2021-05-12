@@ -1,7 +1,9 @@
 # Triggers benchmarks
 
 This benchmark uses standard _pg\_bench_ table `pgbench_accounts`.
-We consider several approaches for calculating records diff: one uses _hstore_ extension, two uses jsonb functions and two others iterate through record fields.
+We consider several approaches for calculating records diff: one uses _hstore_ extension, one _hstore_ with jsonb fallback, two uses jsonb functions and two others iterate through record fields.
+
+_Logidze_ uses hstore with jsonb fallback variant.
 
 # Usage
 
@@ -23,6 +25,8 @@ or separate benchmark:
 
 ```sh
 make hstore
+
+make hstore_fallback
 
 make jsonb
 
@@ -54,8 +58,6 @@ The benchmark shows that hstore variant is the most efficient (running on Macboo
 | jsonb2 | 1674 | 0.354                  |
 | keys   | 2355 | 0.219                  |
 | keys2  | 2542 | 0.210                  |
-
-_Logidze_ uses hstore variant.
 
 **UPD 2020**: Running the same benchmarks in Docker environment (on Macbook Pro 2019, 2.8 GHz Intel Core i7, 16 GB (Docker limited to 8GB), 100_000 transactions per test):
 |Mode    | TPS  | Statement latency (ms) |
