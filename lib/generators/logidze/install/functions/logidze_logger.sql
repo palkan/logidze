@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
-  -- version: 1
+  -- version: 2
   DECLARE
     changes jsonb;
     version jsonb;
@@ -16,6 +16,15 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     include_columns boolean;
     ts timestamp with time zone;
     ts_column text;
+    err_sqlstate text;
+    err_message text;
+    err_detail text;
+    err_hint text;
+    err_context text;
+    err_table_name text;
+    err_schema_name text;
+    err_jsonb jsonb;
+    err_captured boolean;
   BEGIN
     ts_column := NULLIF(TG_ARGV[1], 'null');
     columns := NULLIF(TG_ARGV[2], 'null');
@@ -171,6 +180,30 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     END IF;
 
     return NEW;
+  EXCEPTION
+    WHEN OTHERS THEN
+      GET STACKED DIAGNOSTICS err_sqlstate = RETURNED_SQLSTATE,
+                              err_message = MESSAGE_TEXT,
+                              err_detail = PG_EXCEPTION_DETAIL,
+                              err_hint = PG_EXCEPTION_HINT,
+                              err_context = PG_EXCEPTION_CONTEXT,
+                              err_schema_name = SCHEMA_NAME,
+                              err_table_name = TABLE_NAME;
+      err_jsonb := jsonb_build_object(
+        'returned_sqlstate', err_sqlstate,
+        'message_text', err_message,
+        'pg_exception_detail', err_detail,
+        'pg_exception_hint', err_hint,
+        'pg_exception_context', err_context,
+        'schema_name', err_schema_name,
+        'table_name', err_table_name
+      );
+      err_captured = logidze_capture_exception(err_jsonb);
+      IF err_captured THEN
+        return NEW;
+      ELSE
+        RAISE;
+      END IF;
   END;
 $body$
 LANGUAGE plpgsql;
