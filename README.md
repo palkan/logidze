@@ -44,6 +44,7 @@ Other requirements:
   - [Associations versioning](#associations-versioning)
 - [Dealing with large logs](#dealing-with-large-logs)
 - [Handling records deletion](#handling-records-deletion)
+- [Handling PG exceptions](#handling-pg-exceptions)
 - [Upgrading](#upgrading)
 - [Log format](#log-format)
 - [Troubleshooting 🚨](#troubleshooting)
@@ -433,6 +434,15 @@ Unlike, for example, PaperTrail, Logidze is designed to **only track changes**. 
 If you want to keep changes history after records deletion as well, consider using specialized tools for soft-delete, such as, [Discard](https://github.com/jhawthorn/discard) or [Paranoia](https://github.com/rubysherpas/paranoia).
 
 See also the discussion: [#61](https://github.com/palkan/logidze/issues/61).
+
+## Handling PG exceptions
+
+By default, Logidze raises an exception which causes the entire transaction to fail.
+To change this behavior, it's now possible to override `logidze_capture_exception(error_data jsonb)` function.
+
+For example, you may want to raise a warning instead of an exception and complete the transaction without updating log_data.
+
+Related issues: [#193](https://github.com/palkan/logidze/issues/193)
 
 ## Upgrading
 
