@@ -9,6 +9,8 @@ To change this behavior, it's now possible to override `logidze_capture_exceptio
 
 - [Fixes [#69](https://github.com/palkan/logidze/issues/69)] Fallback on NUMERIC_VALUE_OUT_OF_RANGE exception ([@skryukov][])
 
+- [Fixes [#192](https://github.com/palkan/logidze/issues/192)] Skip `log_data` column during `apply_column_diff` ([@skryukov][])
+
 ## 1.1.0 (2021-03-31)
 
 - Add pending upgrade checks [Experimental]. ([@skryukov][])

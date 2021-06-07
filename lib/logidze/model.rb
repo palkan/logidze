@@ -239,7 +239,7 @@ module Logidze
     end
 
     def apply_column_diff(column, value)
-      return if deleted_column?(column)
+      return if deleted_column?(column) || column == "log_data"
 
       write_attribute column, deserialize_value(column, value)
     end
