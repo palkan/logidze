@@ -12,7 +12,7 @@ describe Logidze::Model, :db do
         "v" => 5,
         "h" =>
           [
-            {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil}},
+            {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil, "log_data" => nil}},
             {"v" => 2, "ts" => time(200), "c" => {"active" => true}},
             {"v" => 3, "ts" => time(200), "r" => 1, "c" => {"name" => "test"}, "m" => {"some_key" => "old_val"}},
             {"v" => 4, "ts" => time(300), "c" => {"age" => 0}},
