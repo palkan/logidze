@@ -28,6 +28,8 @@ describe "triggers", :db do
     it "creates snapshot for existent records", :aggregate_failures do
       expect(post.log_version).to eq 1
       expect(post.log_size).to eq 1
+      expect(post.log_data.versions.last.changes.keys)
+        .not_to include("log_data")
     end
   end
 
@@ -37,6 +39,8 @@ describe "triggers", :db do
     it "creates initial version", :aggregate_failures do
       expect(post.log_version).to eq 1
       expect(post.log_size).to eq 1
+      expect(post.log_data.versions.last.changes.keys)
+        .not_to include("log_data")
     end
 
     context "when logging is disabled" do

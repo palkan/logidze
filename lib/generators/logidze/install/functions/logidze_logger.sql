@@ -31,13 +31,10 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     include_columns := NULLIF(TG_ARGV[3], 'null');
 
     IF TG_OP = 'INSERT' THEN
-      -- always exclude log_data column
-      changes := to_jsonb(NEW.*) - 'log_data';
-
       IF columns IS NOT NULL THEN
-        snapshot = logidze_snapshot(changes, ts_column, columns, include_columns);
+        snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns, include_columns);
       ELSE
-        snapshot = logidze_snapshot(changes, ts_column);
+        snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column);
       END IF;
 
       IF snapshot#>>'{h, -1, c}' != '{}' THEN
@@ -47,13 +44,10 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     ELSIF TG_OP = 'UPDATE' THEN
 
       IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
-        -- always exclude log_data column
-        changes := to_jsonb(NEW.*) - 'log_data';
-
         IF columns IS NOT NULL THEN
-          snapshot = logidze_snapshot(changes, ts_column, columns, include_columns);
+          snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns, include_columns);
         ELSE
-          snapshot = logidze_snapshot(changes, ts_column);
+          snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column);
         END IF;
 
         IF snapshot#>>'{h, -1, c}' != '{}' THEN

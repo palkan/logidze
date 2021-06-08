@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION logidze_snapshot(item jsonb, ts_column text DEFAULT N
     ts timestamp with time zone;
     k text;
   BEGIN
+    item = item - 'log_data';
     IF ts_column IS NULL THEN
       ts := statement_timestamp();
     ELSE

@@ -3,6 +3,7 @@ CREATE OR REPLACE FUNCTION logidze_version(v bigint, data jsonb, ts timestamp wi
   DECLARE
     buf jsonb;
   BEGIN
+    data = data - 'log_data';
     buf := jsonb_build_object(
               'ts',
               (extract(epoch from ts) * 1000)::bigint,
