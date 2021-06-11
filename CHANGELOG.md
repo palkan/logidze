@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## 1.2.0 (2021-06-11)
+
 - Add user-defined exception handling ([@skryukov][])
 
 By default, Logidze raises an exception which causes the entire transaction to fail.
