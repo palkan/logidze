@@ -134,8 +134,8 @@ Model.create_logidze_snapshot
 Model.create_logidze_snapshot(timestamp: :created_at)
 
 # filter columns
-Model.create_logidze_snapshot(only: %(name))
-Model.create_logidze_snapshot(except: %(password))
+Model.create_logidze_snapshot(only: %w[name])
+Model.create_logidze_snapshot(except: %[password])
 
 # or call a similar method (but with !) on a record
 
