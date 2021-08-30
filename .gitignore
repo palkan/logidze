@@ -43,3 +43,4 @@ Gemfile.local
 *.gem
 tmp/
 coverage/
+gemfiles/*.lock
