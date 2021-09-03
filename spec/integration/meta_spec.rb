@@ -363,4 +363,51 @@ describe "logs metadata", :db do
       end
     end
   end
+
+  describe ".with_responsible!" do
+    let(:responsible) { User.create!(name: "owner") }
+    subject { User.create!(name: "test", age: 10, active: false) }
+
+    context "insert" do
+      it "loads responsible when id is provided" do
+        Logidze.with_responsible!(responsible.id)
+
+        expect(subject.reload.whodunnit).to eq(responsible)
+      end
+
+      it "handles nil" do
+        Logidze.with_responsible!(nil)
+
+        expect(subject.reload.whodunnit).to be_nil
+        expect(subject.log_data.current_version.data.keys).not_to include(Logidze::History::Version::META)
+      end
+    end
+
+    context "update" do
+      it "sets responsible" do
+        Logidze.with_responsible!(responsible.id)
+
+        subject.update!(age: 12)
+
+        expect(subject.reload.whodunnit).to eq responsible
+      end
+    end
+  end
+
+  describe ".clear_responsible!" do
+    let(:responsible) { User.create!(name: "owner") }
+
+    before do
+      Logidze.with_responsible!(responsible.id)
+      Logidze.clear_responsible!
+    end
+
+    subject { User.create!(name: "test", age: 10, active: false) }
+
+    context "insert" do
+      it "doesn't set responsible user if it's not provided" do
+        expect(subject.reload.whodunnit).to be_nil
+      end
+    end
+  end
 end

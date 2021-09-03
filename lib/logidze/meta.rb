@@ -15,6 +15,17 @@ module Logidze # :nodoc:
       with_meta(meta, transactional: transactional, &block)
     end
 
+    def with_responsible!(responsible_id)
+      return if responsible_id.nil?
+
+      meta = {Logidze::History::Version::META_RESPONSIBLE => responsible_id}
+      PermanentMetaWithTransaction.wrap_with(meta, &proc {})
+    end
+
+    def clear_responsible!
+      PermanentMetaWithTransaction.wrap_with({}, &proc {})
+    end
+
     class MetaWrapper # :nodoc:
       def self.wrap_with(meta, &block)
         new(meta, &block).perform
@@ -85,6 +96,12 @@ module Logidze # :nodoc:
       def pg_clear_meta_param
         connection.execute("SET LOCAL logidze.meta TO DEFAULT;")
       end
+    end
+
+    class PermanentMetaWithTransaction < MetaWithTransaction # :nodoc:
+      private
+
+      def pg_clear_meta_param; end
     end
 
     class MetaWithoutTransaction < MetaWrapper # :nodoc:
