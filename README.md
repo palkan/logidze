@@ -564,9 +564,19 @@ Related issues: [#69](https://github.com/palkan/logidze/issues/69).
 
 ## Development
 
-We use [Dip](https://github.com/bibendi/dip) for development. Provision the project by running `dip provision` and then use `dip bundle`, `dip rspec` or `dip bash` to interact with a Docker development environment.
+This project requires a PostgreSQL instance running with the following setup:
 
-If you prefer developing on your local machine, make user you have Postgres installed and run `./bin/setup`.
+```sh
+# For testing
+createdb -h postgres -U postgres logidze_test
+
+# For benchmarks
+createdb -h postgres -U postgres logidze_bench
+createdb -h postgres -U postgres logidze_perf_bench
+psql -d logidze_bench -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
+```
+
+This project is compatible with [Reusable Docker environment](https://evilmartians.com/chronicles/reusable-development-containers-with-docker-compose-and-dip) setup.
 
 ## Contributing
 
