@@ -276,10 +276,12 @@ Logidze.append_on_undo = true
 You can store any meta information you want inside your version (it could be IP address, user agent, etc.). To add it you should wrap your code with a block:
 
 ```ruby
-Logidze.with_meta(ip: request.ip) do
+Logidze.with_meta({ip: request.ip}) do
   post.save!
 end
 ```
+
+**NOTE:** You should pass metadata as a Hash; passing keyword arguments doesn't work in Ruby 3.0+.
 
 Meta expects a hash to be passed so you won't need to encode and decode JSON manually.
 
