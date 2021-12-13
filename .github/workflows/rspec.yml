@@ -25,6 +25,10 @@ jobs:
         ]
         fx: ["false"]
         include:
+        - ruby: "3.0"
+          postgres: "14"
+          gemfile: "gemfiles/rails7.gemfile"
+          fx: "false"
         - ruby: "2.7"
           postgres: "13"
           gemfile: "gemfiles/railsmaster.gemfile"
