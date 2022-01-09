@@ -268,5 +268,32 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         expect(file("app/models/custom/data/set.rb")).to contain "has_logidze"
       end
     end
+
+    context "when revoking" do
+      let(:path) { File.join(destination_root, "app", "models", "user.rb") }
+
+      before do
+        File.write(
+          path,
+          <<~RAW
+            class User < ActiveRecord::Base
+            end
+          RAW
+        )
+      end
+
+      let(:path) { File.join(destination_root, "app", "models", "user.rb") }
+      let(:base_args) { ["User"] }
+
+      it "deletes migration file it created" do
+        run_generator(args)
+        migration_file = migration_file("db/migrate/add_logidze_to_users.rb")
+        expect(migration_file).to exist
+
+        Rails::Generators.invoke "logidze:model", args, behavior: :revoke, destination_root: destination_root
+        migration_file = migration_file("db/migrate/add_logidze_to_users.rb")
+        expect(migration_file).not_to exist
+      end
+    end
   end
 end

@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- [Fixes [#205](https://github.com/palkan/logidze/issues/205)] Allow `rails destroy logidze:model SomeModel` to delete the migration file.
+
 ## 1.2.0 (2021-06-11)
 
 - Add user-defined exception handling ([@skryukov][])
