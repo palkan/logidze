@@ -34,6 +34,7 @@ Other requirements:
   - [Log size limits](#log-size-limits)
   - [Tracking only selected columns](#tracking-only-selected-columns)
   - [Logs timestamps](#logs-timestamps)
+  - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
 - [Usage](#usage)
   - [Basic API](#basic-api)
   - [Track meta information](#track-meta-information)
@@ -176,6 +177,14 @@ To change the column name or disable this feature completely, you can use the `t
 bundle exec rails generate logidze:model Post --timestamp_column time
 # will always set version timestamp to `statement_timestamp()`
 bundle exec rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
+```
+
+### Undoing a Generated Invocation
+
+If you would like to re-do your `rails generate` anew, as with other generators you can use `rails destroy` to revert it, which will delete the migration file and undo the injection of `has_logidze` into the model file:
+
+```sh
+bundle exec rails destroy logidze:model Post
 ```
 
 **IMPORTANT**: If you use non-UTC time zone for Active Record (`config.active_record.default_timezone`), you MUST always infer log timestamps from a timestamp column (e.g., when back-filling data); otherwise, you may end up with inconsistent logs ([#199](https://github.com/palkan/logidze/issues/199)). In general, we recommend using UTC as the database time unless there is a very strong reason not to.

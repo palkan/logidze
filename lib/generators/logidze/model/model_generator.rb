@@ -45,7 +45,7 @@ module Logidze
           warn "Use only one: --only or --except"
           exit(1)
         end
-        migration_template "migration.rb.erb", "db/migrate/#{migration_file_name}"
+        migration_template "migration.rb.erb", "db/migrate/#{migration_name}.rb"
       end
 
       def generate_fx_trigger
@@ -73,15 +73,11 @@ module Logidze
           end
         end
 
-        def migration_file_name
-          "#{migration_name}.rb"
-        end
-
         def full_table_name
           config = ActiveRecord::Base
           "#{config.table_name_prefix}#{table_name}#{config.table_name_suffix}"
         end
-
+        
         def limit
           options[:limit]
         end
