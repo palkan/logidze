@@ -12,11 +12,9 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
   let(:table_name_prefix) { TABLE_NAME_PREFIX }
   let(:table_name_suffix) { TABLE_NAME_SUFFIX }
 
-  let(:full_table_name) {
-    ->(table_name) {
-      "#{table_name_prefix}#{table_name}#{table_name_suffix}"
-    }
-  }
+  def full_table_name(table_name)
+    "#{table_name_prefix}#{table_name}#{table_name_suffix}"
+  end
 
   let(:base_args) { [] }
   let(:args) { base_args + fx_args }
@@ -40,7 +38,6 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       let(:path) { File.join(destination_root, "app", "models", "user.rb") }
       let(:base_args) { ["user"] }
 
-
       before do
         File.write(
           path,
@@ -55,11 +52,11 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         is_expected.to exist
         is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
         is_expected.to contain "add_column :users, :log_data, :jsonb"
-        is_expected.to contain(/create trigger "logidze_on_#{full_table_name['users']}"/i)
-        is_expected.to contain(/before update or insert on "#{full_table_name['users']}" for each row/i)
+        is_expected.to contain(/create trigger "logidze_on_#{full_table_name('users')}"/i)
+        is_expected.to contain(/before update or insert on "#{full_table_name('users')}" for each row/i)
         is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at'\);/i)
-        is_expected.to contain(/drop trigger if exists \\\"logidze_on_#{full_table_name['users']}\\\" on \\\"#{full_table_name['users']}\\\"/i)
-        is_expected.not_to contain(/update \\\"#{full_table_name['users']}\\\"/i)
+        is_expected.to contain(/drop trigger if exists "logidze_on_#{full_table_name('users')}" on "#{full_table_name('users')}"/i)
+        is_expected.not_to contain(/update "#{full_table_name('users')}"/i)
 
         expect(file("app/models/user.rb")).to contain "has_logidze"
       end
@@ -123,7 +120,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
         it "creates backfill query" do
           is_expected.to exist
-          is_expected.to contain(/update \"#{full_table_name['users']}\" as t/i)
+          is_expected.to contain(/update "#{full_table_name('users')}" as t/i)
           is_expected.to contain(/set log_data = logidze_snapshot\(to_jsonb\(t\), 'updated_at'\);/i)
         end
       end
@@ -134,10 +131,10 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         it "creates migration with trigger" do
           is_expected.to exist
           is_expected.not_to contain "add_column :users, :log_data, :jsonb"
-          is_expected.to contain(/create trigger "logidze_on_#{full_table_name['users']}"/i)
-          is_expected.to contain(/before update or insert on "#{full_table_name['users']}" for each row/i)
+          is_expected.to contain(/create trigger "logidze_on_#{full_table_name('users')}"/i)
+          is_expected.to contain(/before update or insert on "#{full_table_name('users')}" for each row/i)
           is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at'\);/i)
-          is_expected.to contain(/drop trigger if exists \\\"logidze_on_#{full_table_name['users']}\\\" on \\\"#{full_table_name['users']}\\\"/i)
+          is_expected.to contain(/drop trigger if exists "logidze_on_#{full_table_name('users')}" on "#{full_table_name('users')}"/i)
           is_expected.not_to contain "remove_column :users, :log_data"
         end
       end
@@ -153,8 +150,8 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         it "creates migration with drop and create trigger" do
           is_expected.to exist
           is_expected.not_to contain "add_column :users, :log_data, :jsonb"
-          is_expected.to contain(/drop trigger if exists \\\"logidze_on_#{full_table_name['users']}\\\" on \\\"#{full_table_name['users']}\\\"/i)
-          is_expected.to contain(/before update or insert on "#{full_table_name['users']}" for each row/i)
+          is_expected.to contain(/drop trigger if exists "logidze_on_#{full_table_name('users')}" on "#{full_table_name('users')}"/i)
+          is_expected.to contain(/before update or insert on "#{full_table_name('users')}" for each row/i)
           is_expected.to contain "raise ActiveRecord::IrreversibleMigration"
         end
 
