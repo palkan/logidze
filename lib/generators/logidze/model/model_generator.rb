@@ -73,6 +73,11 @@ module Logidze
           end
         end
 
+        def full_table_name
+          config = ActiveRecord::Base
+          "#{config.table_name_prefix}#{table_name}#{config.table_name_suffix}"
+        end
+
         def limit
           options[:limit]
         end
