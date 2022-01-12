@@ -12,14 +12,14 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
       dir.up do
     <%- if update? -%>
         # Drop legacy trigger if any (<1.0)
-        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+        execute "DROP TRIGGER IF EXISTS \"logidze_on_<%= full_table_name %>\" on \"<%= full_table_name %>\";"
 
     <%- end -%>
         create_trigger :logidze_on_<%= table_name %>, on: :<%= table_name %>
       end
 
       dir.down do
-        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+        execute "DROP TRIGGER IF EXISTS \"logidze_on_<%= full_table_name %>\" on \"<%= full_table_name %>\";"
       end
     end
   <%- end -%>
@@ -27,7 +27,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
     reversible do |dir|
       dir.up do
   <%- if update? -%>
-        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+        execute "DROP TRIGGER IF EXISTS \"logidze_on_<%= full_table_name %>\" on \"<%= full_table_name %>\";"
 
   <%- end -%>
         execute <<~SQL
@@ -44,7 +44,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
         # Uncomment this line if you want to raise an error.
         # raise ActiveRecord::IrreversibleMigration
   <%- else -%>
-        execute "DROP TRIGGER IF EXISTS logidze_on_<%= table_name %> on <%= table_name %>;"
+        execute "DROP TRIGGER IF EXISTS \"logidze_on_<%= full_table_name %>\" on \"<%= full_table_name %>\";"
   <%- end -%>
       end
     end
@@ -54,7 +54,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
     reversible do |dir|
       dir.up do
         execute <<~SQL
-          UPDATE <%= table_name %> as t
+          UPDATE "<%= full_table_name %>" as t
           SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
         SQL
       end

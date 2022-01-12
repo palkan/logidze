@@ -33,6 +33,12 @@ jobs:
           postgres: "13"
           gemfile: "gemfiles/railsmaster.gemfile"
           fx: "false"
+        - ruby: "2.7"
+          postgres: "10"
+          gemfile: "gemfiles/railsmaster.gemfile"
+          fx: "false"
+          table_name_prefix: 'prefix-'
+          table_name_suffix: '-suffix'
         - ruby: "2.6"
           postgres: "9.6"
           gemfile: "gemfiles/rails6.gemfile"
@@ -87,11 +93,15 @@ jobs:
     - name: Run RSpec (unit, integrations)
       env:
         USE_FX: ${{ matrix.fx }}
+        TABLE_NAME_PREFIX: ${{ matrix.table_name_prefix }}
+        TABLE_NAME_SUFFIX: ${{ matrix.table_name_suffix }}
       run: |
         bundle exec rspec --exclude-pattern=spec/acceptance/**/* -f d --force-color
     - name: Run RSpec (acceptance)
       env:
         USE_FX: ${{ matrix.fx }}
+        TABLE_NAME_PREFIX: ${{ matrix.table_name_prefix }}
+        TABLE_NAME_SUFFIX: ${{ matrix.table_name_suffix }}
       run: |
         bundle exec rspec spec/acceptance/ -f d --force-color
 
