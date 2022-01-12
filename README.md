@@ -27,43 +27,29 @@ Other requirements:
 
 ## Table of contents
 
-- [Logidze](#logidze)
-  - [Links](#links)
-  - [Table of contents](#table-of-contents)
-  - [Installation](#installation)
-    - [Using with schema.rb](#using-with-schemarb)
-    - [Configuring models](#configuring-models)
-    - [Backfill data](#backfill-data)
-    - [Log size limits](#log-size-limits)
-    - [Tracking only selected columns](#tracking-only-selected-columns)
-    - [Logs timestamps](#logs-timestamps)
-    - [Undoing a Generate Invocation](#undoing-a-generate-invocation)
-  - [Usage](#usage)
-    - [Basic API](#basic-api)
-    - [Track meta information](#track-meta-information)
-    - [Track responsibility](#track-responsibility)
-    - [Disable logging temporary](#disable-logging-temporary)
-    - [Reset log](#reset-log)
-    - [Full snapshots](#full-snapshots)
-    - [Associations versioning](#associations-versioning)
-  - [Dealing with large logs](#dealing-with-large-logs)
-  - [Handling records deletion](#handling-records-deletion)
-  - [Handling PG exceptions](#handling-pg-exceptions)
-  - [Upgrading](#upgrading)
-    - [Pending upgrade check [Experimental]](#pending-upgrade-check-experimental)
-    - [Upgrading from 0.x to 1.0 (edge)](#upgrading-from-0x-to-10-edge)
-      - [Schema and migrations](#schema-and-migrations)
-      - [API changes](#api-changes)
-  - [Log format](#log-format)
-  - [Troubleshooting](#troubleshooting)
-    - [`log_data` is nil when using Rails fixtures](#log_data-is-nil-when-using-rails-fixtures)
-    - [How to make this work with Apartment 🤔](#how-to-make-this-work-with-apartment-)
-    - [`PG::UntranslatableCharacter: ERROR`](#pguntranslatablecharacter-error)
-    - [`pg_restore` fails to restore a dump](#pg_restore-fails-to-restore-a-dump)
-    - [`PG::NumericValueOutOfRange: ERROR: value overflows numeric format`](#pgnumericvalueoutofrange-error-value-overflows-numeric-format)
-  - [Development](#development)
-  - [Contributing](#contributing)
-  - [License](#license)
+- [Installation & Configuration](#installation)
+  - [Using with schema.rb](#using-with-schemarb)
+  - [Configuring models](#configuring-models)
+  - [Backfill data](#backfill-data)
+  - [Log size limits](#log-size-limits)
+  - [Tracking only selected columns](#tracking-only-selected-columns)
+  - [Logs timestamps](#logs-timestamps)
+  - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
+- [Usage](#usage)
+  - [Basic API](#basic-api)
+  - [Track meta information](#track-meta-information)
+  - [Track responsibility](#track-responsibility)
+  - [Disable logging temporary](#disable-logging-temporary)
+  - [Reset log](#reset-log)
+  - [Creating full snapshot instead of diffs](#full-snapshots)
+  - [Associations versioning](#associations-versioning)
+- [Dealing with large logs](#dealing-with-large-logs)
+- [Handling records deletion](#handling-records-deletion)
+- [Handling PG exceptions](#handling-pg-exceptions)
+- [Upgrading](#upgrading)
+- [Log format](#log-format)
+- [Troubleshooting 🚨](#troubleshooting)
+- [Development](#development)
 
 ## Installation
 
@@ -193,7 +179,7 @@ bundle exec rails generate logidze:model Post --timestamp_column time
 bundle exec rails generate logidze:model Post --timestamp_column nil # "null" and "false" will also work
 ```
 
-### Undoing a Generate Invocation
+### Undoing a Generated Invocation
 
 If you would like to re-do your `rails generate` anew, as with other generators you can use `rails destroy` to revert it, which will delete the migration file and undo the injection of `has_logidze` into the model file:
 
