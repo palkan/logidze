@@ -2,9 +2,11 @@
 
 ## master (unreleased)
 
+## 1.2.1 (2022-01-13)
+
 - [Fixes [#207](https://github.com/palkan/logidze/issues/207)] Add support for the use of `table_name_prefix` or `table_name_suffix`. ([@cavi21][])
 
-- [Fixes [#205](https://github.com/palkan/logidze/issues/205)] Allow `rails destroy logidze:model SomeModel` to delete the migration file.
+- [Fixes [#205](https://github.com/palkan/logidze/issues/205)] Allow `rails destroy logidze:model SomeModel` to delete the migration file. ([@danielmklein][])
 
 ## 1.2.0 (2021-06-11)
 
@@ -364,3 +366,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@skryukov]: https://github.com/skryukov
 [@bf4]: https://github.com/bf4
 [@cavi21]: https://github.com/cavi21
+[@danielmklein]: https://github.com/danielmklein
