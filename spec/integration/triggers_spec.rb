@@ -20,7 +20,7 @@ describe "triggers", :db do
 
   after(:all) { @old_post.destroy! }
 
-  let(:params) { {title: "Triggers", rating: 10, active: false, meta: {tags: %w[some tag]}} }
+  let(:params) { {title: "Triggers", rating: 10, active: false, meta: {tags: %w[some tag]}, data: {some: "json"}} }
 
   describe "backfill" do
     let(:post) { Post.find(@old_post.id) }
@@ -86,6 +86,17 @@ describe "triggers", :db do
       expect(snapshot["h"].first).to include({
         "c" => a_hash_including({"meta" => '{"tags": ["some", "tag"]}'})
       })
+    end
+
+    it "works with json columns", :aggregate_failures do
+      post.update!(data: {other: "json"})
+      diff = post.reload.diff_from(version: (post.reload.log_version - 1))["changes"]
+      expected_diff_data = {
+        "old" => {"some" => "json"},
+        "new" => {"other" => "json"}
+      }
+      expect(diff["data"]["new"].class).to eq diff["data"]["old"].class
+      expect(diff["data"]).to eq expected_diff_data
     end
   end
 
