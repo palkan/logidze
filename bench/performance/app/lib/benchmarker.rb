@@ -54,7 +54,9 @@ module Benchmarker
       position: Faker::Number.number(digits: 3),
       name: Faker::Name.name,
       age: Faker::Number.number(digits: 2),
-      bio: Faker::Lorem.paragraph
+      bio: Faker::Lorem.paragraph,
+      dump: JSON.parse(Faker::Json.shallow_json),
+      data: JSON.parse(Faker::Json.shallow_json)
     }
 
     return params.slice(%i[email position name age bio].sample) if sample

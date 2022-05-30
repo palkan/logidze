@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         END IF;
       END IF;
 
-      IF NEW = OLD THEN
+      IF to_jsonb(NEW.*) = to_jsonb(OLD.*) THEN
         RETURN NEW;
       END IF;
 
