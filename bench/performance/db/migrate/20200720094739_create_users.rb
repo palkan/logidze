@@ -8,6 +8,8 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :name
       t.text :bio
       t.integer :age
+      t.json :dump
+      t.jsonb :data
       t.timestamps
     end
 
@@ -17,6 +19,8 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :name
       t.text :bio
       t.integer :age
+      t.json :dump
+      t.jsonb :data
       t.timestamps
     end
 
@@ -26,6 +30,8 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :name
       t.text :bio
       t.integer :age
+      t.json :dump
+      t.jsonb :data
       t.timestamps
     end
   end

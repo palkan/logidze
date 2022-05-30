@@ -19,6 +19,8 @@ class LogidzeUser
   self.ignored_columns += ["log_data"]
 end
 
+JSON_COLUMNS = %i[data dump].freeze
+
 Benchmark.ips do |x|
   x.config(time: BM_TIME, warmup: BM_WARMUP)
 
@@ -41,15 +43,21 @@ Benchmark.ips do |x|
   x.config(time: BM_TIME, warmup: BM_WARMUP)
 
   x.report("Plain UPDATE #2") do
-    User.random.update!(params2)
+    user = User.random
+    user.update!(params2.except(*JSON_COLUMNS))
+    user.update!(params2.slice(*JSON_COLUMNS))
   end
 
   x.report("PT UPDATE #2") do
-    PaperTrailUser.random.update!(params2)
+    user = PaperTrailUser.random
+    user.update!(params2.except(*JSON_COLUMNS))
+    user.update!(params2.slice(*JSON_COLUMNS))
   end
 
   x.report("Logidze UPDATE #2") do
-    LogidzeUser.random.update!(params2)
+    user = LogidzeUser.random
+    user.update!(params2.except(*JSON_COLUMNS))
+    user.update!(params2.slice(*JSON_COLUMNS))
   end
 
   x.compare!
