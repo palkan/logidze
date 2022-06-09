@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-rails_version = '7.0.0.rc1'
+rails_version = '~> 7.0.0'
 gem 'railties', rails_version
 gem 'activerecord', rails_version
 gem 'rspec-rails', '>= 4.0'
