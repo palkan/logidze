@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+## 1.2.2 (2022-07-13)
+
+- [Fixes [#209](https://github.com/palkan/logidze/issues/209)] Fix tracking JSONB column changes. ([@baygeldin][])
+
 ## 1.2.1 (2022-01-13)
 
 - [Fixes [#207](https://github.com/palkan/logidze/issues/207)] Add support for the use of `table_name_prefix` or `table_name_suffix`. ([@cavi21][])
@@ -367,3 +371,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@bf4]: https://github.com/bf4
 [@cavi21]: https://github.com/cavi21
 [@danielmklein]: https://github.com/danielmklein
+[@baygeldin]: https://github.com/baygeldin
