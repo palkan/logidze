@@ -485,7 +485,7 @@ $ bundle exec rails generate logidze:model Post --update --only=title,body,ratin
 
 ### Pending upgrade check [Experimental]
 
-Logidze can check for a pending upgrade. Use `Logidze.on_pending_upgrade = :warn` to be notified by warning, or `Logidze.on_pending_upgrade = :error` if you want Logidze to raise an error.
+Logidze can check for a pending upgrade. Use `Logidze.on_pending_upgrade = :warn` to be notified by warning, or `Logidze.on_pending_upgrade = :raise` if you want Logidze to raise an error.
 
 ### Upgrading from 0.x to 1.0 (edge)
 
