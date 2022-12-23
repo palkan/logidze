@@ -172,6 +172,8 @@ module Logidze
     # Restore record to the specified version.
     # Return false if version is unknown.
     def switch_to!(version, append: Logidze.append_on_undo)
+      raise ArgumentError, "#log_data is empty" unless log_data
+
       return false unless at_version(version)
 
       if append && version < log_version

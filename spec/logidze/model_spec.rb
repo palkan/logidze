@@ -235,6 +235,11 @@ describe Logidze::Model, :db do
     it "return false if version is unknown" do
       expect(user.switch_to!(10)).to eq false
     end
+
+    it "raises ArgumentError if log_data is nil" do
+      user.log_data = nil
+      expect { user.switch_to!(3) }.to raise_error(ArgumentError)
+    end
   end
 
   describe ".at" do
