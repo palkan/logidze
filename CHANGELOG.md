@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- [Fixes [#217](https://github.com/palkan/logidze/issues/217)] Fix switch_to with `append: true` when there are changes on JSONB columns. ([@miharekar][])
+
 ## 1.2.2 (2022-07-13)
 
 - [Fixes [#209](https://github.com/palkan/logidze/issues/209)] Fix tracking JSONB column changes. ([@baygeldin][])
@@ -66,7 +68,7 @@ now we filter the columns within the trigger function (thus, schema changes do n
 
 - PR [#143](https://github.com/palkan/logidze/pull/143) Add `:transactional` option to `#with_meta` and `#with_responsible` ([@oleg-kiviljov][])
 
-Now it's possible to set meta and responsible without wrapping the block into a DB transaction. For backward compatibility  `:transactional` option by default is set to `true`.
+Now it's possible to set meta and responsible without wrapping the block into a DB transaction. For backward compatibility `:transactional` option by default is set to `true`.
 
 Usage:
 
