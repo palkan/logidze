@@ -286,7 +286,7 @@ describe "triggers", :db do
   end
 
   describe "switch_to!" do
-    before(:all) { @post = Post.create!(title: "Triggers", rating: 10) }
+    before(:all) { @post = Post.create!(title: "Triggers", rating: 10, data: {some: "json"}) }
     after(:all) { @post.destroy! }
 
     let(:post) { @post.reload }
@@ -308,6 +308,17 @@ describe "triggers", :db do
       expect(post.log_version).to eq 3
       expect(post.log_size).to eq 3
       expect(post.rating).to eq 10
+    end
+
+    it "handles JSONB correctly when append: true", :aggregate_failures do
+      post.update!(rating: 5, meta: {tags: %w[jsonb json]}, data: {json: "here"})
+      post.reload.switch_to!(1, append: true)
+      post.reload
+
+      expect(post.log_version).to eq 3
+      expect(post.log_size).to eq 3
+      expect(post.rating).to eq 10
+      expect(post.data).to eq({"some" => "json"})
     end
 
     it "reverts to specified version if it's newer than current version", :aggregate_failures do
