@@ -177,8 +177,9 @@ module Logidze
       return false unless at_version(version)
 
       if append && version < log_version
-        deserialized_changes = log_data.changes_to(version: version).to_h { |c, v| [c, deserialize_value(c, v)] }
-        update!(deserialized_changes)
+        changes = log_data.changes_to(version: version)
+        changes.each { |c, v| changes[c] = deserialize_value(c, v) }
+        update!(changes)
       else
         at_version!(version)
         self.class.without_logging { save! }
