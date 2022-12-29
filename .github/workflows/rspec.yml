@@ -25,6 +25,14 @@ jobs:
         ]
         fx: ["false"]
         include:
+        - ruby: "3.2"
+          postgres: "14"
+          gemfile: "gemfiles/railsmaster.gemfile"
+          fx: "false"
+        - ruby: "3.2"
+          postgres: "14"
+          gemfile: "gemfiles/rails7.gemfile"
+          fx: "false"
         - ruby: "3.1"
           postgres: "14"
           gemfile: "gemfiles/railsmaster.gemfile"
@@ -75,8 +83,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v1
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
       with:
         path: /home/runner/bundle
         key: bundle-${{ matrix.ruby }}-${{ matrix.gemfile }}-${{ hashFiles(matrix.gemfile) }}-${{ hashFiles('**/*.gemspec') }}
