@@ -4,10 +4,10 @@ pre-commit:
       tags: style
       glob: "*.md"
       run: mdl {staged_files}
-    liche:
+    links:
       tags: links
       glob: "*.md"
-      run: liche README.md CHANGELOG.md && test "{staged_files}"
+      run: lychee README.md CHANGELOG.md && test "{staged_files}"
     forspell:
       tags: grammar
       glob: "*.md"
