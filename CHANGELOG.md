@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## 1.2.3 (2023-01-03)
+
 - [Fixes [#217](https://github.com/palkan/logidze/issues/217)] Fix switch_to with `append: true` when there are changes on JSONB columns. ([@miharekar][])
 
 ## 1.2.2 (2022-07-13)
