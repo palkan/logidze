@@ -376,3 +376,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@cavi21]: https://github.com/cavi21
 [@danielmklein]: https://github.com/danielmklein
 [@baygeldin]: https://github.com/baygeldin
+[@miharekar]: https://github.com/miharekar
