@@ -47,11 +47,11 @@ jobs:
           fx: "false"
         - ruby: "2.7"
           postgres: "13"
-          gemfile: "gemfiles/railsmaster.gemfile"
+          gemfile: "gemfiles/rails6.gemfile"
           fx: "false"
         - ruby: "2.7"
           postgres: "10"
-          gemfile: "gemfiles/railsmaster.gemfile"
+          gemfile: "gemfiles/rails6.gemfile"
           fx: "false"
           table_name_prefix: 'prefix-'
           table_name_suffix: '-suffix'
