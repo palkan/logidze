@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
   -- version: 3
   DECLARE
-    updated_record RECORD;
+    updated_record record;
   BEGIN
 
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN

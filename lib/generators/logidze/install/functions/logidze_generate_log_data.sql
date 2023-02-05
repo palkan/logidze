@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION logidze_generate_log_data(NEW RECORD, OLD RECORD, TG_OP text, TG_ARGV text[]) RETURNS RECORD AS $body$
+CREATE OR REPLACE FUNCTION logidze_generate_log_data(new_record anyelement, old_record anyelement, TG_OP text, TG_ARGV text[]) RETURNS RECORD AS $body$
   -- version: 3
   DECLARE
     changes jsonb;
@@ -25,10 +25,14 @@ CREATE OR REPLACE FUNCTION logidze_generate_log_data(NEW RECORD, OLD RECORD, TG_
     err_schema_name text;
     err_jsonb jsonb;
     err_captured boolean;
+    NEW record;
+    OLD record;
   BEGIN
     ts_column := NULLIF(TG_ARGV[1], 'null');
     columns := NULLIF(TG_ARGV[2], 'null');
     include_columns := NULLIF(TG_ARGV[3], 'null');
+    NEW := new_record;
+    OLD := old_record;
 
     IF TG_OP = 'INSERT' THEN
       IF columns IS NOT NULL THEN
@@ -107,8 +111,8 @@ CREATE OR REPLACE FUNCTION logidze_generate_log_data(NEW RECORD, OLD RECORD, TG_
       ELSE
         BEGIN
           changes = hstore_to_jsonb_loose(
-                hstore(NEW.*) - hstore(OLD.*)
-            );
+            hstore(NEW.*) - hstore(OLD.*)
+          );
         EXCEPTION
           WHEN NUMERIC_VALUE_OUT_OF_RANGE THEN
             changes = (SELECT

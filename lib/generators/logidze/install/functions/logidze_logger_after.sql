@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION logidze_logger_after() RETURNS TRIGGER AS $body$
   -- version: 1
   DECLARE
     primary_keys text[];
-    updated_record RECORD;
+    updated_record record;
   BEGIN
     IF pg_trigger_depth() > 1 THEN
       RETURN NULL;
