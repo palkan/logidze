@@ -22,6 +22,10 @@ describe Logidze::Utils::FunctionDefinitions do
 
     it "returns all functions from db without signatures" do
       is_expected.to include(func_def("logidze_logger", 3))
+      is_expected.to include(func_def("logidze_logger_after", 1))
+      is_expected.to include(func_def("logidze_generate_log_data", 1))
+      is_expected.to include(func_def("logidze_fetch_primary_keys", 1))
+      is_expected.to include(func_def("logidze_update_record_log_data", 1))
       is_expected.to include(func_def("logidze_snapshot", 3))
       is_expected.to include(func_def("logidze_filter_keys", 1))
       is_expected.to include(func_def("logidze_compact_history", 1))

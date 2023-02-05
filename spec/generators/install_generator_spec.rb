@@ -27,8 +27,11 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to exist
       is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
       is_expected.to contain(/create or replace function logidze_logger()/i)
+      is_expected.to contain(/create or replace function logidze_logger_after()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
       is_expected.to contain(/create or replace function logidze_filter_keys/i)
+      is_expected.to contain(/create or replace function logidze_fetch_primary_keys/i)
+      is_expected.to contain(/create or replace function logidze_generate_log_data/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
       is_expected.to contain(/create or replace function logidze_capture_exception/i)
     end
