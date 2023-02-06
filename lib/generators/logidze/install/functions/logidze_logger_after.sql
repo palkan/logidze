@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION logidze_logger_after() RETURNS TRIGGER AS $body$
-  -- version: 1
+  -- version: 3
   DECLARE
     primary_keys text[];
     updated_record record;
