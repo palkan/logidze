@@ -30,7 +30,6 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to contain(/create or replace function logidze_logger_after()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
       is_expected.to contain(/create or replace function logidze_filter_keys/i)
-      is_expected.to contain(/create or replace function logidze_fetch_primary_keys/i)
       is_expected.to contain(/create or replace function logidze_generate_log_data/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
       is_expected.to contain(/create or replace function logidze_capture_exception/i)
@@ -45,6 +44,8 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.to exist
         is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
         is_expected.to contain("create_function :logidze_logger, version: 3")
+        is_expected.to contain("create_function :logidze_logger_after, version: 3")
+        is_expected.to contain("create_function :logidze_generate_log_data, version: 3")
         is_expected.to contain("create_function :logidze_snapshot, version: 3")
         is_expected.to contain("create_function :logidze_version, version: 2")
         is_expected.to contain("create_function :logidze_filter_keys, version: 1")
@@ -52,6 +53,8 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.to contain("create_function :logidze_capture_exception, version: 1")
 
         is_expected.to contain("DROP FUNCTION IF EXISTS logidze_logger")
+        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_logger_after")
+        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_generate_log_data")
         is_expected.to contain("DROP FUNCTION IF EXISTS logidze_snapshot")
         is_expected.to contain("DROP FUNCTION IF EXISTS logidze_version")
         is_expected.to contain("DROP FUNCTION IF EXISTS logidze_filter_keys")
@@ -65,6 +68,8 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.to exist
         %w[
           logidze_logger_v03.sql
+          logidze_logger_after_v03.sql
+          logidze_generate_log_data_v03.sql
           logidze_version_v02.sql
           logidze_filter_keys_v01.sql
           logidze_snapshot_v03.sql
@@ -103,6 +108,8 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
 
       is_expected.to exist
       is_expected.to contain(/create or replace function logidze_logger()/i)
+      is_expected.to contain(/create or replace function logidze_logger_after()/i)
+      is_expected.to contain(/create or replace function logidze_generate_log_data()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
       is_expected.to contain(/create or replace function logidze_version/i)
       is_expected.to contain(/create or replace function logidze_filter_keys/i)
@@ -147,6 +154,8 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.not_to contain("update_function :logidze_filter_keys")
         is_expected.to contain("update_function :logidze_compact_history, version: 1, revert_to_version: 5")
         is_expected.to contain("update_function :logidze_logger, version: 3, revert_to_version: 7")
+        is_expected.to contain("create_function :logidze_logger_after, version: 3")
+        is_expected.to contain("create_function :logidze_generate_log_data, version: 3")
         is_expected.to contain("create_function :logidze_capture_exception")
       end
 
