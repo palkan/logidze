@@ -53,6 +53,7 @@ end
 
 RSpec.configure do |config|
   config.include Logidze::AcceptanceHelpers
+  config.include Logidze::PostgresHelpers
 
   config.around(:each) do |example|
     Dir.chdir("#{File.dirname(__FILE__)}/dummy") do
