@@ -189,6 +189,8 @@ bundle exec rails destroy logidze:model Post
 
 **IMPORTANT**: If you use non-UTC time zone for Active Record (`config.active_record.default_timezone`), you MUST always infer log timestamps from a timestamp column (e.g., when back-filling data); otherwise, you may end up with inconsistent logs ([#199](https://github.com/palkan/logidze/issues/199)). In general, we recommend using UTC as the database time unless there is a very strong reason not to.
 
+**IMPORTANT**: Logidze supports partitioned table only for postgresql version 11 and above. For versions 11 and 12 logidze using "after trigger", another versions using "before trigger"
+
 ## Usage
 
 ### Basic API
