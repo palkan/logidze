@@ -5,8 +5,8 @@ class CreatePartitionedPosts < ActiveRecord::Migration[6.1]
     current_pg_version =
       ActiveRecord::Base
         .connection
-        .execute("SELECT (substr(current_setting('server_version'), 1, 2)::smallint);")
-        .values.first&.first
+        .execute("SELECT (substr(current_setting('server_version'), 1, 2)::smallint)")
+        .getvalue(0,0)
 
     unless pg_version_11_and_upper?(current_pg_version)
       return false

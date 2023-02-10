@@ -3,14 +3,14 @@
 require "acceptance_helper"
 require "pg_versions_helper"
 
+RSpec.configure do |c|
+  c.extend Logidze::SqlHelpers
+end
+
 describe "triggers_on_partitioned_table", :db do
   include_context "cleanup migrations"
 
-  CURRENT_VERSION_PG =
-    ActiveRecord::Base
-      .connection
-      .execute("SELECT (substr(current_setting('server_version'), 1, 2)::smallint);")
-      .values.first&.first
+  CURRENT_VERSION_PG = sql("SELECT (substr(current_setting('server_version'), 1, 2)::smallint)")
 
   only_for_pg_version_11_and_upper(CURRENT_VERSION_PG) do
     context "when postgresql 11 version and upper" do
