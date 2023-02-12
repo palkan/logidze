@@ -165,6 +165,8 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.to exist
         %w[
           logidze_logger_v03.sql
+          logidze_logger_after_v03.sql
+          logidze_generate_log_data_v03.sql
           logidze_version_v02.sql
           logidze_snapshot_v03.sql
           logidze_compact_history_v01.sql
