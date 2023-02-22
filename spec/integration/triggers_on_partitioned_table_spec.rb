@@ -3,16 +3,11 @@
 require "acceptance_helper"
 require "pg_versions_helper"
 
-RSpec.configure do |c|
-  c.extend Logidze::SqlHelpers
-end
-
 describe "triggers_on_partitioned_table", :db do
   include_context "cleanup migrations"
 
-  CURRENT_VERSION_PG = sql("SELECT (substr(current_setting('server_version'), 1, 2)::smallint)")
-
-  only_for_pg_version_11_and_upper(CURRENT_VERSION_PG) do
+  # Running spec for pg versions 11 and above, because only these versions support trigger on partitioned tables
+  only_for_pg_version_11_and_above do
     context "when postgresql 11 version and upper" do
       before(:all) do
         @old_post = PartitionedPost.create!(logdate: "2023-01-01", title: "First", rating: 100, active: true)

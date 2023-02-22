@@ -8,6 +8,15 @@ module Logidze
       result = ::ActiveRecord::Base.connection.execute query
       result.values.first&.first
     end
+
+    # Perform SQL query with arguments and return the result
+    def sql_with_args(query, *args)
+      result = ::ActiveRecord::Base.connection.execute(
+        ApplicationRecord.sanitize_sql([query, *args])
+      )
+
+      result.getvalue(0, 0)
+    end
   end
 end
 

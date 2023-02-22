@@ -1,4 +1,4 @@
-class CreatePartitionedPosts < ActiveRecord::Migration[6.1]
+class CreatePartitionedPosts < ActiveRecord::Migration[5.0]
   PG_MINIMUM_VERSION = 11
 
   def up
@@ -8,7 +8,7 @@ class CreatePartitionedPosts < ActiveRecord::Migration[6.1]
         .execute("SELECT (substr(current_setting('server_version'), 1, 2)::smallint)")
         .getvalue(0,0)
 
-    unless pg_version_11_and_upper?(current_pg_version)
+    unless pg_version_11_and_above?(current_pg_version)
       return false
     end
 
@@ -46,7 +46,7 @@ class CreatePartitionedPosts < ActiveRecord::Migration[6.1]
 
   private
 
-  def pg_version_11_and_upper?(current_version)
+  def pg_version_11_and_above?(current_version)
     current_version >= PG_MINIMUM_VERSION
   end
 end
