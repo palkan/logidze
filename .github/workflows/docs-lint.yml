@@ -23,23 +23,24 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: 3.1
     - name: Run Markdown linter
       run: |
         gem install mdl
         mdl *.md
   rubocop:
     runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: gemfiles/rubocop.gemfile
     steps:
     - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: 3.1
+        bundler-cache: true
     - name: Lint Markdown files with RuboCop
       run: |
-        gem install bundler
-        bundle install --gemfile gemfiles/rubocop.gemfile --jobs 4 --retry 3
-        bundle exec --gemfile gemfiles/rubocop.gemfile rubocop -c .rubocop-md.yml
+        bundle exec rubocop -c .rubocop-md.yml
   forspell:
     runs-on: ubuntu-latest
     steps:
@@ -49,11 +50,11 @@ jobs:
         sudo apt-get install hunspell
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: 3.1
     - name: Cache installed gems
       uses: actions/cache@v3
       with:
-        path: /home/runner/.rubies/ruby-2.7.0/lib/ruby/gems/2.7.0
+        path: /home/runner/.rubies/ruby-3.1.0/lib/ruby/gems/3.1.0
         key: gems-cache-${{ runner.os }}
     - name: Install Forspell
       run: gem install forspell

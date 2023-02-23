@@ -3,7 +3,7 @@
 require "open3"
 
 module Logidze
-  module AcceptanceHelpers #:nodoc:
+  module AcceptanceHelpers # :nodoc:
     def successfully(command)
       status, out, err = run_command command, env: {"RAILS_ENV" => "test"}
       expect(status).to be_success, "'#{command}' expected to succeed but failed\nOut: #{out}\nErr: #{err}\n"

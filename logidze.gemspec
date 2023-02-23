@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = ">= 2.5.0"
+  spec.required_ruby_version = ">= 2.7.0"
 
   spec.metadata = {
     "bug_tracker_uri" => "http://github.com/palkan/logidze/issues",
@@ -26,16 +26,15 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "http://github.com/palkan/logidze"
   }
 
-  rails_version = ">= 5.0"
+  rails_version = ">= 6.0"
   spec.add_dependency "railties", rails_version
   spec.add_dependency "activerecord", rails_version
-  spec.add_dependency "ruby-next-core", "~> 0.9"
 
   spec.add_development_dependency "ammeter", "~> 1.1.3"
   spec.add_development_dependency "bundler", ">= 1.10"
   spec.add_development_dependency "fx", "~> 0.5"
-  spec.add_development_dependency "pg", ">= 0.18"
+  spec.add_development_dependency "pg", ">= 1.0"
   spec.add_development_dependency "rake", ">= 13.0"
-  spec.add_development_dependency "rspec-rails", ">= 3.4"
+  spec.add_development_dependency "rspec-rails", ">= 4.0"
   spec.add_development_dependency "timecop", "~> 0.8"
 end

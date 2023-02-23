@@ -6,7 +6,7 @@ module Logidze
     module FxHelper
       def self.included(base)
         base.class_option :fx, type: :boolean, optional: true,
-                               desc: "Define whether to use fx gem functionality"
+          desc: "Define whether to use fx gem functionality"
       end
 
       def fx?

@@ -1,6 +1,5 @@
 require:
-  - standard/cop/semantic_blocks
-  - rubocop-md
+  - standard/cop/block_single_line_braces
 
 inherit_gem:
   standard: config/base.yml
@@ -16,23 +15,15 @@ AllCops:
     - 'spec/dummy/db/migrate/*_enable_hstore.rb'
     - 'spec/dummy/db/migrate/*_logidze_install.rb'
   DisplayCopNames: true
-  TargetRubyVersion: 2.5
+  NewCops: disable
+  TargetRubyVersion: 2.7
   SuggestExtensions: false
 
-Standard/SemanticBlocks:
+Standard/BlockSingleLineBraces:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
   Enabled: true
-
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: no_comma
-
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: no_comma
-
-Layout/ParameterAlignment:
-  EnforcedStyle: with_first_parameter
 
 Naming/FileName:
   Exclude:

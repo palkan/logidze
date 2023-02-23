@@ -18,31 +18,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["2.7"]
+        ruby: ["3.1"]
         postgres: ["12"]
         gemfile: [
-          "gemfiles/rails6.gemfile"
+          "gemfiles/rails7.gemfile"
         ]
         fx: ["false"]
         include:
         - ruby: "3.2"
-          postgres: "14"
+          postgres: "15"
           gemfile: "gemfiles/railsmaster.gemfile"
           fx: "false"
         - ruby: "3.2"
-          postgres: "14"
-          gemfile: "gemfiles/rails7.gemfile"
-          fx: "false"
-        - ruby: "3.1"
-          postgres: "14"
-          gemfile: "gemfiles/railsmaster.gemfile"
-          fx: "false"
-        - ruby: "3.1"
-          postgres: "14"
+          postgres: "15"
           gemfile: "gemfiles/rails7.gemfile"
           fx: "false"
         - ruby: "3.0"
-          postgres: "14"
+          postgres: "13"
           gemfile: "gemfiles/rails7.gemfile"
           fx: "false"
         - ruby: "2.7"
@@ -55,22 +47,6 @@ jobs:
           fx: "false"
           table_name_prefix: 'prefix-'
           table_name_suffix: '-suffix'
-        - ruby: "2.6"
-          postgres: "9.6"
-          gemfile: "gemfiles/rails6.gemfile"
-          fx: "false"
-        - ruby: "2.6"
-          postgres: "12"
-          gemfile: "gemfiles/rails6.gemfile"
-          fx: "true"
-        - ruby: "2.5"
-          postgres: "10"
-          gemfile: "gemfiles/rails52.gemfile"
-          fx: "false"
-        - ruby: "2.5"
-          postgres: "11"
-          gemfile: "gemfiles/rails52.gemfile"
-          fx: "true"
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -84,12 +60,6 @@ jobs:
           --health-retries 5
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/cache@v3
-      with:
-        path: /home/runner/bundle
-        key: bundle-${{ matrix.ruby }}-${{ matrix.gemfile }}-${{ hashFiles(matrix.gemfile) }}-${{ hashFiles('**/*.gemspec') }}
-        restore-keys: |
-          bundle-${{ matrix.ruby }}-${{ matrix.gemfile }}-
     - name: Install system deps
       run: |
         sudo apt-get update
@@ -97,12 +67,7 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-    - name: Bundle install
-      run: |
-        bundle config path /home/runner/bundle
-        bundle config --global gemfile ${{ matrix.gemfile }}
-        bundle install
-        bundle update
+        bundler-cache: true
     - name: Prepare test database
       run: |
         bundle exec rake dummy:db:create
@@ -120,4 +85,3 @@ jobs:
         TABLE_NAME_SUFFIX: ${{ matrix.table_name_suffix }}
       run: |
         bundle exec rspec spec/acceptance/ -f d --force-color
-

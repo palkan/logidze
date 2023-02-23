@@ -5,8 +5,6 @@ require "rails/generators/active_record/migration/migration_generator"
 require_relative "../inject_sql"
 require_relative "../fx_helper"
 
-using RubyNext
-
 module Logidze
   module Generators
     class ModelGenerator < ::ActiveRecord::Generators::Base # :nodoc:
@@ -19,13 +17,13 @@ module Logidze
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
       class_option :debounce_time, type: :numeric, optional: true,
-                                   desc: "Specify debounce time in millisecond"
+        desc: "Specify debounce time in millisecond"
 
       class_option :backfill, type: :boolean, optional: true,
-                              desc: "Add query to backfill existing records history"
+        desc: "Add query to backfill existing records history"
 
       class_option :only_trigger, type: :boolean, optional: true,
-                                  desc: "Create trigger-only migration"
+        desc: "Create trigger-only migration"
 
       class_option :path, type: :string, optional: true, desc: "Specify path to the model file"
 
@@ -33,12 +31,12 @@ module Logidze
       class_option :only, type: :array, optional: true
 
       class_option :timestamp_column, type: :string, optional: true,
-                                      desc: "Specify timestamp column"
+        desc: "Specify timestamp column"
 
       class_option :name, type: :string, optional: true, desc: "Migration name"
 
       class_option :update, type: :boolean, optional: true,
-                            desc: "Define whether this is an update migration"
+        desc: "Define whether this is an update migration"
 
       def generate_migration
         if options[:except] && options[:only]
