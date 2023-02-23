@@ -3,8 +3,6 @@
 require "active_support"
 
 module Logidze
-  using RubyNext
-
   # Extends model with methods to browse history
   module Model
     require "logidze/history/type"

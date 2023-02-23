@@ -31,10 +31,10 @@ module Logidze
       def notify_or_raise!
         case Logidze.on_pending_upgrade
         when :warn
-          warn "\n**************************************************\n"\
-               "⛔️  WARNING: Logidze needs an upgrade and might not work correctly.\n"\
-               "Please, make sure to run `bundle exec rails generate logidze:install --update` "\
-               "and apply generated migration."\
+          warn "\n**************************************************\n" \
+               "⛔️  WARNING: Logidze needs an upgrade and might not work correctly.\n" \
+               "Please, make sure to run `bundle exec rails generate logidze:install --update` " \
+               "and apply generated migration." \
                "\n**************************************************\n\n"
         when :raise
           raise Logidze::Utils::PendingMigrationError, "Logidze needs upgrade. Run `bundle exec rails generate logidze:install --update` and apply generated migration."

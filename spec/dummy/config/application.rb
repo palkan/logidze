@@ -21,10 +21,6 @@ if USE_FX
   $stdout.puts "🔩 Fx is loaded"
 end
 
-unless ActiveRecord::Migration.respond_to?(:[])
-  ActiveRecord::Migration.singleton_class.send(:define_method, :[]) { |_| self }
-end
-
 module Dummy
   class Application < Rails::Application
     config.eager_load = false

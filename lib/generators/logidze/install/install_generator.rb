@@ -6,8 +6,6 @@ require "logidze/utils/function_definitions"
 require_relative "../inject_sql"
 require_relative "../fx_helper"
 
-using RubyNext
-
 module Logidze
   module Generators
     class InstallGenerator < ::Rails::Generators::Base # :nodoc:
@@ -19,7 +17,7 @@ module Logidze
       source_paths << File.expand_path("functions", __dir__)
 
       class_option :update, type: :boolean, optional: true,
-                            desc: "Define whether this is an update migration"
+        desc: "Define whether this is an update migration"
 
       def generate_migration
         migration_template = fx? ? "migration_fx.rb.erb" : "migration.rb.erb"

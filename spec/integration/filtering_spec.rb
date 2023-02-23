@@ -5,7 +5,7 @@ require "acceptance_helper"
 describe "columns filtering", :db do
   it "cannot be used with both only and except options" do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      unsuccessfully "rails generate logidze:model post "\
+      unsuccessfully "rails generate logidze:model post " \
                      "--only=title --except=created_at"
     end
   end
@@ -17,7 +17,7 @@ describe "columns filtering", :db do
       @except = %w[updated_at created_at active]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post "\
+        successfully "rails generate logidze:model post " \
                      "--except=#{@except.join(" ")}"
         successfully "rake db:migrate"
 
@@ -73,7 +73,7 @@ describe "columns filtering", :db do
       @only = %w[title meta]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post "\
+        successfully "rails generate logidze:model post " \
                      "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
@@ -128,7 +128,7 @@ describe "columns filtering", :db do
       @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post "\
+        successfully "rails generate logidze:model post " \
                      "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 

@@ -3,7 +3,6 @@ source 'https://rubygems.org'
 rails_version = '~> 6.0'
 gem 'railties', rails_version
 gem 'activerecord', rails_version
-gem 'rspec-rails', '>= 4.0'
 
 eval_gemfile './shared.gemfile'
 

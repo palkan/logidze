@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- **Breaking**. Ruby 2.7, Rails 6.0, PostgreSQL 10.0+ are required.
+
 ## 1.2.3 (2023-01-03)
 
 - [Fixes [#217](https://github.com/palkan/logidze/issues/217)] Fix switch_to with `append: true` when there are changes on JSONB columns. ([@miharekar][])

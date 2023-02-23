@@ -5,6 +5,6 @@ class ApplicationRecord < ActiveRecord::Base
 
   def self.random(num = 1)
     rel = order("random()")
-    num == 1 ? rel.first : rel.limit(num)
+    (num == 1) ? rel.first : rel.limit(num)
   end
 end

@@ -5,7 +5,7 @@
 
 # Logidze
 
-Logidze provides tools for logging DB records changes when using PostgreSQL (>=9.6). Just like [audited](https://github.com/collectiveidea/audited) and [paper_trail](https://github.com/airblade/paper_trail) do (but [faster](bench/performance)).
+Logidze provides tools for logging DB records changes when using PostgreSQL. Just like [audited](https://github.com/collectiveidea/audited) and [paper_trail](https://github.com/airblade/paper_trail) do (but [faster](bench/performance)).
 
 Logidze allows you to create a DB-level log (using triggers) and gives you an API to browse this log.
 The log is stored with the record itself in JSONB column. No additional tables required.
@@ -14,8 +14,9 @@ The log is stored with the record itself in JSONB column. No additional tables r
 
 Other requirements:
 
-- Ruby ~> 2.5
-- Rails >= 5.0 (for Rails 4.2 use version <=0.12.0)
+- Ruby ~> 2.7
+- Rails >= 6.0 (for Rails 4.2 use version <=0.12.0, for Rails 5.x use version <= 1.2.3)
+- PostgreSQL >= 10.0
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
