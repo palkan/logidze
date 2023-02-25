@@ -11,6 +11,10 @@ Bundler.require(*Rails.groups)
 # Conditionally load fx
 USE_FX = ENV["USE_FX"] == "true"
 
+# Patch Logidze to always use after trigger
+# (so we can re-use all the specs)
+AFTER_TRIGGER = ENV["AFTER_TRIGGER"] == "true"
+
 # Conditionally set table_name_prefix and/or table_name_suffix
 TABLE_NAME_PREFIX = ENV["TABLE_NAME_PREFIX"].presence
 TABLE_NAME_SUFFIX = ENV["TABLE_NAME_SUFFIX"].presence
@@ -19,6 +23,18 @@ require "logidze"
 if USE_FX
   require "fx"
   $stdout.puts "🔩 Fx is loaded"
+end
+
+if AFTER_TRIGGER
+  require "generators/logidze/model/model_generator"
+
+  Logidze::Generators::ModelGenerator.class_eval do
+    def after_trigger?
+      return options[:after_trigger] unless options[:after_trigger].nil?
+
+      true
+    end
+  end
 end
 
 module Dummy

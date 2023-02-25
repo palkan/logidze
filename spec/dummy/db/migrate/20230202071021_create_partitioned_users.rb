@@ -16,7 +16,7 @@ class CreatePartitionedUsers < ActiveRecord::Migration[5.0]
         created_at timestamp not null,
         updated_at timestamp not null
       ) PARTITION BY RANGE (age);
-        
+
       CREATE TABLE partitioned_users_minor   PARTITION OF partitioned_users FOR VALUES FROM (0) TO (18);
       CREATE TABLE partitioned_users_default PARTITION OF partitioned_users DEFAULT;
     SQL
