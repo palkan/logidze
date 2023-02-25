@@ -7,10 +7,10 @@ describe "partition change", :db do
     include_context "cleanup migrations"
 
     before(:all) do
-      skip_database_versions(0...12_00_00)
+      skip if database_version < 11
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model partitioned_user --after_trigger"
+        successfully "rails generate logidze:model partitioned_user --after-trigger"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables

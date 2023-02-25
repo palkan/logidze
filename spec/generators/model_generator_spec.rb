@@ -16,7 +16,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
     "#{table_name_prefix}#{table_name}#{table_name_suffix}"
   end
 
-  let(:base_args) { [] }
+  let(:base_args) { ["--no-after-trigger"] }
   let(:args) { base_args + fx_args }
   let(:ar_version) { "6.0" }
 
@@ -36,7 +36,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       let(:path) { File.join(destination_root, "app", "models", "user.rb") }
-      let(:base_args) { ["user"] }
+      let(:base_args) { ["user", "--no-after-trigger"] }
 
       before do
         File.write(
@@ -76,7 +76,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       context "with limit" do
-        let(:base_args) { ["user", "--limit=5"] }
+        let(:base_args) { ["user", "--limit=5", "--no-after-trigger"] }
 
         it "creates trigger with limit" do
           is_expected.to exist
@@ -85,7 +85,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       context "with debounce_time" do
-        let(:base_args) { ["user", "--debounce_time=5000"] }
+        let(:base_args) { ["user", "--debounce_time=5000", "--no-after-trigger"] }
 
         it "creates trigger with debounce_time" do
           is_expected.to exist
@@ -94,7 +94,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       context "with except" do
-        let(:base_args) { ["user", "--except", "age", "active"] }
+        let(:base_args) { ["user", "--except", "age", "active", "--no-after-trigger"] }
 
         it "creates trigger with columns exclusion" do
           is_expected.to exist
@@ -105,7 +105,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       context "with only" do
-        let(:base_args) { ["user", "--only", "age", "active"] }
+        let(:base_args) { ["user", "--only", "age", "active", "--no-after-trigger"] }
 
         it "creates trigger with columns inclusion" do
           is_expected.to exist
@@ -116,7 +116,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       context "with backfill" do
-        let(:base_args) { ["user", "--backfill"] }
+        let(:base_args) { ["user", "--backfill", "--no-after-trigger"] }
 
         it "creates backfill query" do
           is_expected.to exist
@@ -126,7 +126,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       context "with only trigger" do
-        let(:base_args) { ["user", "--only-trigger"] }
+        let(:base_args) { ["user", "--only-trigger", "--no-after-trigger"] }
 
         it "creates migration with trigger" do
           is_expected.to exist
@@ -145,7 +145,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
           migration_file("db/migrate/update_logidze_for_users.rb")
         end
 
-        let(:base_args) { ["user", "--update"] }
+        let(:base_args) { ["user", "--update", "--no-after-trigger"] }
 
         it "creates migration with drop and create trigger" do
           is_expected.to exist
@@ -182,7 +182,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         context "with custom name" do
           subject { migration_file("db/migrate/logidzedize_users.rb") }
 
-          let(:base_args) { ["user", "--name", "logidzedize_users"] }
+          let(:base_args) { ["user", "--name", "logidzedize_users", "--no-after-trigger"] }
 
           before do
             run_generator(args)
@@ -197,7 +197,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
       context "with timestamp_column" do
         context "custom column name" do
-          let(:base_args) { ["user", "--timestamp_column", "time"] }
+          let(:base_args) { ["user", "--timestamp_column", "time", "--no-after-trigger"] }
 
           it "creates trigger with 'time' timestamp column" do
             is_expected.to exist
@@ -208,7 +208,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         end
 
         context "nil" do
-          let(:base_args) { ["user", "--timestamp_column", "nil"] }
+          let(:base_args) { ["user", "--timestamp_column", "nil", "--no-after-trigger"] }
 
           it "creates trigger without timestamp column" do
             is_expected.to exist
@@ -235,7 +235,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
       let(:path) { File.join(destination_root, "app", "models", "user", "guest.rb") }
 
-      let(:base_args) { ["User/Guest"] }
+      let(:base_args) { ["User/Guest", "--no-after-trigger"] }
 
       before do
         File.write(
@@ -263,7 +263,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
       let(:path) { File.join(destination_root, "app", "models", "custom", "data", "set.rb") }
 
-      let(:base_args) { ["data/set", "--path", "app/models/custom/data/set.rb"] }
+      let(:base_args) { ["data/set", "--path", "app/models/custom/data/set.rb", "--no-after-trigger"] }
 
       before do
         File.write(
@@ -300,7 +300,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       end
 
       let(:path) { File.join(destination_root, "app", "models", "user.rb") }
-      let(:base_args) { ["User"] }
+      let(:base_args) { ["User", "--no-after-trigger"] }
 
       it "deletes migration file it created" do
         run_generator(args)
