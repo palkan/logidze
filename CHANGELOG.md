@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Add `--after-trigger` option to generate _after_ triggers for partitioned tables in older PostgreSQL versions. ([@SparLaimor][], [@prog-supdex][], [@palkan][])
+
 - **Breaking**. Ruby 2.7, Rails 6.0, PostgreSQL 10.0+ are required.
 
 ## 1.2.3 (2023-01-03)
@@ -379,3 +381,5 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@danielmklein]: https://github.com/danielmklein
 [@baygeldin]: https://github.com/baygeldin
 [@miharekar]: https://github.com/miharekar
+[@prog-supdex]: https://github.com/prog-supdex
+[@SparLaimor]: https://github.com/SparLaimor
