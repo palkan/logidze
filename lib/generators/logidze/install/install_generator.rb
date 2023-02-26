@@ -79,6 +79,18 @@ module Logidze
         def function_definitions
           @function_definitions ||= Logidze::Utils::FunctionDefinitions.from_fs
         end
+
+        # Generate `logidze_logger_after.sql` from the regular `logidze_logger.sql`
+        # by find-and-replacing a few lines
+        def generate_logidze_logger_after
+          source = File.read(File.join(__dir__, "functions", "logidze_logger.sql"))
+          source.sub!(/^CREATE OR REPLACE FUNCTION logidze_logger.*$/, "")
+          source.sub!(/^  -- version.*$/, "")
+          source.sub!("  BEGIN", "BEGIN\n    IF pg_trigger_depth() > 1 THEN\n      RETURN NULL;\n    END IF;")
+          source.gsub!("RETURN NEW; -- pass", "RETURN NULL;")
+          source.gsub!("RETURN NEW; -- result", "    EXECUTE format('UPDATE %I.%I SET \"log_data\" = $1 WHERE ctid = %L', TG_TABLE_SCHEMA, TG_TABLE_NAME, NEW.CTID) USING NEW.log_data;\n    RETURN NULL;")
+          source
+        end
       end
 
       def self.next_migration_number(dir)

@@ -1,9 +1,10 @@
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
-  -- version: 3
+  -- version: 4
   DECLARE
     changes jsonb;
     version jsonb;
-    snapshot jsonb;
+    full_snapshot boolean;
+    log_data jsonb;
     new_v integer;
     size integer;
     history_limit integer;
@@ -30,59 +31,56 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     columns := NULLIF(TG_ARGV[2], 'null');
     include_columns := NULLIF(TG_ARGV[3], 'null');
 
-    IF TG_OP = 'INSERT' THEN
+    IF NEW.log_data is NULL OR NEW.log_data = '{}'::jsonb
+    THEN
       IF columns IS NOT NULL THEN
-        snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns, include_columns);
+        log_data = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns, include_columns);
       ELSE
-        snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column);
+        log_data = logidze_snapshot(to_jsonb(NEW.*), ts_column);
       END IF;
 
-      IF snapshot#>>'{h, -1, c}' != '{}' THEN
-        NEW.log_data := snapshot;
+      IF log_data#>>'{h, -1, c}' != '{}' THEN
+        NEW.log_data := log_data;
       END IF;
 
-    ELSIF TG_OP = 'UPDATE' THEN
+    ELSE
 
-      IF OLD.log_data is NULL OR OLD.log_data = '{}'::jsonb THEN
-        IF columns IS NOT NULL THEN
-          snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns, include_columns);
-        ELSE
-          snapshot = logidze_snapshot(to_jsonb(NEW.*), ts_column);
-        END IF;
-
-        IF snapshot#>>'{h, -1, c}' != '{}' THEN
-          NEW.log_data := snapshot;
-        END IF;
-        RETURN NEW;
+      IF TG_OP = 'UPDATE' AND (to_jsonb(NEW.*) = to_jsonb(OLD.*)) THEN
+        RETURN NEW; -- pass
       END IF;
 
       history_limit := NULLIF(TG_ARGV[0], 'null');
       debounce_time := NULLIF(TG_ARGV[4], 'null');
 
-      current_version := (NEW.log_data->>'v')::int;
+      log_data := NEW.log_data;
+
+      current_version := (log_data->>'v')::int;
 
       IF ts_column IS NULL THEN
         ts := statement_timestamp();
-      ELSE
-        ts := (to_jsonb(NEW.*)->>ts_column)::timestamp with time zone;
-        IF ts IS NULL OR ts = (to_jsonb(OLD.*)->>ts_column)::timestamp with time zone THEN
+      ELSEIF TG_OP = 'UPDATE' THEN
+        ts := (to_jsonb(NEW.*) ->> ts_column)::timestamp with time zone;
+        IF ts IS NULL OR ts = (to_jsonb(OLD.*) ->> ts_column)::timestamp with time zone THEN
+          ts := statement_timestamp();
+        END IF;
+      ELSEIF TG_OP = 'INSERT' THEN
+        ts := (to_jsonb(NEW.*) ->> ts_column)::timestamp with time zone;
+        IF ts IS NULL OR (extract(epoch from ts) * 1000)::bigint = (NEW.log_data #>> '{h,-1,ts}')::bigint THEN
           ts := statement_timestamp();
         END IF;
       END IF;
 
-      IF to_jsonb(NEW.*) = to_jsonb(OLD.*) THEN
-        RETURN NEW;
-      END IF;
+      full_snapshot := (coalesce(current_setting('logidze.full_snapshot', true), '') = 'on') OR (TG_OP = 'INSERT');
 
-      IF current_version < (NEW.log_data#>>'{h,-1,v}')::int THEN
+      IF current_version < (log_data#>>'{h,-1,v}')::int THEN
         iterator := 0;
-        FOR item in SELECT * FROM jsonb_array_elements(NEW.log_data->'h')
+        FOR item in SELECT * FROM jsonb_array_elements(log_data->'h')
         LOOP
           IF (item.value->>'v')::int > current_version THEN
-            NEW.log_data := jsonb_set(
-              NEW.log_data,
+            log_data := jsonb_set(
+              log_data,
               '{h}',
-              (NEW.log_data->'h') - iterator
+              (log_data->'h') - iterator
             );
           END IF;
           iterator := iterator + 1;
@@ -91,7 +89,7 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
 
       changes := '{}';
 
-      IF (coalesce(current_setting('logidze.full_snapshot', true), '') = 'on') THEN
+      IF full_snapshot THEN
         BEGIN
           changes = hstore_to_jsonb_loose(hstore(NEW.*));
         EXCEPTION
@@ -132,48 +130,50 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       END IF;
 
       IF changes = '{}' THEN
-        RETURN NEW;
+        RETURN NEW; -- pass
       END IF;
 
-      new_v := (NEW.log_data#>>'{h,-1,v}')::int + 1;
+      new_v := (log_data#>>'{h,-1,v}')::int + 1;
 
-      size := jsonb_array_length(NEW.log_data->'h');
+      size := jsonb_array_length(log_data->'h');
       version := logidze_version(new_v, changes, ts);
 
       IF (
         debounce_time IS NOT NULL AND
-        (version->>'ts')::bigint - (NEW.log_data#>'{h,-1,ts}')::text::bigint <= debounce_time
+        (version->>'ts')::bigint - (log_data#>'{h,-1,ts}')::text::bigint <= debounce_time
       ) THEN
         -- merge new version with the previous one
-        new_v := (NEW.log_data#>>'{h,-1,v}')::int;
-        version := logidze_version(new_v, (NEW.log_data#>'{h,-1,c}')::jsonb || changes, ts);
+        new_v := (log_data#>>'{h,-1,v}')::int;
+        version := logidze_version(new_v, (log_data#>'{h,-1,c}')::jsonb || changes, ts);
         -- remove the previous version from log
-        NEW.log_data := jsonb_set(
-          NEW.log_data,
+        log_data := jsonb_set(
+          log_data,
           '{h}',
-          (NEW.log_data->'h') - (size - 1)
+          (log_data->'h') - (size - 1)
         );
       END IF;
 
-      NEW.log_data := jsonb_set(
-        NEW.log_data,
+      log_data := jsonb_set(
+        log_data,
         ARRAY['h', size::text],
         version,
         true
       );
 
-      NEW.log_data := jsonb_set(
-        NEW.log_data,
+      log_data := jsonb_set(
+        log_data,
         '{v}',
         to_jsonb(new_v)
       );
 
       IF history_limit IS NOT NULL AND history_limit <= size THEN
-        NEW.log_data := logidze_compact_history(NEW.log_data, size - history_limit + 1);
+        log_data := logidze_compact_history(log_data, size - history_limit + 1);
       END IF;
+
+      NEW.log_data := log_data;
     END IF;
 
-    return NEW;
+    RETURN NEW; -- result
   EXCEPTION
     WHEN OTHERS THEN
       GET STACKED DIAGNOSTICS err_sqlstate = RETURNED_SQLSTATE,

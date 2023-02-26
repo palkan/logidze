@@ -38,7 +38,7 @@ describe "partition change", :db do
         expect(partitioned_user.log_data.versions.last.changes)
           .to include("age" => 30)
         expect(partitioned_user.log_data.versions.last.changes.keys)
-          .not_to include("tittle", "active")
+          .to_not include("name", "active")
       end
     end
 
