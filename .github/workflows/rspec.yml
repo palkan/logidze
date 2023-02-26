@@ -51,6 +51,8 @@ jobs:
           gemfile: "gemfiles/rails6.gemfile"
           fx: "false"
           after_trigger: "false"
+          table_name_prefix: 'prefix-'
+          table_name_suffix: '-suffix'
         - ruby: "2.7"
           postgres: "11"
           gemfile: "gemfiles/rails6.gemfile"
@@ -61,8 +63,6 @@ jobs:
           gemfile: "gemfiles/rails6.gemfile"
           fx: "false"
           after_trigger: "false"
-          table_name_prefix: 'prefix-'
-          table_name_suffix: '-suffix'
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}

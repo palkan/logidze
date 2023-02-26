@@ -3,7 +3,7 @@
 class CreatePartitionedUsers < ActiveRecord::Migration[5.0]
   def up
     pg_version = select_value("SELECT current_setting('server_version_num')::int;")
-    return if pg_version < 12_00_00
+    return if pg_version < 11_00_00
 
     execute <<~SQL
       CREATE TABLE partitioned_users (
