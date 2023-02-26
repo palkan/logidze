@@ -51,7 +51,9 @@ module Logidze
       def generate_fx_trigger
         return unless fx?
 
-        template "logidze.sql", "db/triggers/logidze_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
+        template_name = after_trigger? ? "logidze_after.sql" : "logidze.sql"
+
+        template template_name, "db/triggers/logidze_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
       end
 
       def inject_logidze_to_model
