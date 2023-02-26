@@ -227,6 +227,16 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
           is_expected.to contain(/after update or insert on "#{full_table_name('users')}" for each row/i)
           is_expected.to contain(/execute procedure logidze_logger_after\(null, 'updated_at'\);/i)
         end
+
+        context "with fx" do
+          let(:fx_args) { use_fx_args }
+
+          it "generates after trigger" do
+            is_expected.to exist
+            expect(file("db/triggers/logidze_on_users_v01.sql")).to exist
+            expect(file("db/triggers/logidze_on_users_v01.sql")).to contain(/after update or insert on/i)
+          end
+        end
       end
     end
 
