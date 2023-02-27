@@ -5,7 +5,7 @@ class NotLoggedPost < ActiveRecord::Base
 
   self.table_name = "#{table_name_prefix}posts#{table_name_suffix}"
 
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :comments, class_name: "NotLoggedPostComment", foreign_key: :post_id
 
   class WithDefaultScope < self

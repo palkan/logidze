@@ -17,6 +17,7 @@ Other requirements:
 - Ruby ~> 2.7
 - Rails >= 6.0 (for Rails 4.2 use version <=0.12.0, for Rails 5.x use version <= 1.2.3)
 - PostgreSQL >= 10.0
+- Sequel >= 5.0 (*optional*)
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
@@ -36,13 +37,16 @@ Other requirements:
   - [Tracking only selected columns](#tracking-only-selected-columns)
   - [Logs timestamps](#logs-timestamps)
   - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
+  - [Sequel support](#sequel-support)
 - [Usage](#usage)
-  - [Basic API](#basic-api)
+  - [Basic API](#basic-api-in-sequel)
+  - [Sequel support](#sequel-support)
   - [Track meta information](#track-meta-information)
   - [Track responsibility](#track-responsibility)
   - [Disable logging temporary](#disable-logging-temporary)
   - [Reset log](#reset-log)
   - [Creating full snapshot instead of diffs](#full-snapshots)
+  - [Sequel adapter](#sequel-adapter)
   - [Associations versioning](#associations-versioning)
 - [Dealing with large logs](#dealing-with-large-logs)
 - [Handling records deletion](#handling-records-deletion)
@@ -190,6 +194,28 @@ bundle exec rails destroy logidze:model Post
 
 **IMPORTANT**: If you use non-UTC time zone for Active Record (`config.active_record.default_timezone`), you MUST always infer log timestamps from a timestamp column (e.g., when back-filling data); otherwise, you may end up with inconsistent logs ([#199](https://github.com/palkan/logidze/issues/199)). In general, we recommend using UTC as the database time unless there is a very strong reason not to.
 
+### Sequel support
+
+All mentioned generators also optionally support Sequel.
+
+To use generators with Sequel, you should add `--sequel` flag to generators' invocations:
+
+```sh
+# Install Logidze through Sequel migrations
+bundle exec rails generate logidze:install --sequel
+
+# Add a Logidze trigger to a Sequel model's table
+bundle exec rails generate logidze:model Post --sequel
+
+# Run migrations with Sequel
+sequel -m db/migrations postgres://localhost/logidze_development
+```
+
+All options should be supported including adding a custom `plugin :logidze` line to models for model API support.
+
+However, Sequel does not support dumping triggers and functions to a schema dump (and Active Record-specific `fx` gem).
+You have to switch to SQL format through database tools if you want to replicate Logidze in a development environment.
+
 ## Usage
 
 ### Basic API
@@ -279,6 +305,30 @@ Alternatively, you can configure Logidze always to default to `append: true`.
 
 ```ruby
 Logidze.append_on_undo = true
+```
+
+### Basic API in Sequel
+
+The whole model API is also supported by Sequel including model database modifications and dataset scopes:
+
+```ruby
+class Post < Sequel::Model
+  plugin :logidze
+end
+
+post = Post.with_pk!(27)
+
+post.log_data #=> Logidze::History
+post.log_version #=> 3
+post.log_size #=> 3
+
+post.at(version: 2) #=> a copy of Post at version 2
+post.at!(time: 2.days.ago) #=> in-memory modified Post in state like 2 days ago
+
+post.switch_to!(2) #=> database modified Post at version 2
+post.reload_log_data #=> database reloaded `log_data`
+
+Post.where(active: true).at(time: 1.month.ago) #=> Sequel::Dataset with versions in state like 1 month ago
 ```
 
 ### Track meta information
@@ -397,6 +447,41 @@ Logidze.with_full_snapshot do
 end
 ```
 
+### Sequel adapter
+
+By default, Logidze uses a default DB adapter (Active Record) for top-level manipulations.
+For example, it would use it for `Logidze.with_responsible`, `Logidze.without_logging`, etc.
+
+You can manually change the current DB adapter during method calls:
+
+```ruby
+Logidze[:sequel].with_responsible(user.id) do
+  post.save
+end
+
+Logidze[:active_record].without_logging { Post.update(seen: true) }
+```
+
+The Sequel adapter provides all top-level Logidze methods including all options.
+
+If you use Sequel exclusively without ActiveRecord, you may want to change the Logidze default adapter:
+
+```ruby
+# config/initializers/logidze.rb
+Logidze.default_adapter = :sequel
+
+# or
+
+# config/application.rb
+config.logidze.default_adapter = :sequel
+```
+
+By the way, a class level alias `without_logging` always chooses the right adapter as there is no ambiguity:
+
+```ruby
+Post.without_logging { Post.update(seen: true) } # automagically choose the right adapter
+```
+
 ### Associations versioning
 
 Logidze also supports associations versioning. This feature is disabled by default (due to the number of edge cases). You can learn more
@@ -404,7 +489,7 @@ in the [wiki](https://github.com/palkan/logidze/wiki/Associations-versioning).
 
 ## Dealing with large logs
 
-By default, Active Record _selects_ all the table columns when no explicit `select` statement specified.
+By default, Active Record or Sequel _selects_ all the table columns when no explicit `select` statement specified.
 
 That could slow down queries execution if you have field values which exceed the size of the data block (typically 8KB). PostgreSQL turns on its [TOAST](https://wiki.postgresql.org/wiki/TOAST) mechanism), which requires reading from multiple physical locations for fetching the row's data.
 
@@ -416,6 +501,11 @@ Logidze provides a way to avoid loading `log_data` by default (and load it on de
 class User < ActiveRecord::Base
   # Add `ignore_log_data` option to macros
   has_logidze ignore_log_data: true
+end
+
+class Post < Sequel::Model
+  # Add `ignore_log_data` option to macros
+  plugin :logidze, ignore_log_data: true
 end
 ```
 
@@ -440,6 +530,9 @@ The chart below shows the difference in PG query time before and after turning `
 ![](./assets/pg_log_data_chart.png)
 
 If you try to call `#log_data` on the model loaded in such way, you'll get `nil`. If you want to fetch log data (e.g., during the console debugging)–use **`user.reload_log_data`**, which forces loading this column from the DB.
+
+It should be in mind that this feature is implemented in Sequel with `lazy_attributes`, `insert_returning_select` plugins.
+It allows to keep Sequel's default behavior while automatically setting the RETURNING clause with explicit selects.
 
 ## Handling records deletion
 
