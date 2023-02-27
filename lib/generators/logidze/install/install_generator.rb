@@ -86,7 +86,6 @@ module Logidze
           source = File.read(File.join(__dir__, "functions", "logidze_logger.sql"))
           source.sub!(/^CREATE OR REPLACE FUNCTION logidze_logger.*$/, "")
           source.sub!(/^  -- version.*$/, "")
-          source.sub!("  BEGIN", "BEGIN\n    IF pg_trigger_depth() > 1 THEN\n      RETURN NULL;\n    END IF;")
           source.gsub!("RETURN NEW; -- pass", "RETURN NULL;")
           source.gsub!("RETURN NEW; -- result", "    EXECUTE format('UPDATE %I.%I SET \"log_data\" = $1 WHERE ctid = %L', TG_TABLE_SCHEMA, TG_TABLE_NAME, NEW.CTID) USING NEW.log_data;\n    RETURN NULL;")
           source
