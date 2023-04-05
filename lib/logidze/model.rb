@@ -114,6 +114,7 @@ module Logidze
 
     # Return a dirty copy of specified version of record
     def at_version(version)
+      return nil unless log_data
       return self if log_data.version == version
 
       log_entry = log_data.find_by_version(version)

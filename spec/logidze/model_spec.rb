@@ -96,6 +96,11 @@ describe Logidze::Model, :db do
       expect(user_old.age).to eq 0
       expect(user_old.active).to eq true
     end
+
+    it "returns nil if log_data is nil" do
+      user.log_data = nil
+      expect(user.at(version: 1)).to be_nil
+    end
   end
 
   describe "#at!" do
