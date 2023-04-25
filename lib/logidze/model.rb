@@ -94,6 +94,14 @@ module Logidze
 
       build_dup(log_entry, time)
     end
+
+    def logidze_versions(reverse: false, include_self: false)
+      versions_meta = reverse ? log_data.versions.reverse : log_data.versions
+      versions_meta = versions_meta.reject { _1.version == log_data.version } unless include_self
+
+      versions_meta.map { at(version: _1.version) }.to_enum
+    end
+
     # rubocop: enable Metrics/MethodLength
 
     # Revert record to the version at specified time (without saving to DB)

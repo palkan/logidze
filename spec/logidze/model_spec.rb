@@ -103,6 +103,49 @@ describe Logidze::Model, :db do
     end
   end
 
+  describe "#logidze_versions" do
+    it "returns enumerator of versions" do
+      expect(user.logidze_versions).to be_a Enumerator
+    end
+
+    it "can take few versions" do
+      expect(user.logidze_versions.take(2)).to be_a Array
+      expect(user.logidze_versions.take(2).size).to eq 2
+      expect(user.logidze_versions.take(3).size).to eq 3
+    end
+
+    it "can find by attribute" do
+      expect(user.logidze_versions.find { _1.name == "test" }.log_version).to eq 3
+      expect(user.logidze_versions(include_self: true).find { _1.age == 10 }.log_version).to eq 5
+    end
+
+    context "when options are provided" do
+      it "returns versions except current version if include_self is false and reverse is true" do
+        expect(user.logidze_versions(reverse: true, include_self: false).to_a.size).to eq user.log_data.versions.size - 1
+        expect(user.logidze_versions(reverse: true, include_self: false).first)
+          .to eq user.at(version: user.log_data.versions[-2].version)
+      end
+
+      it "returns versions except current version if include_self is false and reverse is false" do
+        expect(user.logidze_versions(reverse: false, include_self: false).to_a.size).to eq user.log_data.versions.size - 1
+        expect(user.logidze_versions(reverse: false, include_self: false).first)
+          .to eq user.at(version: user.log_data.versions.first.version)
+      end
+
+      it "returns all the versions if include_self is true and current version is first if reverse is true" do
+        expect(user.logidze_versions(reverse: true, include_self: true).to_a.size).to eq user.log_data.versions.size
+        expect(user.logidze_versions(reverse: true, include_self: true).first)
+          .to eq user.at(version: user.log_data.versions.last.version)
+      end
+
+      it "returns all the versions if include_self is true and current version is last if reverse is false" do
+        expect(user.logidze_versions(reverse: false, include_self: true).to_a.size).to eq user.log_data.versions.size
+        expect(user.logidze_versions(reverse: false, include_self: true).to_a.last)
+          .to eq user.at(version: user.log_data.versions.last.version)
+      end
+    end
+  end
+
   describe "#at!" do
     it "update object in-place", :aggregate_failures do
       user.at!(time: time(350))
