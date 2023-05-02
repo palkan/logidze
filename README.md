@@ -316,6 +316,8 @@ Logidze.with_meta({ip: request.ip}, transactional: false) do
 end
 ```
 
+**Important:** If you use connection pooling (e.g., PgBouncer), using `.with_meta` without a transaction may lead to unexpected results (since meta is set for a connection). Without a transaction, we cannot guarantee that the same connection will be used for queries (including metadata cleanup).
+
 ### Track responsibility
 
 A special application of meta information is storing the author of the change, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
