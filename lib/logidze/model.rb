@@ -96,10 +96,16 @@ module Logidze
     end
 
     def logidze_versions(reverse: false, include_self: false)
-      versions_meta = reverse ? log_data.versions.reverse : log_data.versions
-      versions_meta = versions_meta.reject { _1.version == log_data.version } unless include_self
+      versions_meta = log_data.versions.dup
 
-      versions_meta.map { at(version: _1.version) }.to_enum
+      if reverse
+        versions_meta.reverse!
+        versions_meta.shift unless include_self
+      else
+        versions_meta.pop unless include_self
+      end
+
+      Enumerator.new { |yielder| versions_meta.each { yielder << at(version: _1.version) } }
     end
 
     # rubocop: enable Metrics/MethodLength
