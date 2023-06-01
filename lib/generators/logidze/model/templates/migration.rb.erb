@@ -37,7 +37,7 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
 
   <%- end -%>
         execute <<~SQL
-<%= inject_sql("logidze.sql", indent: 10) %>
+<%= inject_sql(after_trigger? ? "logidze_after.sql" : "logidze.sql", indent: 10) %>
         SQL
       end
 

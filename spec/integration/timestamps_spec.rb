@@ -2,7 +2,7 @@
 
 require "acceptance_helper"
 
-describe "log timestamps", :db do
+shared_context "log_timestamps_context" do |generator_arg|
   before do
     Timecop.freeze(Time.at(1_000_000)) do
       post.update!(rating: 100)
@@ -21,9 +21,9 @@ describe "log timestamps", :db do
     before(:all) do
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post"
+        successfully "rails generate logidze:model post #{generator_arg}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger"
+        successfully "rails generate logidze:model user #{generator_arg} --only-trigger"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -53,9 +53,9 @@ describe "log timestamps", :db do
       param = "--timestamp_column time"
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{param}"
+        successfully "rails generate logidze:model post #{generator_arg} #{param}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{param}"
+        successfully "rails generate logidze:model user #{generator_arg} --only-trigger #{param}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -77,9 +77,9 @@ describe "log timestamps", :db do
       param = "--timestamp_column nil"
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{param}"
+        successfully "rails generate logidze:model post #{generator_arg} #{param}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{param}"
+        successfully "rails generate logidze:model user #{generator_arg} --only-trigger #{param}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -91,5 +91,15 @@ describe "log timestamps", :db do
       expect(user).to use_statement_timestamp
       expect(user).to use_statement_timestamp
     end
+  end
+end
+
+describe "log timestamps", :db do
+  describe "before update or insert" do
+    include_context "log_timestamps_context"
+  end
+
+  describe "after update or insert" do
+    include_context "log_timestamps_context", "--after_trigger"
   end
 end

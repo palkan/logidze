@@ -2,7 +2,7 @@
 
 require "acceptance_helper"
 
-describe "columns filtering", :db do
+shared_context "columns_filtering_context" do |generator_arg|
   it "cannot be used with both only and except options" do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post "\
@@ -17,7 +17,7 @@ describe "columns filtering", :db do
       @except = %w[updated_at created_at active]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post "\
+        successfully "rails generate logidze:model post #{generator_arg} "\
                      "--except=#{@except.join(" ")}"
         successfully "rake db:migrate"
 
@@ -73,7 +73,7 @@ describe "columns filtering", :db do
       @only = %w[title meta]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post "\
+        successfully "rails generate logidze:model post #{generator_arg} "\
                      "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
@@ -128,7 +128,7 @@ describe "columns filtering", :db do
       @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post "\
+        successfully "rails generate logidze:model post #{generator_arg} "\
                      "--only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
@@ -150,7 +150,7 @@ describe "columns filtering", :db do
       ActiveRecord::Base.connection_pool.disconnect!
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post --except=updated_at --update"
+        successfully "rails generate logidze:model post #{generator_arg} --except=updated_at --update"
         successfully "rake db:migrate"
 
         ActiveRecord::Base.connection_pool.disconnect!
@@ -163,5 +163,15 @@ describe "columns filtering", :db do
       changes2 = post2.log_data.current_version.changes
       expect(changes2.keys).to match_array Post.column_names - %w[updated_at log_data]
     end
+  end
+end
+
+describe "сolumns filtering", :db do
+  describe "before update or insert" do
+    include_context "columns_filtering_context"
+  end
+
+  describe "after update or insert" do
+    include_context "columns_filtering_context", "--after_trigger"
   end
 end

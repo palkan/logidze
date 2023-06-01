@@ -3,13 +3,13 @@
 require "spec_helper"
 require "acceptance_helper"
 
-describe "ignore log columns", :db do
+shared_context "ignore_log_columns_context" do |generator_arg|
   include_context "cleanup migrations"
 
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:model post"
-      successfully "rails generate logidze:model post_comment"
+      successfully "rails generate logidze:model post #{generator_arg}"
+      successfully "rails generate logidze:model post_comment #{generator_arg}"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
@@ -67,5 +67,15 @@ describe "ignore log columns", :db do
         end
       end
     end
+  end
+end
+
+describe "ignore log columns", :db do
+  describe "before update or insert" do
+    include_context "ignore_log_columns_context"
+  end
+
+  describe "after update or insert" do
+    include_context "ignore_log_columns_context", "--after_trigger"
   end
 end

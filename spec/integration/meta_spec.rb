@@ -2,12 +2,12 @@
 
 require "acceptance_helper"
 
-describe "logs metadata", :db do
+shared_context "logs_metadata_context" do |generator_arg|
   include_context "cleanup migrations"
 
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:model user --only-trigger --limit=5"
+      successfully "rails generate logidze:model user #{generator_arg} --only-trigger --limit=5"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
@@ -362,5 +362,15 @@ describe "logs metadata", :db do
         expect(subject.at_version(3).whodunnit).to eq responsible2
       end
     end
+  end
+end
+
+describe "logs metadata", :db do
+  describe "before update or insert" do
+    include_examples "logs_metadata_context"
+  end
+
+  describe "after update or insert" do
+    include_examples "logs_metadata_context", "--after_trigger"
   end
 end

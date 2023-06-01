@@ -2,13 +2,13 @@
 
 require "acceptance_helper"
 
-describe "triggers", :db do
+shared_context "triggers_context" do |generator_arg|
   include_context "cleanup migrations"
 
   before(:all) do
     @old_post = Post.create!(title: "First", rating: 100, active: true)
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:model post --limit 4 --backfill"
+      successfully "rails generate logidze:model post #{generator_arg} --limit 4 --backfill"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
@@ -418,5 +418,15 @@ describe "triggers", :db do
       expect(post.log_data.versions.last.changes)
         .to include("title" => "Full me", "rating" => 22, "active" => true)
     end
+  end
+end
+
+describe "triggers", :db do
+  describe "before update or insert" do
+    include_context "triggers_context"
+  end
+
+  describe "after update or insert" do
+    include_context "triggers_context", "--after_trigger"
   end
 end

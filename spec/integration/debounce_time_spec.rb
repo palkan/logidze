@@ -2,12 +2,12 @@
 
 require "acceptance_helper"
 
-describe "trigger debounce", :db do
+shared_context "trigger_debounce_context" do |generator_arg|
   include_context "cleanup migrations"
 
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:model post --debounce_time=5000"
+      successfully "rails generate logidze:model post #{generator_arg} --debounce_time=5000"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
@@ -69,5 +69,15 @@ describe "trigger debounce", :db do
 
     expect(post.reload.log_version).to eq 3
     expect(post.log_size).to eq 3
+  end
+end
+
+describe "trigger debounce", :db do
+  describe "before update or insert" do
+    include_context "trigger_debounce_context"
+  end
+
+  describe "after update or insert" do
+    include_context "trigger_debounce_context", "--after_trigger"
   end
 end
