@@ -9,6 +9,7 @@ describe Logidze::Utils::FunctionDefinitions do
 
     it "returns all library functions" do
       is_expected.to include(func_def("logidze_logger", 3, ""))
+      is_expected.to include(func_def("logidze_logger_after", 1, ""))
       is_expected.to include(func_def("logidze_snapshot", 3, "jsonb, text, text[], boolean"))
       is_expected.to include(func_def("logidze_filter_keys", 1, "jsonb, text[], boolean"))
       is_expected.to include(func_def("logidze_compact_history", 1, "jsonb, integer"))
@@ -22,6 +23,7 @@ describe Logidze::Utils::FunctionDefinitions do
 
     it "returns all functions from db without signatures" do
       is_expected.to include(func_def("logidze_logger", 3))
+      is_expected.to include(func_def("logidze_logger_after", 1))
       is_expected.to include(func_def("logidze_snapshot", 3))
       is_expected.to include(func_def("logidze_filter_keys", 1))
       is_expected.to include(func_def("logidze_compact_history", 1))

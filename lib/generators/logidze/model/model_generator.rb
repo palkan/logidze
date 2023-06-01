@@ -38,6 +38,8 @@ module Logidze
       class_option :update, type: :boolean, optional: true,
         desc: "Define whether this is an update migration"
 
+      class_option :after_trigger, type: :boolean, optional: true, desc: "Use after trigger"
+
       def generate_migration
         if options[:except] && options[:only]
           warn "Use only one: --only or --except"
@@ -90,6 +92,10 @@ module Logidze
 
         def update?
           options[:update]
+        end
+
+        def after_trigger?
+          options[:after_trigger]
         end
 
         def filtered_columns

@@ -218,6 +218,16 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
           end
         end
       end
+
+      context "with trigger type" do
+        let(:base_args) { ["user", "--after-trigger"] }
+
+        it "use after trigger" do
+          is_expected.to exist
+          is_expected.to contain(/after update or insert on "#{full_table_name('users')}" for each row/i)
+          is_expected.to contain(/execute procedure logidze_logger_after\(null, 'updated_at'\);/i)
+        end
+      end
     end
 
     context "with namespace" do
