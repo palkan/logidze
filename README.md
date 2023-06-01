@@ -36,6 +36,7 @@ Other requirements:
   - [Tracking only selected columns](#tracking-only-selected-columns)
   - [Logs timestamps](#logs-timestamps)
   - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
+  - [Using with partitioned tables](#using-with-partitioned-tables)
 - [Usage](#usage)
   - [Basic API](#basic-api)
   - [Track meta information](#track-meta-information)
@@ -189,6 +190,18 @@ bundle exec rails destroy logidze:model Post
 ```
 
 **IMPORTANT**: If you use non-UTC time zone for Active Record (`config.active_record.default_timezone`), you MUST always infer log timestamps from a timestamp column (e.g., when back-filling data); otherwise, you may end up with inconsistent logs ([#199](https://github.com/palkan/logidze/issues/199)). In general, we recommend using UTC as the database time unless there is a very strong reason not to.
+
+### Using with partitioned tables
+
+Logidze supports partitioned tables for PostgreSQL 13+ without any additional configuration. For PostgreSQL 11/12, you should use _after_ triggers. To do that, provide the `--after-trigger` option to the migration:
+
+```sh
+bundle exec rails generate logidze:model Post --after-trigger
+```
+
+**NOTE:** Record changes are written as a full snapshot if the partition has changed during the update.
+
+**IMPORTANT:** Using Logidze for partitioned tables in PostgreSQL 10 is not supported.
 
 ## Usage
 
