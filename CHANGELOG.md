@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Add retrieving list of versions support. ([@tagirahmad][])
+
 - Add `--after-trigger` option to generate _after_ triggers for partitioned tables in older PostgreSQL versions. ([@SparLaimor][], [@prog-supdex][], [@palkan][])
 
 - **Breaking**. Ruby 2.7, Rails 6.0, PostgreSQL 10.0+ are required.
