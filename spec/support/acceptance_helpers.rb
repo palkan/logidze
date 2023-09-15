@@ -32,7 +32,7 @@ module Logidze
         )
 
       if ENV["LOG"]
-        puts "\n\nCOMMAND:\n#{command}\n\nOUTPUT:\n#{output}\nERROR:\n#{err}\n"
+        puts "\n\nCOMMAND:\n#{cmd}\n\nOUTPUT:\n#{output}\nERROR:\n#{err}\n"
       end
 
       [status, output, err]

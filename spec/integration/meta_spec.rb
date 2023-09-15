@@ -20,7 +20,7 @@ describe "logs metadata", :db do
   let(:meta2) { {"other_key" => "other_val"} }
 
   describe ".with_meta" do
-    subject { User.create!(name: "test", age: 10, active: false) }
+    subject(:user) { User.create!(name: "test", age: 10, active: false) }
 
     context "insert" do
       it "doesn't set meta if it's not provided" do
@@ -208,6 +208,19 @@ describe "logs metadata", :db do
         # now the third version is the earliest
         expect(subject.at_version(2)).to be_nil
         expect(subject.at_version(3).meta).to eq meta2
+      end
+
+      # See https://github.com/palkan/logidze/issues/236
+      context "with Rails touch:true" do
+        let!(:article) { Article.create!(title: "test", user: user) }
+
+        it "updating a record updates the parent record's log_data with the correct meta" do
+          Logidze.with_meta(meta, transactional: false) do
+            article.touch(time: 1.minute.since)
+          end
+
+          expect(user.reload.log_data.meta).to eq(meta)
+        end
       end
     end
 

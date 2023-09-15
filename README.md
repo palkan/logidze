@@ -337,6 +337,8 @@ end
 
 **Important:** If you use connection pooling (e.g., PgBouncer), using `.with_meta` without a transaction may lead to unexpected results (since meta is set for a connection). Without a transaction, we cannot guarantee that the same connection will be used for queries (including metadata cleanup).
 
+**Important**: In Rails, `after_commit` callbacks are executed after transaction is committed, and, thus, after `with_meta` block is executed—the meta wouldn't be added to changes captured in the `after_commit` phase. One particular scenario is having associations with `touch: true` (_touch_ updates are executed after commit).
+
 ### Track responsibility
 
 A special application of meta information is storing the author of the change, which is called _Responsible ID_. There is more likely that you would like to store the `current_user.id` that way.
