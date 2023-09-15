@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative "./function_definitions"
-require_relative "./pending_migration_error"
+require_relative "function_definitions"
+require_relative "pending_migration_error"
 
 module Logidze
   module Utils
