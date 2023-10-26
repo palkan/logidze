@@ -15,7 +15,7 @@ module Logidze
   require "logidze/has_logidze"
   require "logidze/adapter/base"
   require "logidze/adapter/active_record"
-  require "logidze/adapter/sequel"
+  require "logidze/adapter/sequel" if defined?(::Sequel)
 
   require "logidze/engine" if defined?(Rails)
 
