@@ -7,7 +7,7 @@ class Post < ActiveRecord::Base
 
   has_logidze
 
-  belongs_to :user
+  belongs_to :user, optional: true
 
   def reload
     self.errored = nil

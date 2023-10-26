@@ -7,17 +7,22 @@ require "logidze/version"
 module Logidze
   require "logidze/history"
   require "logidze/model"
+  require "logidze/model/time_helper"
+  require "logidze/model/active_record"
+  require "logidze/model/sequel"
   require "logidze/versioned_association"
   require "logidze/ignore_log_data"
   require "logidze/has_logidze"
-  require "logidze/meta"
-
-  extend Logidze::Meta
+  require "logidze/adapter/base"
+  require "logidze/adapter/active_record"
+  require "logidze/adapter/sequel"
 
   require "logidze/engine" if defined?(Rails)
 
   class << self
-    # Determines if Logidze should append a version to the log after updating an old version.
+    # Determines which DB adapter (ActiveRecord or Sequel) Logidze uses by default for manupulations
+    attr_accessor :default_adapter
+    # Determines if Logidze should append a version to the log after updating an old version
     attr_accessor :append_on_undo
     # Determines whether associations versioning is enabled or not
     attr_accessor :associations_versioning
@@ -28,41 +33,61 @@ module Logidze
     # Determines what Logidze should do when upgrade is needed (:raise | :warn | :ignore)
     attr_reader :on_pending_upgrade
 
-    # Temporary disable DB triggers.
-    #
-    # @example
-    #   Logidze.without_logging { Post.update_all(active: true) }
-    def without_logging
-      with_logidze_setting("logidze.disabled", "on") { yield }
-    end
-
-    # Instruct Logidze to create a full snapshot for the new versions, not a diff
-    #
-    # @example
-    #   Logidze.with_full_snapshot { post.touch }
-    def with_full_snapshot
-      with_logidze_setting("logidze.full_snapshot", "on") { yield }
-    end
-
     def on_pending_upgrade=(mode)
       if %i[raise warn ignore].exclude? mode
-        raise ArgumentError, "Unknown on_pending_upgrade option `#{mode.inspect}`. Expecting :raise, :warn or :ignore"
+        raise ArgumentError,
+          "Unknown on_pending_upgrade option `#{mode.inspect}`. Expecting :raise, :warn or :ignore"
       end
       @on_pending_upgrade = mode
     end
 
-    private
+    ADAPTERS = {active_record: Adapter::ActiveRecord, sequel: Adapter::Sequel}.freeze
 
-    def with_logidze_setting(name, value)
-      ActiveRecord::Base.transaction do
-        ActiveRecord::Base.connection.execute "SET LOCAL #{name} TO #{value};"
-        res = yield
-        ActiveRecord::Base.connection.execute "SET LOCAL #{name} TO DEFAULT;"
-        res
-      end
+    # Access DB adapter for manupulations.
+    #
+    # @example
+    #   Logidze[:active_record].without_logging { Post.update_all(active: true) }
+    def [](adapter)
+      ADAPTERS.fetch(adapter.to_sym)
+    end
+
+    # Temporary disable DB triggers (default adapter).
+    #
+    # @example
+    #   Logidze.without_logging { Post.update_all(active: true) }
+    def without_logging(&block)
+      self[default_adapter].without_logging(&block)
+    end
+
+    # Instruct Logidze to create a full snapshot for the new versions, not a diff (default adapter).
+    #
+    # @example
+    #   Logidze.with_full_snapshot { post.touch }
+    def with_full_snapshot(&block)
+      self[default_adapter].with_full_snapshot(&block)
+    end
+
+    # Store any meta information inside the version (it could be IP address, user agent, etc.)
+    # (default adapter).
+    #
+    # @example
+    #   Logidze.with_meta({ip: request.ip}) { post.save! }
+    def with_meta(meta, transactional: true, &block)
+      self[default_adapter].with_meta(meta, transactional: transactional, &block)
+    end
+
+    # Store special meta information about changes' author inside the version (Responsible ID).
+    # Usually, you would like to store the `current_user.id` that way
+    # (default adapter).
+    #
+    # @example
+    #   Logidze.with_responsible(user.id) { post.save! }
+    def with_responsible(responsible_id, transactional: true, &block)
+      self[default_adapter].with_responsible(responsible_id, transactional: transactional, &block)
     end
   end
 
+  self.default_adapter = :active_record
   self.append_on_undo = false
   self.associations_versioning = false
   self.ignore_log_data_by_default = false

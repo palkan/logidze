@@ -8,6 +8,8 @@
 
 - **Breaking**. Ruby 2.7, Rails 6.0, PostgreSQL 10.0+ are required.
 
+- [Fixes [#28](https://github.com/palkan/logidze/issues/28)] Add Sequel preliminary support. ([@ardecvz][])
+
 ## 1.2.3 (2023-01-03)
 
 - [Fixes [#217](https://github.com/palkan/logidze/issues/217)] Fix switch_to with `append: true` when there are changes on JSONB columns. ([@miharekar][])
@@ -386,3 +388,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@prog-supdex]: https://github.com/prog-supdex
 [@SparLaimor]: https://github.com/SparLaimor
 [@tagirahmad]: https://github.com/tagirahmad
+[@ardecvz]: https://github.com/ardecvz

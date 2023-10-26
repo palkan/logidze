@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe Logidze::History::Type do
-  subject { Logidze::History::Type.new }
+  subject { described_class.new }
 
   describe "#cast" do
     it "handles hash" do
