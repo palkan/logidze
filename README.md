@@ -38,10 +38,10 @@ Other requirements:
   - [Logs timestamps](#logs-timestamps)
   - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
   - [Using with partitioned tables](#using-with-partitioned-tables)
-  - [Sequel support](#sequel-support)
+  - [Sequel with Rails support](#sequel-with-rails-support)
 - [Usage](#usage)
   - [Basic API](#basic-api-in-sequel)
-  - [Sequel support](#sequel-support)
+  - [Sequel with Rails support](#sequel-with-rails-support)
   - [Track meta information](#track-meta-information)
   - [Track responsibility](#track-responsibility)
   - [Disable logging temporary](#disable-logging-temporary)
@@ -207,7 +207,7 @@ bundle exec rails generate logidze:model Post --after-trigger
 
 **IMPORTANT:** Using Logidze for partitioned tables in PostgreSQL 10 is not supported.
 
-### Sequel support
+### Sequel with Rails support
 
 All mentioned generators also optionally support Sequel.
 
