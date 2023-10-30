@@ -16,12 +16,12 @@ module Logidze
         include Logidze::IgnoreLogData
         include Logidze::Model
 
-        define_method(:logidze_adapter) do
-          @logidze_adapter ||= Logidze::Model::ActiveRecord.new(self)
+        define_method(:logidze_connection_adapter) do
+          @logidze_connection_adapter ||= Logidze::Model::ActiveRecord.new(self)
         end
 
         class << self
-          def logidze_adapter
+          def logidze_connection_adapter
             Logidze::Model::ActiveRecord
           end
 

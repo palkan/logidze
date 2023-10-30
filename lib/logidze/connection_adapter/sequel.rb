@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Logidze
-  module Adapter
+  module ConnectionAdapter
     # Sequel realization to manipulate Logidze database settings and attach meta information
     module Sequel
       include Base

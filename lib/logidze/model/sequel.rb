@@ -2,7 +2,7 @@
 
 module Logidze
   module Model
-    # Sequel database adapter which allows database serialization,
+    # Sequel connection adapter which allows database serialization,
     # model introspection, modifications and duplication
     class Sequel
       attr_accessor :model

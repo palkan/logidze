@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Logidze
-  module Adapter
+  module ConnectionAdapter
     # ActiveRecord realization to manipulate Logidze database settings and attach meta information
     module ActiveRecord
       include Base

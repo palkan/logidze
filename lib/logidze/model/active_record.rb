@@ -2,7 +2,7 @@
 
 module Logidze
   module Model
-    # ActiveRecord database adapter which allows database serialization,
+    # ActiveRecord connection adapter which allows database serialization,
     # model introspection, modifications and duplication
     class ActiveRecord
       attr_accessor :model

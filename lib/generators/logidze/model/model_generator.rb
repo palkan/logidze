@@ -47,7 +47,7 @@ module Logidze
           warn "Use only one: --only or --except"
           exit(1)
         end
-        migration_template with_adapter("migration.rb.erb"), "db/migrate/#{migration_name}.rb"
+        migration_template with_connection_adapter("migration.rb.erb"), "db/migrate/#{migration_name}.rb"
       end
 
       def generate_fx_trigger
@@ -69,7 +69,7 @@ module Logidze
       end
 
       no_tasks do
-        def with_adapter(migration_name)
+        def with_connection_adapter(migration_name)
           [("sequel" if sequel?), migration_name].compact.join("/")
         end
 

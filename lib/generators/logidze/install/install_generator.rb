@@ -22,14 +22,14 @@ module Logidze
         desc: "Define whether this is an update migration"
 
       def generate_migration
-        migration_template = fx? ? "migration_fx.rb.erb" : with_adapter("migration.rb.erb")
+        migration_template = fx? ? "migration_fx.rb.erb" : with_connection_adapter("migration.rb.erb")
         migration_template migration_template, "db/migrate/#{migration_name}.rb"
       end
 
       def generate_hstore_migration
         return if update?
 
-        migration_template with_adapter("hstore.rb.erb"), "db/migrate/enable_hstore.rb"
+        migration_template with_connection_adapter("hstore.rb.erb"), "db/migrate/enable_hstore.rb"
       end
 
       def generate_fx_functions
@@ -43,7 +43,7 @@ module Logidze
       end
 
       no_tasks do
-        def with_adapter(migration_name)
+        def with_connection_adapter(migration_name)
           [("sequel" if sequel?), migration_name].compact.join("/")
         end
 

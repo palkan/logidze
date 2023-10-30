@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Logidze # :nodoc:
-  module Adapter
+  module ConnectionAdapter
     # Provide API interface to manipulate Logidze database settings and attach meta information
     module Base
-      # Temporary disable DB triggers (default adapter).
+      # Temporary disable DB triggers (default connection adapter).
       #
       # @example
       #   Logidze[:active_record].without_logging { Post.update_all(active: true) }
@@ -53,20 +53,20 @@ module Logidze # :nodoc:
       end
 
       class MetaWrapper # :nodoc:
-        def self.wrap_with(adapter, meta, &block)
-          new(adapter, meta, &block).perform
+        def self.wrap_with(connection_adapter, meta, &block)
+          new(connection_adapter, meta, &block).perform
         end
 
-        attr_reader :adapter, :meta, :block
+        attr_reader :connection_adapter, :meta, :block
 
-        def initialize(adapter, meta, &block)
-          @adapter = adapter
+        def initialize(connection_adapter, meta, &block)
+          @connection_adapter = connection_adapter
           @meta = meta
           @block = block
         end
 
         def perform
-          raise ArgumentError, "Adapter must be choosen" unless adapter
+          raise ArgumentError, "Connection adapter must be choosen" unless connection_adapter
           raise ArgumentError, "Block must be given" unless block
           return block.call if meta.nil?
 
@@ -96,7 +96,7 @@ module Logidze # :nodoc:
         end
 
         def encode_meta(value)
-          adapter.quote(ActiveSupport::JSON.encode(value))
+          connection_adapter.quote(ActiveSupport::JSON.encode(value))
         end
 
         def pg_reset_meta_param(prev_meta)
@@ -112,15 +112,15 @@ module Logidze # :nodoc:
         private
 
         def call_block_in_meta_context
-          adapter.transaction { super }
+          connection_adapter.transaction { super }
         end
 
         def pg_set_meta_param(value)
-          adapter.execute("SET LOCAL logidze.meta = #{encode_meta(value)};")
+          connection_adapter.execute("SET LOCAL logidze.meta = #{encode_meta(value)};")
         end
 
         def pg_clear_meta_param
-          adapter.execute("SET LOCAL logidze.meta TO DEFAULT;")
+          connection_adapter.execute("SET LOCAL logidze.meta TO DEFAULT;")
         end
       end
 
@@ -128,11 +128,11 @@ module Logidze # :nodoc:
         private
 
         def pg_set_meta_param(value)
-          adapter.execute("SET logidze.meta = #{encode_meta(value)};")
+          connection_adapter.execute("SET logidze.meta = #{encode_meta(value)};")
         end
 
         def pg_clear_meta_param
-          adapter.execute("SET logidze.meta TO DEFAULT;")
+          connection_adapter.execute("SET logidze.meta TO DEFAULT;")
         end
       end
 

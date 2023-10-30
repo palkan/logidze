@@ -483,12 +483,12 @@ Logidze.with_full_snapshot do
 end
 ```
 
-### Sequel adapter
+### Sequel connection adapter
 
-By default, Logidze uses a default DB adapter (Active Record) for top-level manipulations.
+By default, Logidze uses a default connection adapter (Active Record) for top-level manipulations.
 For example, it would use it for `Logidze.with_responsible`, `Logidze.without_logging`, etc.
 
-You can manually change the current DB adapter during method calls:
+You can manually change the current connection adapter during method calls:
 
 ```ruby
 Logidze[:sequel].with_responsible(user.id) do
@@ -498,24 +498,24 @@ end
 Logidze[:active_record].without_logging { Post.update(seen: true) }
 ```
 
-The Sequel adapter provides all top-level Logidze methods including all options.
+The Sequel connection adapter provides all top-level Logidze methods including all options.
 
-If you use Sequel exclusively without ActiveRecord, you may want to change the Logidze default adapter:
+If you use Sequel exclusively without ActiveRecord, you may want to change the Logidze default connection adapter:
 
 ```ruby
 # config/initializers/logidze.rb
-Logidze.default_adapter = :sequel
+Logidze.default_connection_adapter = :sequel
 
 # or
 
 # config/application.rb
-config.logidze.default_adapter = :sequel
+config.logidze.default_connection_adapter = :sequel
 ```
 
-By the way, a class level alias `without_logging` always chooses the right adapter as there is no ambiguity:
+By the way, a class level alias `without_logging` always chooses the right connection adapter as there is no ambiguity:
 
 ```ruby
-Post.without_logging { Post.update(seen: true) } # automagically choose the right adapter
+Post.without_logging { Post.update(seen: true) } # automagically choose the right connection adapter
 ```
 
 ### Associations versioning

@@ -25,7 +25,7 @@ module Sequel
       module DatasetMethods
         include ::Logidze::Model::ClassMethods
 
-        def logidze_adapter
+        def logidze_connection_adapter
           ::Logidze::Model::Sequel
         end
 
@@ -47,7 +47,7 @@ module Sequel
 
       module ClassMethods
         Sequel::Plugins.def_dataset_methods(self, %i[
-          logidze_adapter
+          logidze_connection_adapter
           ignores_log_data?
           with_log_data
           has_logidze
@@ -63,8 +63,8 @@ module Sequel
       module InstanceMethods
         include ::Logidze::Model
 
-        def logidze_adapter
-          @logidze_adapter ||= ::Logidze::Model::Sequel.new(self)
+        def logidze_connection_adapter
+          @logidze_connection_adapter ||= ::Logidze::Model::Sequel.new(self)
         end
 
         # TODO: use `serialization` plugin later as it seems the setter doesn't work without reload.
