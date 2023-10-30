@@ -12,7 +12,7 @@ module Logidze
       def deserialize(value)
         case value
         when String
-          decoded = ::ActiveSupport::JSON.decode(value) rescue nil
+          decoded = ::Sequel.parse_json(value) rescue nil
           History.new(decoded) if decoded.present?
         when Hash, *hashlike
           History.new(value)
@@ -25,7 +25,7 @@ module Logidze
       def serialize(value)
         case value
         when Hash, *hashlike, History
-          ::ActiveSupport::JSON.encode(value)
+          ::Sequel.object_to_json(value)
         else
           value
         end
