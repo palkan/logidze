@@ -1,6 +1,0 @@
-test:
-  adapter: postgresql
-  encoding: unicode
-  url: <%= ENV['DATABASE_URL'] %>
-  pool: 5
-  database: logidze_test
