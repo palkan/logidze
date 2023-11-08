@@ -8,7 +8,7 @@
 
 - **Breaking**. Ruby 2.7, Rails 6.0, PostgreSQL 10.0+ are required.
 
-- [Fixes [#28](https://github.com/palkan/logidze/issues/28)] Add Sequel preliminary support. ([@ardecvz][])
+- [Fixes [#28](https://github.com/palkan/logidze/issues/28)] Add Sequel preliminary support. ([@ardecvz][], [@sanks02][])
 
 ## 1.2.3 (2023-01-03)
 
@@ -389,3 +389,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@SparLaimor]: https://github.com/SparLaimor
 [@tagirahmad]: https://github.com/tagirahmad
 [@ardecvz]: https://github.com/ardecvz
+[@sanks02]: https://github.com/sanks02
