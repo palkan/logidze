@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require "active_support"
+
 module Logidze
   module Model
+    extend ActiveSupport::Concern
+
     # ActiveRecord connection adapter which allows database serialization,
     # model introspection, modifications and duplication
     class ActiveRecord

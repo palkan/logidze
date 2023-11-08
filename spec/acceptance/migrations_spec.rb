@@ -2,7 +2,7 @@
 
 require "acceptance_helper"
 
-describe "Logidze migrations" do
+describe "Logidze migrations", :acceptance do
   describe "#install" do
     let(:check_logidze_command) { "ActiveRecord::Base.connection.execute %q{select logidze_version(1, '{}'::jsonb, statement_timestamp())}" }
 

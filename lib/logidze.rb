@@ -8,16 +8,22 @@ module Logidze
   require "logidze/history"
   require "logidze/model"
   require "logidze/model/time_helper"
-  require "logidze/model/active_record"
-  require "logidze/model/sequel"
-  require "logidze/versioned_association"
-  require "logidze/ignore_log_data"
-  require "logidze/has_logidze"
   require "logidze/connection_adapter/base"
-  require "logidze/connection_adapter/active_record"
-  require "logidze/connection_adapter/sequel" if defined?(::Sequel)
 
-  require "logidze/engine" if defined?(Rails)
+  if defined?(::ActiveRecord)
+    require "logidze/model/active_record"
+    require "logidze/versioned_association"
+    require "logidze/ignore_log_data"
+    require "logidze/has_logidze"
+    require "logidze/connection_adapter/active_record"
+
+    require "logidze/engine" if defined?(Rails)
+  end
+
+  if defined?(::Sequel)
+    require "logidze/model/sequel"
+    require "logidze/connection_adapter/sequel"
+  end
 
   class << self
     # Determines which connection adapter (ActiveRecord or Sequel) Logidze uses by default for manupulations
@@ -34,7 +40,7 @@ module Logidze
     attr_reader :on_pending_upgrade
 
     def on_pending_upgrade=(mode)
-      if %i[raise warn ignore].exclude? mode
+      if !%i[raise warn ignore].include? mode
         raise ArgumentError,
           "Unknown on_pending_upgrade option `#{mode.inspect}`. Expecting :raise, :warn or :ignore"
       end

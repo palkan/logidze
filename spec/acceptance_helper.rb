@@ -4,6 +4,8 @@ require "spec_helper"
 
 require "digest/sha1"
 
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each { |f| require f }
+
 # For faster development, let's not re-create a database for every test run,
 # only if Logidze SQL has changed
 #

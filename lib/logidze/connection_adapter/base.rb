@@ -2,6 +2,12 @@
 
 module Logidze # :nodoc:
   module ConnectionAdapter
+    module ActiveRecord
+    end
+
+    module Sequel
+    end
+
     # Provide API interface to manipulate Logidze database settings and attach meta information
     module Base
       # Temporary disable DB triggers (default connection adapter).
@@ -96,7 +102,7 @@ module Logidze # :nodoc:
         end
 
         def encode_meta(value)
-          connection_adapter.quote(ActiveSupport::JSON.encode(value))
+          connection_adapter.encode_meta(value)
         end
 
         def pg_reset_meta_param(prev_meta)

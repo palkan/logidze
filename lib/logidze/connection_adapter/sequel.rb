@@ -7,6 +7,10 @@ module Logidze
       include Base
       extend self
 
+      def encode_meta(value)
+        quote(::Sequel.object_to_json(value))
+      end
+
       def transaction(&block)
         ::Sequel::Model.db.transaction(&block)
       end

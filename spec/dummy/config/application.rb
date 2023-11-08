@@ -53,7 +53,5 @@ module Dummy
       $stdout.puts "🔩 Using table_name_suffix = '#{TABLE_NAME_SUFFIX}'"
       config.active_record.table_name_suffix = TABLE_NAME_SUFFIX
     end
-
-    Sequel.postgres(extensions: :activerecord_connection)
   end
 end

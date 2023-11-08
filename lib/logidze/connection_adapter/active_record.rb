@@ -7,6 +7,10 @@ module Logidze
       include Base
       extend self
 
+      def encode_meta(value)
+        quote(ActiveSupport::JSON.encode(value))
+      end
+
       def transaction(&block)
         ::ActiveRecord::Base.transaction(&block)
       end

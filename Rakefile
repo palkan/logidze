@@ -21,12 +21,21 @@ desc "Run specs other than spec/acceptance"
 RSpec::Core::RakeTask.new("spec") do |task|
   task.exclude_pattern = "spec/acceptance/**/*_spec.rb"
   task.verbose = false
+  ENV["SPEC_TASK"] = "true"
 end
 
 desc "Run acceptance specs in spec/acceptance"
 RSpec::Core::RakeTask.new("spec:acceptance") do |task|
   task.pattern = "spec/acceptance/**/*_spec.rb"
   task.verbose = false
+  ENV["SPEC_ACCEPTANCE_TASK"] = "true"
+end
+
+desc "Run Sequel specs in spec/sequel"
+RSpec::Core::RakeTask.new("spec:sequel") do |task|
+  task.pattern = "spec/sequel/**/*_spec.rb"
+  task.verbose = false
+  ENV["SPEC_SEQUEL_TASK"] = "true"
 end
 
 desc "Run the specs and acceptance tests"

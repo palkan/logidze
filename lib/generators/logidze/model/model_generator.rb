@@ -4,14 +4,12 @@ require "rails/generators"
 require "rails/generators/active_record/migration/migration_generator"
 require_relative "../inject_sql"
 require_relative "../fx_helper"
-require_relative "../sequel_helper"
 
 module Logidze
   module Generators
     class ModelGenerator < ::ActiveRecord::Generators::Base # :nodoc:
       include InjectSql
       include FxHelper
-      include SequelHelper
 
       source_root File.expand_path("templates", __dir__)
       source_paths << File.expand_path("triggers", __dir__)
@@ -47,7 +45,7 @@ module Logidze
           warn "Use only one: --only or --except"
           exit(1)
         end
-        migration_template with_connection_adapter("migration.rb.erb"), "db/migrate/#{migration_name}.rb"
+        migration_template "migration.rb.erb", "db/migrate/#{migration_name}.rb"
       end
 
       def generate_fx_trigger
@@ -63,16 +61,10 @@ module Logidze
 
         indents = "  " * (class_name.scan("::").count + 1)
 
-        include_logidze = sequel? ? "plugin :logidze" : "has_logidze"
-
-        inject_into_class(model_file_path, class_name.demodulize, "#{indents}#{include_logidze}\n")
+        inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze\n")
       end
 
       no_tasks do
-        def with_connection_adapter(migration_name)
-          [("sequel" if sequel?), migration_name].compact.join("/")
-        end
-
         def migration_name
           return options[:name] if options[:name].present?
 
@@ -84,8 +76,6 @@ module Logidze
         end
 
         def full_table_name
-          return table_name if sequel?
-
           config = ActiveRecord::Base
           "#{config.table_name_prefix}#{table_name}#{config.table_name_suffix}"
         end

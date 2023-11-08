@@ -4,7 +4,7 @@ require "spec_helper"
 
 describe Logidze::Model, :sequel do
   let(:user) do
-    SequelModel::User.create(
+    User.create(
       name: "test",
       extra: {gender: "X", social: {fb: [1, 2], vk: false}}.to_json,
       settings: "{sms,mail}",

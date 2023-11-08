@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
-require "active_support"
-
 module Logidze
   # Extends model with methods to browse history
   module Model
-    extend ActiveSupport::Concern
-
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
       def at(time: nil, version: nil)
@@ -227,7 +223,7 @@ module Logidze
 
       association.singleton_class.prepend Logidze::VersionedAssociation
 
-      if association.is_a?(::ActiveRecord::Associations::CollectionAssociation)
+      if defined?(::ActiveRecord) && association.is_a?(::ActiveRecord::Associations::CollectionAssociation)
         association.singleton_class.prepend(
           Logidze::VersionedAssociation::CollectionAssociation
         )
