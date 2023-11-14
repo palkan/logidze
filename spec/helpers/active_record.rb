@@ -15,7 +15,7 @@ RSpec.configure do |config|
 
   config.example_status_persistence_file_path = "../tmp/rspec_examples.txt"
   config.filter_run :focus
-  config.filter_run_excluding sequel: true
+  config.filter_run_excluding :sequel
   config.run_all_when_everything_filtered = true
 
   config.order = :random
@@ -35,14 +35,5 @@ RSpec.configure do |config|
     ActiveRecord::Base.connection.rollback_transaction
 
     raise "Migrations are pending: #{ex.metadata[:location]}" if ActiveRecord::Base.connection.migration_context.needs_migration?
-  end
-
-  config.around(:each, sequel: true) do |example|
-    Sequel::Model.db.transaction(rollback: :always, auto_savepoint: true) { example.run }
-  end
-
-  # Sequel does not support table prefixes / suffixes
-  if ENV["TABLE_NAME_PREFIX"].present? || ENV["TABLE_NAME_SUFFIX"].present?
-    config.filter_run_excluding :sequel
   end
 end
