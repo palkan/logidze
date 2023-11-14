@@ -10,3 +10,12 @@ Examples:
   rails generate logidze:model User --update --whitelist=name,age
 
     This will generate the migration to update existing trigger (drop and create).
+
+  rails generate logidze:model User --sequel
+
+    This will generate the Sequel supported migration to add log column and trigger.
+    This will also add `plugin :logidze` to model.
+
+  rails generate logidze:model User --sequel --update --whitelist=name,age
+
+    This will generate the Sequel supported migration to update existing trigger (drop and create).
