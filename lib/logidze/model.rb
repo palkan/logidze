@@ -230,7 +230,7 @@ module Logidze
 
     # Loads log_data field from the database, stores to the attributes hash and returns it
     def reload_log_data
-      self.log_data = self.class.where(self.class.primary_key => id).pluck("#{self.class.table_name}.log_data".to_sym).first
+      self.log_data = self.class.where(self.class.primary_key => id).pluck(:"#{self.class.table_name}.log_data").first
     end
 
     # Nullify log_data column for a single record
