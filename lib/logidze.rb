@@ -8,22 +8,16 @@ module Logidze
   require "logidze/history"
   require "logidze/model"
   require "logidze/model/time_helper"
+  require "logidze/model/active_record"
+  require "logidze/model/sequel" if defined?(::Sequel)
+  require "logidze/versioned_association"
+  require "logidze/ignore_log_data"
+  require "logidze/has_logidze"
   require "logidze/connection_adapter/base"
+  require "logidze/connection_adapter/active_record"
+  require "logidze/connection_adapter/sequel" if defined?(::Sequel)
 
-  if defined?(::ActiveRecord)
-    require "logidze/model/active_record"
-    require "logidze/versioned_association"
-    require "logidze/ignore_log_data"
-    require "logidze/has_logidze"
-    require "logidze/connection_adapter/active_record"
-
-    require "logidze/engine" if defined?(Rails)
-  end
-
-  if defined?(::Sequel)
-    require "logidze/model/sequel"
-    require "logidze/connection_adapter/sequel"
-  end
+  require "logidze/engine" if defined?(Rails)
 
   class << self
     # Determines which connection adapter (ActiveRecord or Sequel) Logidze uses by default for manupulations

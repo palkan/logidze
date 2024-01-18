@@ -17,7 +17,7 @@ Other requirements:
 - Ruby ~> 2.7
 - Rails >= 6.0 (for Rails 4.2 use version <=0.12.0, for Rails 5.x use version <= 1.2.3)
 - PostgreSQL >= 10.0
-- Sequel >= 5.0 (*optional*)
+- Sequel >= 5.0 (_optional_)
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
@@ -210,6 +210,8 @@ bundle exec rails generate logidze:model Post --after-trigger
 ### Sequel support
 
 All mentioned generators also optionally support Sequel.
+
+**NOTE:** ActiveRecord and ActiveSupport are required to be installed because that's where the generators come from.
 
 To use generators with Sequel, you should add `--sequel` flag to generators' invocations:
 

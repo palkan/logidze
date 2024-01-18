@@ -1,10 +1,24 @@
 # frozen_string_literal: true
 
+require "acceptance_helper"
+
 describe "create logidze snapshot", :sequel do
+  include_context "cleanup migrations"
+
+  before(:all) do
+    Dir.chdir("#{File.dirname(__FILE__)}/../../dummy") do
+      successfully "rails generate logidze:model user --only-trigger --limit=5"
+      successfully "rake db:migrate"
+
+      # Close active connections to handle db variables
+      ActiveRecord::Base.connection_pool.disconnect!
+    end
+  end
+
   let(:now) { Time.local(1989, 7, 10, 18, 23, 33) }
   let(:user) do
     Logidze.without_logging do
-      User.create(
+      SequelModel::User.create(
         time: now, name: "test", age: 10, active: false, extra: {gender: "X"}.to_json
       )
     end
@@ -64,7 +78,7 @@ describe "create logidze snapshot", :sequel do
     specify do
       expect(user.log_data).to be_nil
 
-      User.where(id: user.id)
+      SequelModel::User.where(id: user.id)
         .create_logidze_snapshot(timestamp: :time, only: %w[name age])
 
       user.reload

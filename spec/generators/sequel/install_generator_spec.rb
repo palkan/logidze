@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "spec_helper"
 require "generators/logidze/install/install_generator"
 
 describe Logidze::Generators::InstallGenerator, type: :generator, sequel: true do

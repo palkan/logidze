@@ -79,7 +79,7 @@ module Logidze
       def reload_log_data
         model.log_data = model.class.where(
           model.class.primary_key => model.id
-        ).pluck("#{model.class.table_name}.log_data".to_sym).first
+        ).pluck(:"#{model.class.table_name}.log_data").first
       end
 
       def reset_log_data

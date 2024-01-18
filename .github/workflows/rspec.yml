@@ -69,6 +69,7 @@ jobs:
           fx: "false"
           table_name_prefix: 'prefix-'
           table_name_suffix: '-suffix'
+          after_trigger: "false"
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}

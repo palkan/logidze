@@ -1,12 +1,26 @@
 # frozen_string_literal: true
 
+require "acceptance_helper"
+
 describe "logs metadata", :sequel do
+  include_context "cleanup migrations"
+
+  before(:all) do
+    Dir.chdir("#{File.dirname(__FILE__)}/../../dummy") do
+      successfully "rails generate logidze:model user --only-trigger --limit=5"
+      successfully "rake db:migrate"
+
+      # Close active connections to handle db variables
+      ActiveRecord::Base.connection_pool.disconnect!
+    end
+  end
+
   let(:meta) { {"some_key" => "some_val"} }
   let(:meta_alt) { {"some_key" => "some_val2"} }
   let(:meta2) { {"other_key" => "other_val"} }
 
   describe ".with_meta" do
-    subject { User.create(name: "test", age: 10, active: false) }
+    subject { SequelModel::User.create(name: "test", age: 10, active: false) }
 
     context "insert" do
       it "doesn't set meta if it's not provided" do
@@ -28,7 +42,7 @@ describe "logs metadata", :sequel do
       it "handles failed transaction" do
         ignore_exceptions do
           Logidze[:sequel].with_meta(meta) do
-            CustomUser.create
+            SequelModel::CustomUser.create
           end
         end
 
@@ -205,13 +219,13 @@ describe "logs metadata", :sequel do
         end
 
         # create another one and check that meta is nil here
-        expect(User.create(name: "test", age: 10, active: false).reload.meta).to be_nil
+        expect(SequelModel::User.create(name: "test", age: 10, active: false).reload.meta).to be_nil
       end
 
       it "recovers after exception" do
         ignore_exceptions do
           Logidze[:sequel].with_meta(meta, transactional: false) do
-            CustomUser.create
+            SequelModel::CustomUser.create
           end
         end
 
@@ -221,9 +235,9 @@ describe "logs metadata", :sequel do
   end
 
   describe ".with_responsible" do
-    let(:responsible) { User.create(name: "owner") }
+    let(:responsible) { SequelModel::User.create(name: "owner") }
 
-    subject { User.create(name: "test", age: 10, active: false) }
+    subject { SequelModel::User.create(name: "test", age: 10, active: false) }
 
     context "insert" do
       it "doesn't set responsible user if it's not provided" do
@@ -245,7 +259,7 @@ describe "logs metadata", :sequel do
       it "handles failed transaction" do
         ignore_exceptions do
           Logidze[:sequel].with_responsible(responsible.id) do
-            CustomUser.create
+            SequelModel::CustomUser.create
           end
         end
 
@@ -281,7 +295,7 @@ describe "logs metadata", :sequel do
     end
 
     context "update" do
-      let(:responsible2) { User.create(name: "tester") }
+      let(:responsible2) { SequelModel::User.create(name: "tester") }
 
       it "sets responsible" do
         Logidze[:sequel].with_responsible(responsible.id) do

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "spec_helper"
 require "generators/logidze/model/model_generator"
 
 describe Logidze::Generators::ModelGenerator, type: :generator, sequel: true do

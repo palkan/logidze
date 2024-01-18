@@ -4,7 +4,7 @@ require "spec_helper"
 
 describe Logidze::Model, :sequel do
   let(:user) do
-    User.create(
+    SequelModel::User.create(
       name: "test",
       age: 10,
       active: false,
@@ -164,7 +164,7 @@ describe Logidze::Model, :sequel do
     end
 
     it "return false no possible undo" do
-      u = User.create(
+      u = SequelModel::User.create(
         log_data: {
           "v" => 1,
           "h" =>
@@ -210,7 +210,7 @@ describe Logidze::Model, :sequel do
     end
 
     it "return false no possible redo" do
-      u = User.create(
+      u = SequelModel::User.create(
         log_data: {
           "v" => 1,
           "h" =>
@@ -287,7 +287,7 @@ describe Logidze::Model, :sequel do
     it { is_expected.to eq(user.log_data.version) }
 
     context "when model created within a without_logging block" do
-      let(:user) { User.create(name: "test") }
+      let(:user) { User.create!(name: "test") }
 
       before { Logidze.without_logging { user } }
 
@@ -301,7 +301,7 @@ describe Logidze::Model, :sequel do
     it { is_expected.to eq(user.log_data.size) }
 
     context "when model created within a without_logging block" do
-      let(:user) { User.create(name: "test") }
+      let(:user) { SequelModel::User.create(name: "test") }
 
       before { Logidze.without_logging { user } }
 
@@ -311,7 +311,7 @@ describe Logidze::Model, :sequel do
 
   context "when logs contain outdated schema" do
     let(:user) do
-      User.create(
+      SequelModel::User.create(
         name: "test",
         log_data: {
           "v" => 3,
@@ -362,7 +362,7 @@ describe Logidze::Model, :sequel do
     before { user }
 
     it "returns reverted records", :aggregate_failures do
-      u = User.at(time: time(350)).first
+      u = SequelModel::User.at(time: time(350)).first
 
       expect(u.name).to eq "test"
       expect(u.age).to eq 0
@@ -370,7 +370,7 @@ describe Logidze::Model, :sequel do
     end
 
     it "returns reverted records when called on relation", :aggregate_failures do
-      u = User.where(active: false).order(Sequel.desc(:age)).at(time: time(350)).first
+      u = SequelModel::User.where(active: false).order(Sequel.desc(:age)).at(time: time(350)).first
 
       expect(u.name).to eq "test"
       expect(u.age).to eq 0
@@ -378,7 +378,7 @@ describe Logidze::Model, :sequel do
     end
 
     it "skips nil records" do
-      User.create(
+      SequelModel::User.create(
         log_data: {
           "v" => 1,
           "h" =>
@@ -388,7 +388,7 @@ describe Logidze::Model, :sequel do
         }
       )
 
-      expect(User.at(time: time(350)).size).to eq 1
+      expect(SequelModel::User.at(time: time(350)).size).to eq 1
     end
   end
 
@@ -397,7 +397,7 @@ describe Logidze::Model, :sequel do
 
     it "returns diffs for records", :aggregate_failures do
       expect(
-        User.diff_from(time: time(350)).first
+        SequelModel::User.diff_from(time: time(350)).first
       ).to eq(
         "id" => user.id,
         "changes" =>
@@ -410,7 +410,7 @@ describe Logidze::Model, :sequel do
 
     it "returns diffs for records when called on relation", :aggregate_failures do
       expect(
-        User.where(active: false).order(Sequel.desc(:age)).diff_from(time: time(350)).first
+        SequelModel::User.where(active: false).order(Sequel.desc(:age)).diff_from(time: time(350)).first
       ).to eq(
         "id" => user.id,
         "changes" =>
@@ -426,7 +426,7 @@ describe Logidze::Model, :sequel do
     let!(:user2) { Logidze::Model::Sequel.new(user).clowne_copier.tap(&:save) }
     let!(:user3) { Logidze::Model::Sequel.new(user).clowne_copier.tap(&:save) }
 
-    before { User.where(id: [user.id, user2.id]).reset_log_data }
+    before { SequelModel::User.where(id: [user.id, user2.id]).reset_log_data }
 
     it "nullify log_data column for a association" do
       expect(user.reload.log_size).to be_zero
@@ -442,8 +442,8 @@ describe Logidze::Model, :sequel do
   context "with ignore_log_data: true" do
     describe ".with_log_data" do
       it "generates the same query as model with ignore_log_data: false" do
-        expect(NotLoggedPost.with_log_data.sql).to eq(
-          Post.dataset.sql
+        expect(SequelModel::NotLoggedPost.with_log_data.sql).to eq(
+          SequelModel::Post.dataset.sql
         )
       end
     end

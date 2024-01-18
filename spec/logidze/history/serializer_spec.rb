@@ -5,7 +5,7 @@ require "spec_helper"
 describe "Logidze::History::Serializer", :sequel do
   subject { Logidze::History::Serializer }
 
-  before { User.db.extension :pg_json }
+  before { SequelModel::User.db.extension :pg_json }
 
   describe "#deserialize" do
     it "handles valid JSON" do
