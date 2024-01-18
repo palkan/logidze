@@ -2,7 +2,16 @@
 
 ## master (unreleased)
 
+## 1.3.0 (2024-01-09)
+
 - Add retrieving list of versions support. ([@tagirahmad][])
+
+```ruby
+post.versions # => Enumerator
+post.versions.find do
+  _1.title == "old title"
+end
+```
 
 - Add `--after-trigger` option to generate _after_ triggers for partitioned tables in older PostgreSQL versions. ([@SparLaimor][], [@prog-supdex][], [@palkan][])
 

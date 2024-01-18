@@ -236,5 +236,85 @@ module Logidze
       association
     end
     # rubocop: enable Metrics/MethodLength
+
+    def log_size
+      log_data&.size || 0
+    end
+
+    # Loads log_data field from the database, stores to the attributes hash and returns it
+    def reload_log_data
+      self.log_data = self.class.where(self.class.primary_key => id).pluck(:"#{self.class.table_name}.log_data").first
+    end
+
+    # Nullify log_data column for a single record
+    def reset_log_data
+      self.class.without_logging { update_column(:log_data, nil) }
+    end
+
+    def create_logidze_snapshot!(**opts)
+      self.class.where(self.class.primary_key => id).create_logidze_snapshot(**opts)
+
+      reload_log_data
+    end
+
+    protected
+
+    def apply_diff(version, diff)
+      diff.each do |k, v|
+        apply_column_diff(k, v)
+      end
+
+      log_data.version = version
+      self
+    end
+
+    def apply_column_diff(column, value)
+      return if deleted_column?(column) || column == "log_data"
+
+      write_attribute column, deserialize_value(column, value)
+    end
+
+    def build_dup(log_entry, requested_ts = log_entry.time)
+      object_at = dup
+      object_at.apply_diff(log_entry.version, log_data.changes_to(version: log_entry.version))
+      object_at.id = id
+      object_at.logidze_requested_ts = requested_ts
+
+      object_at
+    end
+
+    def deserialize_value(column, value)
+      @attributes[column].type.deserialize(value)
+    end
+
+    def deleted_column?(column)
+      !@attributes.key?(column)
+    end
+
+    def deserialize_changes!(diff)
+      diff.each do |k, v|
+        v["old"] = deserialize_value(k, v["old"])
+        v["new"] = deserialize_value(k, v["new"])
+      end
+    end
+
+    def logidze_past?
+      return false unless @logidze_requested_ts
+
+      @logidze_requested_ts < Time.now.to_i * TIME_FACTOR
+    end
+
+    def parse_time(ts)
+      case ts
+      when Numeric
+        ts.to_i
+      when String
+        (Time.parse(ts).to_r * TIME_FACTOR).to_i
+      when Date
+        (ts.to_time.to_r * TIME_FACTOR).to_i
+      when Time
+        (ts.to_r * TIME_FACTOR).to_i
+      end
+    end
   end
 end
