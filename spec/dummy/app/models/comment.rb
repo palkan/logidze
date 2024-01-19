@@ -2,5 +2,5 @@
 
 class Comment < ActiveRecord::Base
   has_logidze ignore_log_data: false
-  belongs_to :article, touch: true
+  belongs_to :article, optional: true, touch: true
 end

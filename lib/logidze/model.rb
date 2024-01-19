@@ -237,26 +237,6 @@ module Logidze
     end
     # rubocop: enable Metrics/MethodLength
 
-    def log_size
-      log_data&.size || 0
-    end
-
-    # Loads log_data field from the database, stores to the attributes hash and returns it
-    def reload_log_data
-      self.log_data = self.class.where(self.class.primary_key => id).pluck(:"#{self.class.table_name}.log_data").first
-    end
-
-    # Nullify log_data column for a single record
-    def reset_log_data
-      self.class.without_logging { update_column(:log_data, nil) }
-    end
-
-    def create_logidze_snapshot!(**opts)
-      self.class.where(self.class.primary_key => id).create_logidze_snapshot(**opts)
-
-      reload_log_data
-    end
-
     protected
 
     def apply_diff(version, diff)
