@@ -272,8 +272,8 @@ post.logidze_versions.find do
 end
 
 # we can also add options
-post.logidze_versions(reverse: true) # from older to newer
-post.logidze_versions(include_self: true) # returns self as the first one (default) or the last one record (if reverse: true)
+post.logidze_versions(reverse: true) # from newer to older
+post.logidze_versions(include_self: true) # returns self as the last record or the first one when `reverse` is set to true
 ```
 
 There are also `#undo!` and `#redo!` options (and more general `#switch_to!`):
