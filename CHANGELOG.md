@@ -7,8 +7,8 @@
 - Add retrieving list of versions support. ([@tagirahmad][])
 
 ```ruby
-post.versions # => Enumerator
-post.versions.find do
+post.logidze_versions # => Enumerator
+post.logidze_versions.find do
   _1.title == "old title"
 end
 ```

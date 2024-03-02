@@ -260,20 +260,20 @@ Post.where(created_at: Time.zone.today.all_day).diff_from(time: 1.hour.ago)
 Also, it is possible to retrieve list of model's `versions`:
 
 ```ruby
-post.versions # => Enumerator
+post.logidze_versions # => Enumerator
 
 # you can use Enumerator's #take to return all
-post.versions.take
+post.logidze_versions.take
 
 # or you take a few or call any Enumerable method
-post.versions.take(2)
-post.versions.find do
+post.logidze_versions.take(2)
+post.logidze_versions.find do
   _1.title == "old title"
 end
 
 # we can also add options
-post.versions(reverse: true) # from older to newer
-post.versions(include_self: true) # returns self as the first one (default) or the last one record (if reverse: true)
+post.logidze_versions(reverse: true) # from older to newer
+post.logidze_versions(include_self: true) # returns self as the first one (default) or the last one record (if reverse: true)
 ```
 
 There are also `#undo!` and `#redo!` options (and more general `#switch_to!`):
