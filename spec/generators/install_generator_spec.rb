@@ -18,6 +18,18 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
     allow(ActiveRecord::Migration).to receive(:current_version).and_return(ar_version)
   end
 
+  describe "hstore migration" do
+    subject { migration_file("db/migrate/enable_hstore.rb") }
+
+    it "creates migration", :aggregate_failures do
+      run_generator(args)
+
+      is_expected.to exist
+      is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
+      is_expected.to contain(/enable_extension :hstore/i)
+    end
+  end
+
   describe "trigger migration" do
     subject { migration_file("db/migrate/logidze_install.rb") }
 
@@ -29,6 +41,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to contain(/create or replace function logidze_logger()/i)
       is_expected.to contain(/create or replace function logidze_logger_after()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
+      is_expected.to contain(/create or replace function logidze_version/i)
       is_expected.to contain(/create or replace function logidze_filter_keys/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
       is_expected.to contain(/create or replace function logidze_capture_exception/i)
@@ -78,18 +91,6 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
     end
   end
 
-  describe "hstore migration" do
-    subject { migration_file("db/migrate/enable_hstore.rb") }
-
-    it "creates migration", :aggregate_failures do
-      run_generator(args)
-
-      is_expected.to exist
-      is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
-      is_expected.to contain(/enable_extension :hstore/i)
-    end
-  end
-
   context "update migration" do
     let(:version) { Logidze::VERSION.delete(".") }
     let(:base_args) { ["--update"] }
@@ -110,6 +111,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       is_expected.to contain(/create or replace function logidze_filter_keys/i)
       is_expected.to contain(/create or replace function logidze_compact_history/i)
       is_expected.to contain(/create or replace function logidze_capture_exception/i)
+      is_expected.to contain(/Drop legacy functions/i)
     end
 
     context "when using fx" do

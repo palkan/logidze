@@ -3,7 +3,7 @@
 class User < ActiveRecord::Base
   has_logidze
 
-  delegate :responsible_id, :meta, to: :log_data
+  delegate :responsible_id, :meta, to: :log_data, allow_nil: true
 
   has_many :not_logged_posts
 

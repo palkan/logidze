@@ -1,0 +1,9 @@
+Sequel.migration do
+  up do
+    run "CREATE EXTENSION IF NOT EXISTS hstore"
+  end
+
+  down do
+    run "DROP EXTENSION IF EXISTS hstore CASCADE"
+  end
+end

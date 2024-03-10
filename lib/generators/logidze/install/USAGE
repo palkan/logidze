@@ -10,3 +10,7 @@ Examples:
 
     This will generate schema.rb compatible migration with `create_function` definitions and separate SQL files.
     The fx gem must be installed.
+
+  rails generate logidze:install --sequel
+
+    This will generate the Sequel supported core migration file with trigger function defined.

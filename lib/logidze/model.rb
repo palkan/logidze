@@ -5,15 +5,7 @@ require "active_support"
 module Logidze
   # Extends model with methods to browse history
   module Model
-    require "logidze/history/type"
-
     extend ActiveSupport::Concern
-
-    included do
-      attribute :log_data, Logidze::History::Type.new
-
-      delegate :version, to: :log_data, prefix: "log"
-    end
 
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
@@ -28,7 +20,9 @@ module Logidze
 
       # Alias for Logidze.without_logging
       def without_logging(&block)
-        Logidze.without_logging(&block)
+        logidze_connection_adapter_name = logidze_connection_adapter.name.demodulize.underscore
+
+        Logidze[logidze_connection_adapter_name].without_logging(&block)
       end
 
       # rubocop: disable Naming/PredicateName
@@ -39,7 +33,7 @@ module Logidze
 
       # Nullify log_data column for a association
       def reset_log_data
-        without_logging { update_all(log_data: nil) }
+        without_logging { logidze_connection_adapter.new(self).mass_reset_log_data }
       end
 
       # Initialize log_data with the current state if it's null
@@ -55,18 +49,9 @@ module Logidze
           args[2] = only ? "true" : "false"
         end
 
-        without_logging do
-          where(log_data: nil).update_all(
-            <<~SQL
-              log_data = logidze_snapshot(to_jsonb(#{quoted_table_name}), #{args.join(", ")})
-            SQL
-          )
-        end
+        without_logging { logidze_connection_adapter.new(self).mass_create_logidze_snapshot(args) }
       end
     end
-
-    # Use this to convert Ruby time to milliseconds
-    TIME_FACTOR = 1_000
 
     attr_accessor :logidze_requested_ts
 
@@ -77,7 +62,7 @@ module Logidze
     def at(time: nil, version: nil)
       return at_version(version) if version
 
-      time = parse_time(time)
+      time = TimeHelper.parse_time(time)
 
       unless log_data
         return Logidze.return_self_if_log_data_is_empty ? self : nil
@@ -92,7 +77,7 @@ module Logidze
 
       log_entry = log_data.find_by_time(time)
 
-      build_dup(log_entry, time)
+      logidze_connection_adapter.build_dup(log_entry, time)
     end
 
     def logidze_versions(reverse: false, include_self: false)
@@ -116,14 +101,14 @@ module Logidze
 
       raise ArgumentError, "#log_data is empty" unless log_data
 
-      time = parse_time(time)
+      time = TimeHelper.parse_time(time)
 
       return self if log_data.current_ts?(time)
       return false unless log_data.exists_ts?(time)
 
       version = log_data.find_by_time(time).version
 
-      apply_diff(version, log_data.changes_to(version: version))
+      logidze_connection_adapter.apply_diff(version, log_data.changes_to(version: version))
     end
 
     # Return a dirty copy of specified version of record
@@ -134,7 +119,7 @@ module Logidze
       log_entry = log_data.find_by_version(version)
       return nil unless log_entry
 
-      build_dup(log_entry)
+      logidze_connection_adapter.build_dup(log_entry)
     end
 
     # Revert record to the specified version (without saving to DB)
@@ -144,7 +129,7 @@ module Logidze
       return self if log_data.version == version
       return false unless log_data.find_by_version(version)
 
-      apply_diff(version, log_data.changes_to(version: version))
+      logidze_connection_adapter.apply_diff(version, log_data.changes_to(version: version))
     end
 
     # Return diff object representing changes since specified time.
@@ -154,12 +139,13 @@ module Logidze
     #   post.diff_from(time: 2.days.ago) # or post.diff_from(version: 2)
     #   #=> { "id" => 1, "changes" => { "title" => { "old" => "Hello!", "new" => "World" } } }
     def diff_from(version: nil, time: nil)
-      time = parse_time(time) if time
-      changes = log_data&.diff_from(time: time, version: version)&.tap do |v|
-        deserialize_changes!(v)
+      time = TimeHelper.parse_time(time) if time
+
+      changes = log_data&.diff_from(time: time, version: version)&.tap do |diff|
+        logidze_connection_adapter.deserialize_changes!(diff)
       end || {}
 
-      changes.delete_if { |k, _v| deleted_column?(k) }
+      changes.delete_if { |k, _v| logidze_connection_adapter.deleted_column?(k) }
 
       {"id" => id, "changes" => changes}
     end
@@ -191,12 +177,39 @@ module Logidze
 
       if append && version < log_version
         changes = log_data.changes_to(version: version)
-        changes.each { |c, v| changes[c] = deserialize_value(c, v) }
-        update!(changes)
+        changes.each { |c, v| changes[c] = logidze_connection_adapter.deserialize_value(c, v) }
+        logidze_connection_adapter.update!(changes)
       else
         at_version!(version)
-        self.class.without_logging { save! }
+        self.class.without_logging { logidze_connection_adapter.save! }
       end
+    end
+
+    # Log data field's current version
+    def log_version
+      log_data&.version
+    end
+
+    # Log data field's size
+    def log_size
+      log_data&.size || 0
+    end
+
+    # Loads log_data field from the database, stores to the attributes hash and returns it
+    def reload_log_data
+      logidze_connection_adapter.reload_log_data
+    end
+
+    # Nullify log_data column for a single record
+    def reset_log_data
+      self.class.without_logging { logidze_connection_adapter.reset_log_data }
+    end
+
+    # Initialize log_data with the current state if it's null
+    def create_logidze_snapshot!(**opts)
+      self.class.where(self.class.primary_key => id).create_logidze_snapshot(**opts)
+
+      reload_log_data
     end
 
     # rubocop: disable Metrics/MethodLength
@@ -206,7 +219,7 @@ module Logidze
       return association unless Logidze.associations_versioning
 
       should_apply_logidze =
-        logidze_past? &&
+        TimeHelper.logidze_past?(logidze_requested_ts) &&
         association.klass.respond_to?(:has_logidze?) &&
         !association.singleton_class.include?(Logidze::VersionedAssociation)
 
@@ -214,7 +227,7 @@ module Logidze
 
       association.singleton_class.prepend Logidze::VersionedAssociation
 
-      if association.is_a? ActiveRecord::Associations::CollectionAssociation
+      if association.is_a?(::ActiveRecord::Associations::CollectionAssociation)
         association.singleton_class.prepend(
           Logidze::VersionedAssociation::CollectionAssociation
         )
@@ -223,26 +236,6 @@ module Logidze
       association
     end
     # rubocop: enable Metrics/MethodLength
-
-    def log_size
-      log_data&.size || 0
-    end
-
-    # Loads log_data field from the database, stores to the attributes hash and returns it
-    def reload_log_data
-      self.log_data = self.class.where(self.class.primary_key => id).pluck(:"#{self.class.table_name}.log_data").first
-    end
-
-    # Nullify log_data column for a single record
-    def reset_log_data
-      self.class.without_logging { update_column(:log_data, nil) }
-    end
-
-    def create_logidze_snapshot!(**opts)
-      self.class.where(self.class.primary_key => id).create_logidze_snapshot(**opts)
-
-      reload_log_data
-    end
 
     protected
 

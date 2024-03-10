@@ -5,6 +5,7 @@ require "rails/generators/active_record"
 require "logidze/utils/function_definitions"
 require_relative "../inject_sql"
 require_relative "../fx_helper"
+require_relative "../sequel_helper"
 
 module Logidze
   module Generators
@@ -12,6 +13,7 @@ module Logidze
       include Rails::Generators::Migration
       include InjectSql
       include FxHelper
+      include SequelHelper
 
       source_root File.expand_path("templates", __dir__)
       source_paths << File.expand_path("functions", __dir__)
@@ -20,14 +22,14 @@ module Logidze
         desc: "Define whether this is an update migration"
 
       def generate_migration
-        migration_template = fx? ? "migration_fx.rb.erb" : "migration.rb.erb"
+        migration_template = fx? ? "migration_fx.rb.erb" : with_adapter("migration.rb.erb")
         migration_template migration_template, "db/migrate/#{migration_name}.rb"
       end
 
       def generate_hstore_migration
         return if update?
 
-        migration_template "hstore.rb.erb", "db/migrate/enable_hstore.rb"
+        migration_template with_adapter("hstore.rb.erb"), "db/migrate/enable_hstore.rb"
       end
 
       def generate_fx_functions
@@ -41,6 +43,10 @@ module Logidze
       end
 
       no_tasks do
+        def with_adapter(migration_name)
+          [("sequel" if sequel?), migration_name].compact.join("/")
+        end
+
         def migration_name
           if update?
             "logidze_update_#{Logidze::VERSION.delete(".")}"
