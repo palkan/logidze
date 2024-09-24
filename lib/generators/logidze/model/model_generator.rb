@@ -125,7 +125,8 @@ module Logidze
         end
 
         def next_version
-          previous_version&.next || 1
+          version = previous_version
+          (behavior == :invoke ? version&.next : version) || 1
         end
 
         def all_triggers

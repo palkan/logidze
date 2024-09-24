@@ -312,14 +312,36 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       let(:path) { File.join(destination_root, "app", "models", "user.rb") }
       let(:base_args) { ["User", "--no-after-trigger"] }
 
-      it "deletes migration file it created" do
+      before do
         run_generator(args)
+      end
+
+      it "deletes migration file it created" do
         migration_file = migration_file("db/migrate/add_logidze_to_users.rb")
+
         expect(migration_file).to exist
 
-        Rails::Generators.invoke "logidze:model", args, behavior: :revoke, destination_root: destination_root
-        migration_file = migration_file("db/migrate/add_logidze_to_users.rb")
+        Rails::Generators.invoke "logidze:model", args,
+          behavior: :revoke,
+          destination_root: destination_root
+
         expect(migration_file).not_to exist
+      end
+
+      context "with fx" do
+        let(:fx_args) { use_fx_args }
+
+        it "deletes trigger file it created" do
+          trigger_file = file("db/triggers/logidze_on_users_v01.sql")
+
+          expect(trigger_file).to exist
+
+          Rails::Generators.invoke "logidze:model", args,
+            behavior: :revoke,
+            destination_root: destination_root
+
+          expect(trigger_file).not_to exist
+        end
       end
     end
   end

@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Fix `rails destroy logidze:model SomeModel` not deleting the `fx` trigger file file. ([@tylerhunt][])
+
 ## 1.3.0 (2024-01-09)
 
 - Add retrieving list of versions support. ([@tagirahmad][])
@@ -395,3 +397,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@prog-supdex]: https://github.com/prog-supdex
 [@SparLaimor]: https://github.com/SparLaimor
 [@tagirahmad]: https://github.com/tagirahmad
+[@tylerhunt]: https://github.com/tylerhunt
