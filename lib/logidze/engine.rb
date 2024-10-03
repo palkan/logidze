@@ -20,5 +20,18 @@ module Logidze
         end
       end
     end
+
+    initializer "sort triggers by name" do |app|
+      if config.logidze.sort_triggers_by_name
+        ActiveSupport.on_load(:active_record) do
+          require "fx/adapters/postgres/triggers"
+          Fx::Adapters::Postgres::Triggers.singleton_class.prepend(Module.new do
+            def all(*args)
+              super.sort_by(&:name)
+            end
+          end)
+        end
+      end
+    end
   end
 end
