@@ -2,6 +2,11 @@
 
 ## master (unreleased)
 
+- Support sorting of trigger names alphabetically (defaults to false)
+```ruby
+Logdize.sort_triggers_by_name = true
+```
+
 ## 1.3.0 (2024-01-09)
 
 - Add retrieving list of versions support. ([@tagirahmad][])
