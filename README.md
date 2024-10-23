@@ -575,7 +575,8 @@ If you specify the limit in the trigger definition, then log size will not excee
 
 ## Ordering of Triggers in schema.rb
 
-By default, when generating `schema.rb`, Rails will order the triggers based on the id's of their respective tables. This can lead to unneccessary changes being made when utilizing `rails db:prepare`, since the ordering of the tables will now be based off the alphabetical ordering (see [#250](https://github.com/palkan/logidze/issues/250) for more details). To force the ordering to be consistent with `rails db:prepare`, logidze can be configured to order the triggers alphabetically.
+By default, when generating `schema.rb`, Rails will order the triggers based on the id's of their respective tables. This can lead to unnecessary changes being made when utilizing `rails db:prepare`, since the ordering of the tables will now be based off the alphabetical ordering (see [#250](https://github.com/palkan/logidze/issues/250) for more details). To force the ordering to be consistent with `rails db:prepare`, Logidze can be configured to order the triggers alphabetically.
+
 ```ruby
 # config/initializers/logidze.rb
 
