@@ -3,6 +3,7 @@
 ## master (unreleased)
 
 - Support sorting of trigger names alphabetically (defaults to false)
+
 ```ruby
 Logdize.sort_triggers_by_name = true
 ```

@@ -70,5 +70,5 @@ module Logidze
   self.ignore_log_data_by_default = false
   self.return_self_if_log_data_is_empty = true
   self.on_pending_upgrade = :ignore
-  self.sort_triggers_by_name = :false
+  self.sort_triggers_by_name = false
 end
