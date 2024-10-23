@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## 1.3.1 (2024-10-23)
+
 - Fix `rails destroy logidze:model SomeModel` not deleting the `fx` trigger file file. ([@tylerhunt][])
 
 - Support sorting of trigger names alphabetically (defaults to false)
