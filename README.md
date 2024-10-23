@@ -573,6 +573,16 @@ The `log_data` column has the following format:
 
 If you specify the limit in the trigger definition, then log size will not exceed the specified size. When a new change occurs, and there is no more room for it, the two oldest changes will be merged.
 
+## Ordering of Triggers in schema.rb
+
+By default, when generating `schema.rb`, Rails will order the triggers based on the id's of their respective tables. This can lead to unnecessary changes being made when utilizing `rails db:prepare`, since the ordering of the tables will now be based off the alphabetical ordering (see [#250](https://github.com/palkan/logidze/issues/250) for more details). To force the ordering to be consistent with `rails db:prepare`, Logidze can be configured to order the triggers alphabetically.
+
+```ruby
+# config/initializers/logidze.rb
+
+Logidze.sort_triggers_by_name = true
+```
+
 ## Troubleshooting
 
 ### `log_data` is nil when using Rails fixtures

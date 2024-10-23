@@ -25,6 +25,8 @@ module Logidze
     attr_accessor :ignore_log_data_by_default
     # Whether #at should return self or nil when log_data is nil
     attr_accessor :return_self_if_log_data_is_empty
+    # Determines if triggers are sorted by related table id or by name
+    attr_accessor :sort_triggers_by_name
     # Determines what Logidze should do when upgrade is needed (:raise | :warn | :ignore)
     attr_reader :on_pending_upgrade
 
@@ -68,4 +70,5 @@ module Logidze
   self.ignore_log_data_by_default = false
   self.return_self_if_log_data_is_empty = true
   self.on_pending_upgrade = :ignore
+  self.sort_triggers_by_name = false
 end
