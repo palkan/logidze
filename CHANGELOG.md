@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Support Rails 7.2 ([@atomaka][])
+
 ## 1.3.1 (2024-10-23)
 
 - Fix `rails destroy logidze:model SomeModel` not deleting the `fx` trigger file file. ([@tylerhunt][])
