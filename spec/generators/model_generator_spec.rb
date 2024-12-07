@@ -71,7 +71,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
         it "creates a trigger file" do
           is_expected.to be_a_file
-          expect(file("db/triggers/logidze_on_users_v01.sql")).to exist
+          expect(file("db/triggers/logidze_on_users_v01.sql")).to be_a_file
         end
       end
 
@@ -175,7 +175,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
           it "creates a trigger file" do
             is_expected.to be_a_file
-            expect(file("db/triggers/logidze_on_users_v02.sql")).to exist
+            expect(file("db/triggers/logidze_on_users_v02.sql")).to be_a_file
           end
         end
 
@@ -233,7 +233,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
           it "generates after trigger" do
             is_expected.to be_a_file
-            expect(file("db/triggers/logidze_on_users_v01.sql")).to exist
+            expect(file("db/triggers/logidze_on_users_v01.sql")).to be_a_file
             expect(file("db/triggers/logidze_on_users_v01.sql")).to contain(/after update or insert on/i)
           end
         end
@@ -334,13 +334,13 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         it "deletes trigger file it created" do
           trigger_file = file("db/triggers/logidze_on_users_v01.sql")
 
-          expect(trigger_file).to exist
+          expect(trigger_file).to be_a_file
 
           Rails::Generators.invoke "logidze:model", args,
             behavior: :revoke,
             destination_root: destination_root
 
-          expect(trigger_file).not_to exist
+          expect(trigger_file).not_to be_a_file
         end
       end
     end

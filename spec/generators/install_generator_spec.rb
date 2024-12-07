@@ -72,7 +72,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
           logidze_compact_history_v01.sql
           logidze_capture_exception_v01.sql
         ].each do |path|
-          expect(file("db/functions/#{path}")).to exist
+          expect(file("db/functions/#{path}")).to be_a_file
         end
       end
     end
@@ -166,7 +166,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
           logidze_compact_history_v01.sql
           logidze_capture_exception_v01.sql
         ].each do |path|
-          expect(file("db/functions/#{path}")).to exist
+          expect(file("db/functions/#{path}")).to be_a_file
         end
       end
     end
