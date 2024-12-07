@@ -39,6 +39,12 @@ RSpec.configure do |config|
   config.append_after(:each, db: true) do |ex|
     ActiveRecord::Base.connection.rollback_transaction
 
-    raise "Migrations are pending: #{ex.metadata[:location]}" if ActiveRecord::Base.connection_pool.migration_context.needs_migration?
+    migration_context = if Rails::VERSION::MAJOR >= 7
+      ActiveRecord::MigrationContext.new("db/migrate")
+    else
+      ActiveRecord::Base.connection.migration_context
+    end
+
+    raise "Migrations are pending: #{ex.metadata[:location]}" if migration_context.needs_migration?
   end
 end
