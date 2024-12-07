@@ -4,8 +4,11 @@ require "acceptance_helper"
 
 describe "logidze_snapshot" do
   let(:now) { Time.zone.local(1989, 7, 10, 18, 23, 33) }
+  let(:now_to_s) do
+    now.respond_to?(:to_fs) ? now.to_fs(:db) : now.to_s(:db)
+  end
 
-  let(:data) { %('{"title": "Feel me", "rating": 42, "name": "Jack", "extra": {"gender": "X"}, "updated_at": "#{now.to_fs(:db)}"}'::jsonb) }
+  let(:data) { %('{"title": "Feel me", "rating": 42, "name": "Jack", "extra": {"gender": "X"}, "updated_at": "#{now_to_s}"}'::jsonb) }
 
   specify "without optional args" do
     res = sql "select logidze_snapshot(#{data})"
