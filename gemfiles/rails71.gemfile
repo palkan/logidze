@@ -1,0 +1,9 @@
+source 'https://rubygems.org'
+
+rails_version = '~> 7.1.0'
+gem 'railties', rails_version
+gem 'activerecord', rails_version
+
+eval_gemfile './shared.gemfile'
+
+gemspec path: '..'

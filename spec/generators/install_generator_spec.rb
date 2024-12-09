@@ -24,7 +24,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
     it "creates migration", :aggregate_failures do
       run_generator(args)
 
-      is_expected.to exist
+      is_expected.to be_a_file
       is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
       is_expected.to contain(/create or replace function logidze_logger()/i)
       is_expected.to contain(/create or replace function logidze_logger_after()/i)
@@ -40,7 +40,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       it "creates migration", :aggregate_failures do
         run_generator(args)
 
-        is_expected.to exist
+        is_expected.to be_a_file
         is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
         is_expected.to contain("create_function :logidze_logger, version: 4")
         is_expected.to contain("create_function :logidze_logger_after, version: 4")
@@ -62,7 +62,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       it "creates function files" do
         run_generator(args)
 
-        is_expected.to exist
+        is_expected.to be_a_file
         %w[
           logidze_logger_v04.sql
           logidze_logger_after_v04.sql
@@ -72,7 +72,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
           logidze_compact_history_v01.sql
           logidze_capture_exception_v01.sql
         ].each do |path|
-          expect(file("db/functions/#{path}")).to exist
+          expect(file("db/functions/#{path}")).to be_a_file
         end
       end
     end
@@ -84,7 +84,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
     it "creates migration", :aggregate_failures do
       run_generator(args)
 
-      is_expected.to exist
+      is_expected.to be_a_file
       is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
       is_expected.to contain(/enable_extension :hstore/i)
     end
@@ -99,10 +99,10 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
     it "creates only functions", :aggregate_failures do
       run_generator(args)
 
-      expect(migration_file("db/migrate/enable_hstore.rb")).not_to exist
-      expect(migration_file("db/migrate/logidze_install.rb")).not_to exist
+      expect(migration_file("db/migrate/enable_hstore.rb")).not_to be_a_file
+      expect(migration_file("db/migrate/logidze_install.rb")).not_to be_a_file
 
-      is_expected.to exist
+      is_expected.to be_a_file
       is_expected.to contain(/create or replace function logidze_logger()/i)
       is_expected.to contain(/create or replace function logidze_logger_after()/i)
       is_expected.to contain(/create or replace function logidze_snapshot/i)
@@ -144,7 +144,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       it "creates migration", :aggregate_failures do
         run_generator(args)
 
-        is_expected.to exist
+        is_expected.to be_a_file
         is_expected.to contain("update_function :logidze_version, version: 2, revert_to_version: 3")
         is_expected.to contain("update_function :logidze_snapshot, version: 3, revert_to_version: 4")
         is_expected.not_to contain("update_function :logidze_filter_keys")
@@ -157,7 +157,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
       it "creates function files" do
         run_generator(args)
 
-        is_expected.to exist
+        is_expected.to be_a_file
         %w[
           logidze_logger_v04.sql
           logidze_logger_after_v04.sql
@@ -166,7 +166,7 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
           logidze_compact_history_v01.sql
           logidze_capture_exception_v01.sql
         ].each do |path|
-          expect(file("db/functions/#{path}")).to exist
+          expect(file("db/functions/#{path}")).to be_a_file
         end
       end
     end

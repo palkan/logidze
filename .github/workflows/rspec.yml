@@ -21,7 +21,7 @@ jobs:
         ruby: ["3.1"]
         postgres: ["12"]
         gemfile: [
-          "gemfiles/rails7.gemfile"
+          "gemfiles/rails72.gemfile"
         ]
         fx: ["false"]
         after_trigger: ["false"]
@@ -33,17 +33,27 @@ jobs:
           after_trigger: "false"
         - ruby: "3.2"
           postgres: "15"
-          gemfile: "gemfiles/rails7.gemfile"
+          gemfile: "gemfiles/rails72.gemfile"
+          fx: "false"
+          after_trigger: "false"
+        - ruby: "3.2"
+          postgres: "15"
+          gemfile: "gemfiles/rails71.gemfile"
+          fx: "false"
+          after_trigger: "false"
+        - ruby: "3.2"
+          postgres: "15"
+          gemfile: "gemfiles/rails70.gemfile"
           fx: "false"
           after_trigger: "false"
         - ruby: "3.1"
           postgres: "12"
-          gemfile: "gemfiles/rails7.gemfile"
+          gemfile: "gemfiles/rails72.gemfile"
           fx: "false"
           after_trigger: "true"
         - ruby: "3.0"
           postgres: "13"
-          gemfile: "gemfiles/rails7.gemfile"
+          gemfile: "gemfiles/rails72.gemfile"
           fx: "false"
           after_trigger: "false"
         - ruby: "2.7"
