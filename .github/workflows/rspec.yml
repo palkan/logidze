@@ -12,6 +12,7 @@ jobs:
     env:
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
+      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}
       CI: true
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
