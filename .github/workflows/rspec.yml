@@ -19,59 +19,69 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1"]
-        postgres: ["12"]
+        ruby: ["3.4"]
+        postgres: ["16"]
         gemfile: [
-          "gemfiles/rails72.gemfile"
+          rails8.gemfile
         ]
         fx: ["false"]
         after_trigger: ["false"]
         include:
-        - ruby: "3.2"
+        - ruby: "3.4"
+          postgres: "16"
+          gemfile: rails8.gemfile
+          fx: "false"
+          after_trigger: "false"
+        - ruby: "3.3"
+          postgres: "16"
+          gemfile: rails8.gemfile
+          fx: "false"
+          after_trigger: "true"
+        - ruby: "3.3"
+          postgres: "16"
+          gemfile: rails72.gemfile
+          fx: "false"
+          after_trigger: "false"
+        - ruby: "3.3"
           postgres: "15"
-          gemfile: "gemfiles/railsmaster.gemfile"
+          gemfile: railsmaster.gemfile
           fx: "false"
           after_trigger: "false"
         - ruby: "3.2"
           postgres: "15"
-          gemfile: "gemfiles/rails72.gemfile"
+          gemfile: rails72.gemfile
           fx: "false"
           after_trigger: "false"
         - ruby: "3.2"
           postgres: "15"
-          gemfile: "gemfiles/rails71.gemfile"
+          gemfile: rails71.gemfile
           fx: "false"
           after_trigger: "false"
         - ruby: "3.2"
           postgres: "15"
-          gemfile: "gemfiles/rails70.gemfile"
+          gemfile: rails70.gemfile
           fx: "false"
           after_trigger: "false"
         - ruby: "3.1"
           postgres: "12"
-          gemfile: "gemfiles/rails72.gemfile"
+          gemfile: rails72.gemfile
           fx: "false"
           after_trigger: "true"
-        - ruby: "3.0"
-          postgres: "13"
-          gemfile: "gemfiles/rails72.gemfile"
-          fx: "false"
-          after_trigger: "false"
         - ruby: "2.7"
           postgres: "13"
-          gemfile: "gemfiles/rails6.gemfile"
+          gemfile: rails6.gemfile
           fx: "false"
           after_trigger: "false"
           table_name_prefix: 'prefix-'
           table_name_suffix: '-suffix'
         - ruby: "2.7"
           postgres: "11"
-          gemfile: "gemfiles/rails6.gemfile"
+          gemfile: rails6.gemfile
           fx: "false"
           after_trigger: "true"
         - ruby: "2.7"
           postgres: "10"
-          gemfile: "gemfiles/rails6.gemfile"
+          gemfile: rails6.gemfile
           fx: "false"
           after_trigger: "false"
     services:
