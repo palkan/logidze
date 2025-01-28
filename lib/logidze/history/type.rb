@@ -36,6 +36,10 @@ module Logidze
       def changed_in_place?(raw_old_value, new_value)
         cast_value(raw_old_value) != new_value
       end
+
+      def mutable?
+        true
+      end
     end
   end
 end
