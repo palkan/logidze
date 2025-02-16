@@ -1,0 +1,7 @@
+Description:
+  Generates the necessary migration for running Logidze with Logidze data stored in a separate table
+  
+Examples:
+  rails generate logidze:migration:logs
+
+    This will generate the migration to add separate table for storing Logidze data.
