@@ -9,10 +9,14 @@ module Logidze
 
     module ClassMethods # :nodoc:
       # Include methods to work with history.
-      #
-      def has_logidze(ignore_log_data: Logidze.ignore_log_data_by_default)
+      def has_logidze(ignore_log_data: Logidze.ignore_log_data_by_default, detached: false)
         include Logidze::IgnoreLogData
         include Logidze::Model
+        if detached
+          # Adds needed behavior to models and alters behavior of some methods from +Logidze::Model+ to
+          # work with detached table for `log_data`
+          include Logidze::Detachable
+        end
 
         @ignore_log_data = ignore_log_data
 
