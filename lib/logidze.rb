@@ -11,6 +11,8 @@ module Logidze
   require "logidze/ignore_log_data"
   require "logidze/has_logidze"
   require "logidze/meta"
+  require "logidze/logidze_data"
+  require "logidze/detachable"
 
   extend Logidze::Meta
 
