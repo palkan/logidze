@@ -92,6 +92,17 @@ module Logidze
         end
       end
 
+      # Generate `logidze_detached_logger_after.sql` from the regular `logidze_detached_logger.sql`
+      # by find-and-replacing a few lines
+      def generate_logidze_detached_logger_after
+        source = File.read(File.join(__dir__, "functions", "logidze_detached_logger.sql"))
+        source.sub!(/^CREATE OR REPLACE FUNCTION logidze_detached_logger.*$/, "")
+        source.sub!(/^  -- version.*$/, "")
+        source.gsub!("RETURN NEW; -- pass", "RETURN NULL;")
+        source.gsub!("RETURN NEW; -- result", "RETURN NULL;")
+        source
+      end
+
       def self.next_migration_number(dir)
         ::ActiveRecord::Generators::Base.next_migration_number(dir)
       end

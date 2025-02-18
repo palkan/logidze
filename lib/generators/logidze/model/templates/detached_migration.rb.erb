@@ -32,9 +32,8 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
         SQL
 
   <%- end -%>
-        # TODO: fix after_trigger generators later
         execute <<~SQL
-<%= inject_sql("logidze_detached.sql", indent: 10) %>
+<%= inject_sql(after_trigger? ? "logidze_detached_after.sql" : "logidze_detached.sql", indent: 10) %>
         SQL
       end
 
