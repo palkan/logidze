@@ -24,5 +24,9 @@ Benchmark.ips do |x|
     LogidzeUser.create!(params)
   end
 
+  x.report("LogidzeDetached INSERT") do
+    LogidzeDetachedUser.create!(params)
+  end
+
   x.compare!
 end
