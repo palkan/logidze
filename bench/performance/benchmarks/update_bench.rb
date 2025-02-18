@@ -36,6 +36,10 @@ Benchmark.ips do |x|
     LogidzeUser.random.update!(params)
   end
 
+  x.report("LogidzeDetached UPDATE #1") do
+    LogidzeDetachedUser.random.update!(params)
+  end
+
   x.compare!
 end
 
@@ -56,6 +60,12 @@ Benchmark.ips do |x|
 
   x.report("Logidze UPDATE #2") do
     user = LogidzeUser.random
+    user.update!(params2.except(*JSON_COLUMNS))
+    user.update!(params2.slice(*JSON_COLUMNS))
+  end
+
+  x.report("Logidze Detached UPDATE #2") do
+    user = LogidzeDetachedUser.random
     user.update!(params2.except(*JSON_COLUMNS))
     user.update!(params2.slice(*JSON_COLUMNS))
   end

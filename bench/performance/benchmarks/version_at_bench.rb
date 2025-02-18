@@ -34,6 +34,10 @@ Benchmark.ips do |x|
     LogidzeUser.random.at(time: ts1)
   end
 
+  x.report("LogidzeDetached AT single") do
+    LogidzeDetachedUser.random.at(time: ts1)
+  end
+
   x.compare!
 end
 
@@ -46,6 +50,10 @@ Benchmark.ips do |x|
 
   x.report("Logidze AT many") do
     LogidzeUser.random(M).at(time: ts1)
+  end
+
+  x.report("LogidzeDetached AT many") do
+    LogidzeDetachedUser.random(M).at(time: ts1)
   end
 
   x.compare!

@@ -36,5 +36,9 @@ Benchmark.ips do |x|
     LogidzeUser.random(N / 2).diff_from(time: ts1)
   end
 
+  x.report("LogidzeDetached DIFF") do
+    LogidzeDetachedUser.random(N / 2).diff_from(time: ts1)
+  end
+
   x.compare!
 end

@@ -14,5 +14,10 @@ module Dummy
 
     config.logger = ENV["LOG"] ? Logger.new($stdout) : Logger.new(IO::NULL)
     config.active_record.dump_schema_after_migration = false
+    config.active_record.yaml_column_permitted_classes = [
+      ActiveSupport::TimeWithZone,
+      ActiveSupport::TimeZone,
+      Time
+    ]
   end
 end
