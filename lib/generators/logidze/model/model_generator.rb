@@ -51,14 +51,12 @@ module Logidze
         migration_template "#{migration_name_prefix}migration.rb.erb", "db/migrate/#{migration_name}.rb"
       end
 
-      # TODO: Refactor after fixing after generation
       def generate_fx_trigger
         return unless fx?
 
-        template_name = after_trigger? ? "logidze_after.sql" : "logidze.sql"
-        template_name = "logidze_detached.sql" if detached?
+        template_name = after_trigger? ? "#{template_name_prefix}_after.sql" : "#{template_name_prefix}.sql"
 
-        template template_name, "db/triggers/#{trigger_name}_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
+        template template_name, "db/triggers/#{template_name_prefix}_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
       end
 
       def inject_logidze_to_model
@@ -207,8 +205,8 @@ module Logidze
         options[:path] || File.join("app", "models", "#{file_path}.rb")
       end
 
-      def trigger_name
-        detached? ? "logidze_detached_on" : "logidze_on"
+      def template_name_prefix
+        detached? ? "logidze_detached" : "logidze"
       end
 
       def migration_name_prefix
