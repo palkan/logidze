@@ -188,7 +188,7 @@ describe Logidze::Detachable, :db do
     end
   end
 
-  describe "undo!", skip: "Fix after trigger implementation" do
+  describe "undo!" do
     it "revert record to previous state", :aggregate_failures do
       expect(user.undo!).to eq true
       user.reload
@@ -216,21 +216,22 @@ describe Logidze::Detachable, :db do
     end
 
     it "return false no possible undo" do
-      u = User.create!(
+      u = DetachedUser.new
+      u.build_logidze_data(
         log_data: {
           "v" => 1,
-          "h" =>
-          [
+          "h" => [
             {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil}}
           ]
         }
       )
+      u.save!
 
       expect(u.undo!).to eq false
     end
   end
 
-  describe "redo!", skip: "Fix after trigger implementation" do
+  describe "redo!" do
     before do
       user.undo!
       user.reload
@@ -262,21 +263,22 @@ describe Logidze::Detachable, :db do
     end
 
     it "return false no possible redo" do
-      u = User.create!(
+      u = DetachedUser.new
+      u.build_logidze_data(
         log_data: {
           "v" => 1,
-          "h" =>
-          [
+          "h" => [
             {"v" => 1, "ts" => time(100), "c" => {"name" => nil, "age" => nil, "active" => nil}}
           ]
         }
       )
+      u.save!
 
       expect(u.redo!).to eq false
     end
   end
 
-  describe "#switch_to!", skip: "Fix after trigger implementation" do
+  describe "#switch_to!" do
     it "revert record to the specified version", :aggregate_failures do
       expect(user.switch_to!(3)).to eq true
       user.reload
@@ -291,8 +293,8 @@ describe Logidze::Detachable, :db do
     end
 
     it "raises ArgumentError if log_data is nil" do
-      user.log_data = nil
-      expect { user.switch_to!(3) }.to raise_error(ArgumentError)
+      user.logidze_data.destroy!
+      expect { user.reload.switch_to!(3) }.to raise_error(ArgumentError)
     end
   end
 
@@ -395,13 +397,13 @@ describe Logidze::Detachable, :db do
     end
   end
 
-  describe "#log_size", skip: "Fix after trigger implementation" do
+  describe "#log_size" do
     subject { user.log_size }
 
     it { is_expected.to eq(user.log_data.size) }
 
-    context "when model created within a without_logging block" do
-      let(:user) { User.create!(name: "test") }
+    context "when model created within a without_logging block", skip: "Fix after spec triggers setup" do
+      let(:user) { DetachedUser.create!(name: "test") }
 
       before { Logidze.without_logging { user } }
 
@@ -409,23 +411,35 @@ describe Logidze::Detachable, :db do
     end
   end
 
-  describe ".reset_log_data", skip: "Fix after trigger implementation" do
+  describe ".reset_log_data" do
     let!(:user2) { user.dup.tap(&:save!) }
-    let!(:user3) { user.dup.tap(&:save!) }
+    let!(:other_user) do
+      DetachedOtherUser.create!(
+        name: "test",
+        age: 10,
+        active: false
+      )
+    end
 
-    before { DetachedUser.limit(2).reset_log_data }
+    before do
+      [user2, other_user].each do |new_user|
+        Logidze::LogidzeData.create!(log_data: user.log_data.dup, loggable: new_user)
+      end
+    end
 
-    it "nullify log_data column for a association" do
+    before { DetachedUser.reset_log_data }
+
+    it "nullify all related log_data" do
       expect(user.reload.log_size).to be_zero
       expect(user2.reload.log_size).to be_zero
     end
 
-    it "not affect other model records" do
-      expect(user3.reload.log_size).to eq 5
+    it "does not affect other types of log_data records" do
+      expect(other_user.reload.log_size).to eq 5
     end
   end
 
-  describe "#reset_log_data", skip: "Fix after trigger implementation" do
+  describe "#reset_log_data" do
     subject { user.log_size }
 
     before { user.reset_log_data }

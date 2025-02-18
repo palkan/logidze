@@ -394,6 +394,7 @@ describe Logidze::Model, :db do
 
     it { is_expected.to eq(user.log_data.size) }
 
+    # TODO: This test is false positive - check for triggers implementation for test env
     context "when model created within a without_logging block" do
       let(:user) { User.create!(name: "test") }
 
