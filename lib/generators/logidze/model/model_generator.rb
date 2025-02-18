@@ -14,6 +14,9 @@ module Logidze
       source_root File.expand_path("templates", __dir__)
       source_paths << File.expand_path("triggers", __dir__)
 
+      class_option :detached, type: :boolean, optional: true,
+        desc: "Store history data in a separate table"
+
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
       class_option :debounce_time, type: :numeric, optional: true,
@@ -45,15 +48,17 @@ module Logidze
           warn "Use only one: --only or --except"
           exit(1)
         end
-        migration_template "migration.rb.erb", "db/migrate/#{migration_name}.rb"
+        migration_template "#{migration_name_prefix}migration.rb.erb", "db/migrate/#{migration_name}.rb"
       end
 
+      # TODO: Refactor after fixing after generation
       def generate_fx_trigger
         return unless fx?
 
         template_name = after_trigger? ? "logidze_after.sql" : "logidze.sql"
+        template_name = "logidze_detached.sql" if detached?
 
-        template template_name, "db/triggers/logidze_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
+        template template_name, "db/triggers/#{trigger_name}_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
       end
 
       def inject_logidze_to_model
@@ -61,7 +66,7 @@ module Logidze
 
         indents = "  " * (class_name.scan("::").count + 1)
 
-        inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze\n")
+        inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze#{detached_option}\n")
       end
 
       no_tasks do
@@ -80,12 +85,20 @@ module Logidze
           "#{config.table_name_prefix}#{table_name}#{config.table_name_suffix}"
         end
 
+        def detached_loggable_type
+          escape_pgsql_string(name)
+        end
+
         def limit
           options[:limit]
         end
 
         def backfill?
           options[:backfill]
+        end
+
+        def detached?
+          options[:detached]
         end
 
         def only_trigger?
@@ -152,6 +165,11 @@ module Logidze
           format_pgsql_args(limit, timestamp_column, filtered_columns, include_columns, debounce_time)
         end
 
+        def logidze_detached_logger_parameters
+          format_pgsql_args(limit, timestamp_column, filtered_columns, include_columns, debounce_time,
+            detached_loggable_type)
+        end
+
         def logidze_snapshot_parameters
           format_pgsql_args("to_jsonb(t)", timestamp_column, filtered_columns, include_columns)
         end
@@ -187,6 +205,18 @@ module Logidze
 
       def model_file_path
         options[:path] || File.join("app", "models", "#{file_path}.rb")
+      end
+
+      def trigger_name
+        detached? ? "logidze_detached_on" : "logidze_on"
+      end
+
+      def migration_name_prefix
+        detached? ? "detached_" : ""
+      end
+
+      def detached_option
+        detached? ? " detached: true" : ""
       end
     end
   end

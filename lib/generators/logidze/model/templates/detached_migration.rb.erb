@@ -1,0 +1,76 @@
+class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+  def change
+<%- if fx? -%>
+  <%- if previous_version -%>
+    update_trigger :logidze_detached_on_<%= table_name %>, on: :<%= table_name %>, version: <%= next_version %>, revert_to_version: <%= previous_version %>
+  <%- else -%>
+    reversible do |dir|
+      dir.up do
+    <%- if update? -%>
+        # Drop legacy trigger if any (<1.0)
+        execute <<~SQL
+          DROP TRIGGER IF EXISTS "logidze_detached_on_<%= full_table_name %>" on "<%= full_table_name %>";
+        SQL
+
+    <%- end -%>
+        create_trigger :logidze_detached_on_<%= table_name %>, on: :<%= table_name %>
+      end
+
+      dir.down do
+        execute <<~SQL
+          DROP TRIGGER IF EXISTS "logidze_detached_on_<%= full_table_name %>" on "<%= full_table_name %>";
+        SQL
+      end
+    end
+  <%- end -%>
+<%- else -%>
+    reversible do |dir|
+      dir.up do
+  <%- if update? -%>
+        execute <<~SQL
+          DROP TRIGGER IF EXISTS "logidze_detached_on_<%= full_table_name %>" on "<%= full_table_name %>";
+        SQL
+
+  <%- end -%>
+        # TODO: fix after_trigger generators later
+        execute <<~SQL
+<%= inject_sql("logidze_detached.sql", indent: 10) %>
+        SQL
+      end
+
+      dir.down do
+  <%- if update? -%>
+        # NOTE: We have no idea on how to revert the migration
+        # ('cause we don't know the previous trigger params),
+        # but you can do that on your own.
+        #
+        # Uncomment this line if you want to raise an error.
+        # raise ActiveRecord::IrreversibleMigration
+  <%- else -%>
+        execute <<~SQL
+          DROP TRIGGER IF EXISTS "logidze_detached_on_<%= full_table_name %>" on "<%= full_table_name %>";
+        SQL
+  <%- end -%>
+      end
+    end
+<%- end -%>
+<%- if backfill? -%>
+
+    reversible do |dir|
+      dir.up do
+        execute <<~SQL
+          insert into logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
+          select logidze_snapshot(<%= logidze_snapshot_parameters %>), <%= detached_loggable_type %>, t.id, current_timestamp, current_timestamp
+          from <%= full_table_name %> t
+          where t.id not in (
+            select ld.loggable_id
+            from logidze_data ld
+            inner join <%= full_table_name %> t on ld.loggable_id = t.id
+            and ld.loggable_type = <%= detached_loggable_type %>
+          );
+        SQL
+      end
+    end
+<%- end -%>
+  end
+end
