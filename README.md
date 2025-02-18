@@ -203,6 +203,15 @@ bundle exec rails generate logidze:model Post --after-trigger
 
 **IMPORTANT:** Using Logidze for partitioned tables in PostgreSQL 10 is not supported.
 
+### Storing history data in a separate table
+
+By default, Logidze stores history data in the `log_data` column in the origin record table, which might lead to table bloat.
+If it concerns you, you may configure Logidze to store history data in a separate table by providing `--detached` option to the migration:
+
+```sh
+bundle exec rails logidze:model Post --detached
+```
+
 ## Usage
 
 ### Basic API
