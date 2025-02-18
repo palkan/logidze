@@ -3,6 +3,7 @@
 ## master (unreleased)
 
 - Support Rails 7.2 ([@atomaka][])
+- Add `--detached` option to store `log_data` in a separate `logidze_data` table to avoid table bloat.
 
 ## 1.3.1 (2024-10-23)
 
