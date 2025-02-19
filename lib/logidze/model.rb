@@ -184,6 +184,8 @@ module Logidze
 
     # Restore record to the specified version.
     # Return false if version is unknown.
+    #
+    # Keep in sync with +Logidze::Detachable.switch_to!+
     def switch_to!(version, append: Logidze.append_on_undo)
       raise ArgumentError, "#log_data is empty" unless log_data
 
