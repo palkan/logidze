@@ -138,11 +138,11 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
             is_expected.to be_a_file
             is_expected.to contain(/insert into logidze_data \(log_data, loggable_type, loggable_id, created_at, updated_at\)/i)
             is_expected.to contain(/select logidze_snapshot\(to_jsonb\(t\), 'updated_at'\), 'User', t.id, current_timestamp, current_timestamp/i)
-            is_expected.to contain(/from users t/i)
+            is_expected.to contain(/from #{full_table_name("users")} t/i)
             is_expected.to contain(/where t.id not in/i)
             is_expected.to contain(/select ld.loggable_id/i)
             is_expected.to contain(/from logidze_data ld/i)
-            is_expected.to contain(/inner join users t on ld.loggable_id = t.id/i)
+            is_expected.to contain(/inner join #{full_table_name("users")} t on ld.loggable_id = t.id/i)
             is_expected.to contain(/and ld.loggable_type = 'User'/i)
           end
         end
