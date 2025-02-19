@@ -114,46 +114,46 @@ When each record has 10 versions:
 
 ```sh
 Plain records
-Total Allocated:				            44.46 KB
-Total Retained:					            22.55 KB
-Retained_memsize memory (per record):		2.39 KB
+Total Allocated:                            44.46 KB
+Total Retained:                             22.55 KB
+Retained_memsize memory (per record):       2.39 KB
 
 PT with versions
-Total Allocated:				            393.6 KB
-Total Retained:					            226.78 KB
-Retained_memsize memory (per record):		206.05 KB
+Total Allocated:                            393.6 KB
+Total Retained:                             226.78 KB
+Retained_memsize memory (per record):       206.05 KB
 
 Logidze records
-Total Allocated:				            77.39 KB
-Total Retained:					            38.97 KB
-Retained_memsize memory (per record):		3.8 KB
+Total Allocated:                            77.39 KB
+Total Retained:                             38.97 KB
+Retained_memsize memory (per record):       3.8 KB
 
 LogidzeDetached records
-Total Allocated:				            53.84 KB
-Total Retained:					            24.1 KB
-Retained_memsize memory (per record):		-2288 B
+Total Allocated:                            53.84 KB
+Total Retained:                             24.1 KB
+Retained_memsize memory (per record):       -2288 B
 ```
 
 When each record has 100 versions:
 
 ```sh
 Plain records
-Total Allocated:				            43.21 KB
-Total Retained:					            21.93 KB
-Retained_memsize memory (per record):		2.27 KB
+Total Allocated:                            43.21 KB
+Total Retained:                             21.93 KB
+Retained_memsize memory (per record):       2.27 KB
 
 PT with versions
-Total Allocated:				            3.23 MB
-Total Retained:					            1.95 MB
-Retained_memsize memory (per record):		1.93 MB
+Total Allocated:                            3.23 MB
+Total Retained:                             1.95 MB
+Retained_memsize memory (per record):       1.93 MB
 
 Logidze records
-Total Allocated:				            279.76 KB
-Total Retained:					            140.16 KB
-Retained_memsize memory (per record):		14.14 KB
+Total Allocated:                            279.76 KB
+Total Retained:                             140.16 KB
+Retained_memsize memory (per record):       14.14 KB
 
 LogidzeDetached records
-Total Allocated:				            53.22 KB
-Total Retained:					            23.79 KB
-Retained_memsize memory (per record):		-1928 B
+Total Allocated:                            53.22 KB
+Total Retained:                             23.79 KB
+Retained_memsize memory (per record):       -1928 B
 ```
