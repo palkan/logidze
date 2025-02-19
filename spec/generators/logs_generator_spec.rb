@@ -23,8 +23,9 @@ describe Logidze::Generators::Migration::LogsGenerator, type: :generator do
       is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
       is_expected.to contain "create_table :logidze_data"
       is_expected.to contain "t.jsonb :log_data"
-      is_expected.to contain "t.belongs_to :loggable, polymorphic: true"
+      is_expected.to contain "t.belongs_to :loggable, polymorphic: true, index: false"
       is_expected.to contain "t.timestamps"
+      is_expected.to contain "t.index %w[loggable_type loggable_id], name: \"index_logidze_loggable\""
     end
   end
 end
