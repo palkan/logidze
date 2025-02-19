@@ -37,6 +37,7 @@ Other requirements:
   - [Logs timestamps](#logs-timestamps)
   - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
   - [Using with partitioned tables](#using-with-partitioned-tables)
+  - [Storing history data in a separate table](#storing-history-data-in-a-separate-table)
 - [Usage](#usage)
   - [Basic API](#basic-api)
   - [Track meta information](#track-meta-information)
