@@ -212,6 +212,8 @@ If it concerns you, you may configure Logidze to store history data in a separat
 bundle exec rails logidze:model Post --detached
 ```
 
+**IMPORTANT:** Using `--detached` mode for storing historic data negatively affects performance, although it is still better compared to PaperTrail.
+
 ## Usage
 
 ### Basic API
