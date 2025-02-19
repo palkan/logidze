@@ -13,11 +13,33 @@ module Logidze
     module ClassMethods # :nodoc:
       # Nullify log_data column for a association
       def reset_log_data
-        without_logging { Logidze::LogidzeData.where(loggable_type: name).destroy_all }
+        Logidze::LogidzeData.where(loggable_type: name).destroy_all
       end
 
       # Initialize log_data with the current state if it's null
       def create_logidze_snapshot(timestamp: nil, only: nil, except: nil)
+        ActiveRecord::Base.connection.execute <<~SQL.squish
+          INSERT INTO logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
+          SELECT logidze_snapshot(
+              to_jsonb(#{quoted_table_name}),
+              #{snapshot_query_args(timestamp: timestamp, only: only, except: except)}
+            ),
+            '#{name}',
+            #{quoted_table_name}.id,
+            current_timestamp,
+            current_timestamp
+          FROM #{quoted_table_name}
+          WHERE #{quoted_table_name}.id NOT IN (
+            SELECT ld.loggable_id
+            FROM logidze_data ld
+            INNER JOIN #{quoted_table_name} on ld.loggable_id = #{quoted_table_name}.id
+            AND ld.loggable_type = '#{name}'
+          );
+        SQL
+      end
+
+      # Computes args for creating initializing snapshots in +.create_logidze_snapshot+ and +#create_logidze_snapshot!+
+      def snapshot_query_args(timestamp: nil, only: nil, except: nil)
         args = ["'null'"]
 
         args[0] = "'#{timestamp}'" if timestamp
@@ -29,20 +51,7 @@ module Logidze
           args[2] = only ? "true" : "false"
         end
 
-        query = <<~SQL
-          insert into logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
-          select logidze_snapshot(to_jsonb(#{quoted_table_name}), #{args.join(", ")}), '#{name}', 
-                 #{quoted_table_name}.id, current_timestamp, current_timestamp
-          from #{quoted_table_name}
-          where #{quoted_table_name}.id not in (
-            select ld.loggable_id
-            from logidze_data ld
-            inner join #{quoted_table_name} on ld.loggable_id = #{quoted_table_name}.id 
-            and ld.loggable_type = '#{name}'
-          );
-        SQL
-
-        without_logging { ActiveRecord::Base.connection.execute(query) }
+        args.join(", ")
       end
     end
 
@@ -62,40 +71,35 @@ module Logidze
       Logidze::LogidzeData.where(loggable: self).destroy_all
     end
 
-    # TODO: refactor to align with .create_logidze_snapshot
+    # Initialize log_data with the current state if it's null for a single record
     def create_logidze_snapshot!(timestamp: nil, only: nil, except: nil)
-      args = ["'null'"]
-
-      args[0] = "'#{timestamp}'" if timestamp
-
-      columns = only || except
-
-      if columns
-        args[1] = "'{#{columns.join(",")}}'"
-        args[2] = only ? "true" : "false"
-      end
-
-      query = <<~SQL
-        insert into logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
-        select logidze_snapshot(to_jsonb(#{self.class.quoted_table_name}), #{args.join(", ")}), '#{self.class.name}', 
-               #{self.class.quoted_table_name}.id, current_timestamp, current_timestamp
-        from #{self.class.quoted_table_name}
-        where #{self.class.quoted_table_name}.id not in (
-          select ld.loggable_id
-          from logidze_data ld
-          inner join #{self.class.quoted_table_name} on ld.loggable_id = #{self.class.quoted_table_name}.id 
-          and ld.loggable_type = '#{self.class.name}'
+      ActiveRecord::Base.connection.execute <<~SQL.squish
+        INSERT INTO logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
+        SELECT logidze_snapshot(
+            to_jsonb(#{self.class.quoted_table_name}),
+            #{self.class.snapshot_query_args(timestamp: timestamp, only: only, except: except)}
+          ),
+          '#{self.class.name}',
+          #{self.class.quoted_table_name}.id,
+          current_timestamp,
+          current_timestamp
+        FROM #{self.class.quoted_table_name}
+        WHERE #{self.class.quoted_table_name}.id NOT IN (
+          SELECT ld.loggable_id
+          FROM logidze_data ld
+          INNER JOIN #{self.class.quoted_table_name} on ld.loggable_id = #{self.class.quoted_table_name}.id
+          AND ld.loggable_type = '#{self.class.name}'
         )
-        and #{self.class.quoted_table_name}.id = #{id};
+        AND #{self.class.quoted_table_name}.id = #{id};
       SQL
-
-      Logidze.without_logging { ActiveRecord::Base.connection.execute(query) }
 
       reload_log_data
     end
 
     # Restore record to the specified version.
     # Return false if version is unknown.
+    #
+    # Keep in sync with +Logidze::Model.switch_to!+
     def switch_to!(version, append: Logidze.append_on_undo)
       raise ArgumentError, "#log_data is empty" unless Logidze::LogidzeData.exists?(loggable: self)
 
@@ -120,8 +124,7 @@ module Logidze
 
     def build_dup(log_entry, requested_ts = log_entry.time)
       object_at = dup
-      logidze_data_at = logidze_data.dup
-      object_at.logidze_data = logidze_data_at
+      object_at.logidze_data = logidze_data.dup
       object_at.apply_diff(log_entry.version, log_data.changes_to(version: log_entry.version))
       object_at.id = id
       object_at.logidze_requested_ts = requested_ts
