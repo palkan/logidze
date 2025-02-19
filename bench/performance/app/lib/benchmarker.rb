@@ -13,6 +13,7 @@ module Benchmarker
       User.create!(params) unless skip_user
       PaperTrailUser.create!(params)
       LogidzeUser.create!(params)
+      LogidzeDetachedUser.create!(params)
     end
 
     $stdout.puts "Done in #{Time.current - ts}s"
@@ -23,6 +24,7 @@ module Benchmarker
     PaperTrailUser.delete_all
     User.delete_all
     PaperTrail::Version.delete_all
+    LogidzeDetachedUser.delete_all
   end
 
   def generate_versions(num = 1)
@@ -36,6 +38,10 @@ module Benchmarker
       end
 
       LogidzeUser.find_each do |u|
+        u.update!(fake_params(sample: true))
+      end
+
+      LogidzeDetachedUser.find_each do |u|
         u.update!(fake_params(sample: true))
       end
 

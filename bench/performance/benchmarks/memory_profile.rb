@@ -54,4 +54,4 @@ end
 MemoryReport.call("Plain records", User.all)
 MemoryReport.call("PT with versions", PaperTrailUser.joins(:versions).all)
 MemoryReport.call("Logidze records", LogidzeUser.all)
-MemoryReport.call("LogidzeDetached records", LogidzeDetachedUser.all)
+MemoryReport.call("LogidzeDetached records", LogidzeDetachedUser.joins(:logidze_data).all)
