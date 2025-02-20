@@ -413,6 +413,7 @@ describe Logidze::Detachable, :db do
 
   describe ".reset_log_data" do
     let!(:user2) { user.dup.tap(&:save!) }
+    let!(:user3) { user.dup.tap(&:save!) }
     let!(:other_user) do
       DetachedOtherUser.create!(
         name: "test",
@@ -422,12 +423,12 @@ describe Logidze::Detachable, :db do
     end
 
     before do
-      [user2, other_user].each do |new_user|
+      [user2, user3, other_user].each do |new_user|
         Logidze::LogidzeData.create!(log_data: user.log_data.dup, loggable: new_user)
       end
     end
 
-    before { DetachedUser.reset_log_data }
+    before { DetachedUser.limit(2).reset_log_data }
 
     it "nullify all related log_data" do
       expect(user.reload.log_size).to be_zero
@@ -436,6 +437,10 @@ describe Logidze::Detachable, :db do
 
     it "does not affect other types of log_data records" do
       expect(other_user.reload.log_size).to eq 5
+    end
+
+    it "does not affect model records outside of the association scope" do
+      expect(user3.reload.log_size).to eq 5
     end
   end
 
