@@ -7,13 +7,15 @@ module Logidze
     included do
       has_one :logidze_data, as: :loggable, class_name: "Logidze::LogidzeData", dependent: :destroy
 
-      delegate :log_data, to: :logidze_data
+      delegate :log_data, to: :logidze_data, allow_nil: true
     end
 
     module ClassMethods # :nodoc:
       # Nullify log_data column for a association
+      #
+      # @return [Integer] number of deleted +Logidze::LogidzeData+ records
       def reset_log_data
-        Logidze::LogidzeData.where(loggable_type: name).destroy_all
+        Logidze::LogidzeData.where(loggable_id: ids, loggable_type: name).delete_all
       end
 
       # Initialize log_data with the current state if it's null
@@ -60,15 +62,9 @@ module Logidze
       self.log_data = Logidze::LogidzeData.where(loggable: self).first.log_data
     end
 
-    def log_size
-      return 0 if logidze_data.nil?
-
-      log_data&.size || 0
-    end
-
     # Nullify log_data column for a single record
     def reset_log_data
-      Logidze::LogidzeData.where(loggable: self).destroy_all
+      tap { logidze_data.delete }.reload_logidze_data
     end
 
     # Initialize log_data with the current state if it's null for a single record
