@@ -5,7 +5,7 @@ module Logidze
     extend ActiveSupport::Concern
 
     included do
-      has_one :logidze_data, as: :loggable, class_name: "::Logidze::LogidzeData", dependent: :destroy
+      has_one :logidze_data, as: :loggable, class_name: "::Logidze::LogidzeData", dependent: :destroy, autosave: true
 
       delegate :log_data, to: :logidze_data, allow_nil: true
     end
@@ -86,30 +86,6 @@ module Logidze
       SQL
 
       reload_log_data
-    end
-
-    # Restore record to the specified version.
-    # Return false if version is unknown.
-    #
-    # Keep in sync with +Logidze::Model.switch_to!+
-    def switch_to!(version, append: Logidze.append_on_undo)
-      raise ArgumentError, "#log_data is empty" unless Logidze::LogidzeData.exists?(loggable: self)
-
-      return false unless at_version(version)
-
-      if append && version < log_version
-        changes = log_data.changes_to(version: version)
-        changes.each { |c, v| changes[c] = deserialize_value(c, v) }
-        update!(changes)
-      else
-        at_version!(version)
-        self.class.without_logging do
-          ActiveRecord::Base.transaction do
-            save!
-            logidze_data.save!
-          end
-        end
-      end
     end
 
     protected
