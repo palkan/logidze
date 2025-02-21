@@ -85,7 +85,7 @@ module Logidze
         end
 
         def detached_loggable_type
-          escape_pgsql_string(name) if detached?
+          escape_pgsql_string(class_name) if detached?
         end
 
         def limit
