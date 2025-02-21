@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
-  -- version: 4
+  -- version: 5
   DECLARE
     changes jsonb;
     version jsonb;
@@ -15,6 +15,14 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     item record;
     columns text[];
     include_columns boolean;
+    detached_log_data jsonb;
+    -- We use `detached_loggable_type` for:
+    -- 1. Checking if current implementation is `--detached` (`log_data` is stored in a separated table)
+    -- 2. If implementation is `--detached` then we use detached_loggable_type to determine
+    --    to which table current `log_data` record belongs
+    detached_loggable_type text;
+    log_data_is_empty boolean;
+    log_data_ts_key_data text;
     ts timestamp with time zone;
     ts_column text;
     err_sqlstate text;
@@ -30,8 +38,26 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     ts_column := NULLIF(TG_ARGV[1], 'null');
     columns := NULLIF(TG_ARGV[2], 'null');
     include_columns := NULLIF(TG_ARGV[3], 'null');
+    detached_loggable_type := NULLIF(TG_ARGV[5], 'null');
 
-    IF NEW.log_data is NULL OR NEW.log_data = '{}'::jsonb
+    -- getting previous log_data if it exists for detached `log_data` storage variant
+    IF detached_loggable_type IS NOT NULL
+    THEN
+      SELECT ld.log_data INTO detached_log_data
+      FROM logidze_data ld
+      WHERE ld.loggable_type = detached_loggable_type
+        AND ld.loggable_id = NEW.id
+      LIMIT 1;
+    END IF;
+
+    IF detached_loggable_type IS NULL
+    THEN
+        log_data_is_empty = NEW.log_data is NULL OR NEW.log_data = '{}'::jsonb;
+    ELSE
+        log_data_is_empty = detached_log_data IS NULL OR detached_log_data = '{}'::jsonb;
+    END IF;
+
+    IF log_data_is_empty
     THEN
       IF columns IS NOT NULL THEN
         log_data = logidze_snapshot(to_jsonb(NEW.*), ts_column, columns, include_columns);
@@ -40,7 +66,13 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       END IF;
 
       IF log_data#>>'{h, -1, c}' != '{}' THEN
-        NEW.log_data := log_data;
+        IF detached_loggable_type IS NULL
+        THEN
+          NEW.log_data := log_data;
+        ELSE
+          INSERT INTO logidze_data (log_data, loggable_type, loggable_id)
+          VALUES (log_data, detached_loggable_type, NEW.id);
+        END IF;
       END IF;
 
     ELSE
@@ -52,7 +84,12 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       history_limit := NULLIF(TG_ARGV[0], 'null');
       debounce_time := NULLIF(TG_ARGV[4], 'null');
 
-      log_data := NEW.log_data;
+      IF detached_loggable_type IS NULL
+      THEN
+          log_data := NEW.log_data;
+      ELSE
+          log_data := detached_log_data;
+      END IF;
 
       current_version := (log_data->>'v')::int;
 
@@ -65,8 +102,16 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         END IF;
       ELSEIF TG_OP = 'INSERT' THEN
         ts := (to_jsonb(NEW.*) ->> ts_column)::timestamp with time zone;
-        IF ts IS NULL OR (extract(epoch from ts) * 1000)::bigint = (NEW.log_data #>> '{h,-1,ts}')::bigint THEN
-          ts := statement_timestamp();
+
+        IF detached_loggable_type IS NULL
+        THEN
+          log_data_ts_key_data = NEW.log_data #>> '{h,-1,ts}';
+        ELSE
+          log_data_ts_key_data = detached_log_data #>> '{h,-1,ts}';
+        END IF;
+
+        IF ts IS NULL OR (extract(epoch from ts) * 1000)::bigint = log_data_ts_key_data::bigint THEN
+            ts := statement_timestamp();
         END IF;
       END IF;
 
@@ -123,7 +168,12 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         END;
       END IF;
 
-      changes = changes - 'log_data';
+      -- We store `log_data` in a separate table for the `detached` mode
+      -- So we remove `log_data` only when we store historic data in the record's origin table
+      IF detached_loggable_type IS NULL
+      THEN
+          changes = changes - 'log_data';
+      END IF;
 
       IF columns IS NOT NULL THEN
         changes = logidze_filter_keys(changes, columns, include_columns);
@@ -170,7 +220,16 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         log_data := logidze_compact_history(log_data, size - history_limit + 1);
       END IF;
 
-      NEW.log_data := log_data;
+      IF detached_loggable_type IS NULL
+      THEN
+        NEW.log_data := log_data;
+      ELSE
+        detached_log_data = log_data;
+        UPDATE logidze_data
+        SET log_data = detached_log_data
+        WHERE logidze_data.loggable_type = detached_loggable_type
+          AND logidze_data.loggable_id = NEW.id;
+      END IF;
     END IF;
 
     RETURN NEW; -- result

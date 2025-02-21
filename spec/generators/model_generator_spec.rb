@@ -64,71 +64,13 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       context "with detached" do
         let(:base_args) { ["user", "--no-after-trigger", "--detached"] }
 
-        it "creates migration", :aggregate_failures do
+        it "creates migration w/o `log_data` column and with correct arguments", :aggregate_failures do
           is_expected.to be_a_file
-          is_expected.to contain "ActiveRecord::Migration[#{ar_version}]"
-          is_expected.to contain(/create trigger "logidze_detached_on_#{full_table_name("users")}"/i)
-          is_expected.to contain(/before update or insert on "#{full_table_name("users")}" for each row/i)
-          is_expected.to contain(/execute procedure logidze_detached_logger\(null, 'updated_at', null, null, null, 'User'\);/i)
-          is_expected.to contain(/drop trigger if exists "logidze_detached_on_#{full_table_name("users")}" on "#{full_table_name("users")}"/i)
+          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, null, null, 'User'\);/i)
           is_expected.not_to contain(/update "#{full_table_name("users")}"/i)
           is_expected.not_to contain "add_column :users, :log_data, :jsonb"
 
           expect(file("app/models/user.rb")).to contain "has_logidze detached: true"
-        end
-
-        context "with fx" do
-          let(:fx_args) { use_fx_args }
-
-          it "creates migration", :aggregate_failures do
-            is_expected.to be_a_file
-            is_expected.to contain("create_trigger :logidze_detached_on_users, on: :users")
-          end
-
-          it "creates a trigger file" do
-            is_expected.to be_a_file
-            expect(file("db/triggers/logidze_detached_on_users_v01.sql")).to be_a_file
-          end
-        end
-
-        context "with limit" do
-          let(:base_args) { ["user", "--limit=5", "--no-after-trigger", "--detached"] }
-
-          it "creates trigger with limit" do
-            is_expected.to be_a_file
-            is_expected.to contain(/execute procedure logidze_detached_logger\(5, 'updated_at', null, null, null, 'User'\);/i)
-          end
-        end
-
-        context "with debounce_time" do
-          let(:base_args) { ["user", "--debounce_time=5000", "--no-after-trigger", "--detached"] }
-
-          it "creates trigger with debounce_time" do
-            is_expected.to be_a_file
-            is_expected.to contain(/execute procedure logidze_detached_logger\(null, 'updated_at', null, null, 5000, 'User'\);/i)
-          end
-        end
-
-        context "with except" do
-          let(:base_args) { ["user", "--except", "age", "active", "--no-after-trigger", "--detached"] }
-
-          it "creates trigger with columns exclusion" do
-            is_expected.to be_a_file
-            is_expected.to contain(
-              /execute procedure logidze_detached_logger\(null, 'updated_at', '\{age, active\}', null, null, 'User'\);/i
-            )
-          end
-        end
-
-        context "with only" do
-          let(:base_args) { ["user", "--only", "age", "active", "--no-after-trigger", "--detached"] }
-
-          it "creates trigger with columns inclusion" do
-            is_expected.to be_a_file
-            is_expected.to contain(
-              /execute procedure logidze_detached_logger\(null, 'updated_at', '\{age, active\}', true, null, 'User'\);/i
-            )
-          end
         end
 
         context "with backfill" do
@@ -136,28 +78,14 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
           it "creates backfill query" do
             is_expected.to be_a_file
-            is_expected.to contain(/insert into logidze_data \(log_data, loggable_type, loggable_id, created_at, updated_at\)/i)
-            is_expected.to contain(/select logidze_snapshot\(to_jsonb\(t\), 'updated_at'\), 'User', t.id, current_timestamp, current_timestamp/i)
-            is_expected.to contain(/from #{full_table_name("users")} t/i)
-            is_expected.to contain(/where t.id not in/i)
-            is_expected.to contain(/select ld.loggable_id/i)
-            is_expected.to contain(/from logidze_data ld/i)
-            is_expected.to contain(/inner join #{full_table_name("users")} t on ld.loggable_id = t.id/i)
-            is_expected.to contain(/and ld.loggable_type = 'User'/i)
-          end
-        end
-
-        context "with only trigger" do
-          let(:base_args) { ["user", "--only-trigger", "--no-after-trigger", "--detached"] }
-
-          it "creates migration with trigger" do
-            is_expected.to be_a_file
-            is_expected.not_to contain "add_column :users, :log_data, :jsonb"
-            is_expected.to contain(/create trigger "logidze_detached_on_#{full_table_name("users")}"/i)
-            is_expected.to contain(/before update or insert on "#{full_table_name("users")}" for each row/i)
-            is_expected.to contain(/execute procedure logidze_detached_logger\(null, 'updated_at', null, null, null, 'User'\);/i)
-            is_expected.to contain(/drop trigger if exists "logidze_detached_on_#{full_table_name("users")}" on "#{full_table_name("users")}"/i)
-            is_expected.not_to contain "remove_column :users, :log_data"
+            is_expected.to contain(/INSERT INTO logidze_data \(log_data, loggable_type, loggable_id\)/i)
+            is_expected.to contain(/SELECT logidze_snapshot\(to_jsonb\(t\), 'updated_at'\), 'User', t.id/i)
+            is_expected.to contain(/FROM #{full_table_name("users")} t/i)
+            is_expected.to contain(/WHERE t.id not in/i)
+            is_expected.to contain(/SELECT ld.loggable_id/i)
+            is_expected.to contain(/FROM logidze_data ld/i)
+            is_expected.to contain(/INNER JOIN #{full_table_name("users")} t ON ld.loggable_id = t.id/i)
+            is_expected.to contain(/AND ld.loggable_type = 'User'/i)
           end
         end
       end

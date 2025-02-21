@@ -87,20 +87,19 @@ module Logidze
           source.sub!(/^CREATE OR REPLACE FUNCTION logidze_logger.*$/, "")
           source.sub!(/^  -- version.*$/, "")
           source.gsub!("RETURN NEW; -- pass", "RETURN NULL;")
-          source.gsub!("RETURN NEW; -- result", "    EXECUTE format('UPDATE %I.%I SET \"log_data\" = $1 WHERE ctid = %L', TG_TABLE_SCHEMA, TG_TABLE_NAME, NEW.CTID) USING NEW.log_data;\n    RETURN NULL;")
+
+          return_condition = <<~SQL
+            IF detached_loggable_type IS NULL
+                THEN
+                  EXECUTE format('UPDATE %I.%I SET "log_data" = $1 WHERE ctid = %L', TG_TABLE_SCHEMA, TG_TABLE_NAME, NEW.CTID) USING NEW.log_data;
+                END IF;
+
+                RETURN NULL;
+          SQL
+          source.gsub!("RETURN NEW; -- result", return_condition)
+
           source
         end
-      end
-
-      # Generate `logidze_detached_logger_after.sql` from the regular `logidze_detached_logger.sql`
-      # by find-and-replacing a few lines
-      def generate_logidze_detached_logger_after
-        source = File.read(File.join(__dir__, "functions", "logidze_detached_logger.sql"))
-        source.sub!(/^CREATE OR REPLACE FUNCTION logidze_detached_logger.*$/, "")
-        source.sub!(/^  -- version.*$/, "")
-        source.gsub!("RETURN NEW; -- pass", "RETURN NULL;")
-        source.gsub!("RETURN NEW; -- result", "RETURN NULL;")
-        source
       end
 
       def self.next_migration_number(dir)

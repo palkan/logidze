@@ -1,6 +1,6 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
   def change
-<%- unless update? || only_trigger? -%>
+<%- unless update? || only_trigger? || detached? -%>
     add_column :<%= table_name %>, :log_data, :jsonb
 <%- end -%>
 
@@ -61,10 +61,24 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
 
     reversible do |dir|
       dir.up do
-        execute <<~SQL
-          UPDATE "<%= full_table_name %>" as t
-          SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
-        SQL
+        <%- if detached?  %>
+          execute <<~SQL
+            INSERT INTO logidze_data (log_data, loggable_type, loggable_id)
+            SELECT logidze_snapshot(<%= logidze_snapshot_parameters %>), <%= detached_loggable_type %>, t.id
+            FROM <%= full_table_name %> t
+            WHERE t.id NOT IN (
+              SELECT ld.loggable_id
+              FROM logidze_data ld
+              INNER JOIN <%= full_table_name %> t ON ld.loggable_id = t.id
+              AND ld.loggable_type = <%= detached_loggable_type %>
+            );
+          SQL
+        <%- else %>
+          execute <<~SQL
+            UPDATE "<%= full_table_name %>" as t
+            SET log_data = logidze_snapshot(<%= logidze_snapshot_parameters %>);
+          SQL
+        <%- end %>
       end
     end
 <%- end -%>
