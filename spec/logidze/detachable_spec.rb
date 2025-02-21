@@ -391,9 +391,12 @@ describe Logidze::Detachable, :db do
   end
 
   describe "#reload_log_data" do
-    it "returns log_data" do
-      expect(Logidze::LogidzeData).to receive(:where).and_call_original
-      expect(user.reload_log_data).to eq(user.log_data)
+    it "returns log_data from DB" do
+      db_value = user.log_data
+      stale_value = {}
+      user.logidze_data.log_data = stale_value
+
+      expect(user.reload_log_data).to eq(db_value)
     end
   end
 

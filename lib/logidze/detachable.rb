@@ -57,7 +57,7 @@ module Logidze
 
     # Loads log_data field from the database, stores to the attributes hash and returns it
     def reload_log_data
-      self.log_data = Logidze::LogidzeData.where(loggable: self).first.log_data
+      reload_logidze_data.log_data
     end
 
     # Nullify log_data column for a single record
