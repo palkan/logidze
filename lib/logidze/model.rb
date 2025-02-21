@@ -263,14 +263,16 @@ module Logidze
       write_attribute column, deserialize_value(column, value)
     end
 
-    def build_dup(log_entry, requested_ts = log_entry.time)
-      object_at = dup
+    # rubocop: disable Lint/ShadowedArgument
+    def build_dup(log_entry, requested_ts = log_entry.time, object_at: nil)
+      object_at ||= dup
       object_at.apply_diff(log_entry.version, log_data.changes_to(version: log_entry.version))
       object_at.id = id
       object_at.logidze_requested_ts = requested_ts
 
       object_at
     end
+    # rubocop: enable Lint/ShadowedArgument
 
     def deserialize_value(column, value)
       @attributes[column].type.deserialize(value)
