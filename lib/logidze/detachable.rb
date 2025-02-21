@@ -118,14 +118,12 @@ module Logidze
 
     protected
 
-    def build_dup(log_entry, requested_ts = log_entry.time)
+    # rubocop: disable Lint/ShadowedArgument
+    def build_dup(log_entry, requested_ts = log_entry.time, object_at: nil)
       object_at = dup
       object_at.logidze_data = logidze_data.dup
-      object_at.apply_diff(log_entry.version, log_data.changes_to(version: log_entry.version))
-      object_at.id = id
-      object_at.logidze_requested_ts = requested_ts
-
-      object_at
+      super
     end
+    # rubocop: enable Lint/ShadowedArgument
   end
 end
