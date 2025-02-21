@@ -21,15 +21,13 @@ module Logidze
       # Initialize log_data with the current state if it's null
       def create_logidze_snapshot(timestamp: nil, only: nil, except: nil)
         ActiveRecord::Base.connection.execute <<~SQL.squish
-          INSERT INTO logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
+          INSERT INTO logidze_data (log_data, loggable_type, loggable_id)
           SELECT logidze_snapshot(
               to_jsonb(#{quoted_table_name}),
               #{snapshot_query_args(timestamp: timestamp, only: only, except: except)}
             ),
             '#{name}',
-            #{quoted_table_name}.id,
-            current_timestamp,
-            current_timestamp
+            #{quoted_table_name}.id
           FROM #{quoted_table_name}
           WHERE #{quoted_table_name}.id NOT IN (
             SELECT ld.loggable_id
@@ -70,15 +68,13 @@ module Logidze
     # Initialize log_data with the current state if it's null for a single record
     def create_logidze_snapshot!(timestamp: nil, only: nil, except: nil)
       ActiveRecord::Base.connection.execute <<~SQL.squish
-        INSERT INTO logidze_data (log_data, loggable_type, loggable_id, created_at, updated_at)
+        INSERT INTO logidze_data (log_data, loggable_type, loggable_id)
         SELECT logidze_snapshot(
             to_jsonb(#{self.class.quoted_table_name}),
             #{self.class.snapshot_query_args(timestamp: timestamp, only: only, except: except)}
           ),
           '#{self.class.name}',
-          #{self.class.quoted_table_name}.id,
-          current_timestamp,
-          current_timestamp
+          #{self.class.quoted_table_name}.id
         FROM #{self.class.quoted_table_name}
         WHERE #{self.class.quoted_table_name}.id NOT IN (
           SELECT ld.loggable_id

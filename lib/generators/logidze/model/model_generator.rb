@@ -48,23 +48,24 @@ module Logidze
           warn "Use only one: --only or --except"
           exit(1)
         end
-        migration_template "#{migration_name_prefix}migration.rb.erb", "db/migrate/#{migration_name}.rb"
+        migration_template "migration.rb.erb", "db/migrate/#{migration_name}.rb"
       end
 
       def generate_fx_trigger
         return unless fx?
 
-        template_name = after_trigger? ? "#{template_name_prefix}_after.sql" : "#{template_name_prefix}.sql"
+        template_name = after_trigger? ? "logidze_after.sql" : "logidze.sql"
 
-        template template_name, "db/triggers/#{template_name_prefix}_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
+        template template_name, "db/triggers/logidze_on_#{table_name}_v#{next_version.to_s.rjust(2, "0")}.sql"
       end
 
       def inject_logidze_to_model
         return if update?
 
         indents = "  " * (class_name.scan("::").count + 1)
+        macros_name = detached? ? "has_logidze detached: true\n" : "has_logidze\n"
 
-        inject_into_class(model_file_path, class_name.demodulize, "#{indents}has_logidze#{detached_option}\n")
+        inject_into_class(model_file_path, class_name.demodulize, indents + macros_name)
       end
 
       no_tasks do
@@ -84,7 +85,7 @@ module Logidze
         end
 
         def detached_loggable_type
-          escape_pgsql_string(name)
+          escape_pgsql_string(name) if detached?
         end
 
         def limit
@@ -160,10 +161,6 @@ module Logidze
         end
 
         def logidze_logger_parameters
-          format_pgsql_args(limit, timestamp_column, filtered_columns, include_columns, debounce_time)
-        end
-
-        def logidze_detached_logger_parameters
           format_pgsql_args(limit, timestamp_column, filtered_columns, include_columns, debounce_time,
             detached_loggable_type)
         end
@@ -203,18 +200,6 @@ module Logidze
 
       def model_file_path
         options[:path] || File.join("app", "models", "#{file_path}.rb")
-      end
-
-      def template_name_prefix
-        detached? ? "logidze_detached" : "logidze"
-      end
-
-      def migration_name_prefix
-        detached? ? "detached_" : ""
-      end
-
-      def detached_option
-        detached? ? " detached: true" : ""
       end
     end
   end
