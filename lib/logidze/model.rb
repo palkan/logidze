@@ -17,13 +17,17 @@ module Logidze
 
     module ClassMethods # :nodoc:
       # Return records reverted to specified time
-      def at(time: nil, version: nil)
-        all.to_a.filter_map { |record| record.at(time: time, version: version) }
+      def at(time: nil, version: nil, initial_scope: all)
+        validate_initial_scope!(initial_scope)
+
+        initial_scope.all.to_a.filter_map { |record| record.at(time: time, version: version) }
       end
 
       # Return changes made to records since specified time
-      def diff_from(time: nil, version: nil)
-        all.map { |record| record.diff_from(time: time, version: version) }
+      def diff_from(time: nil, version: nil, initial_scope: all)
+        validate_initial_scope!(initial_scope)
+
+        initial_scope.all.map { |record| record.diff_from(time: time, version: version) }
       end
 
       # Alias for Logidze.without_logging
@@ -61,6 +65,14 @@ module Logidze
               log_data = logidze_snapshot(to_jsonb(#{quoted_table_name}), #{args.join(", ")})
             SQL
           )
+        end
+      end
+
+      private
+
+      def validate_initial_scope!(initial_scope)
+        unless initial_scope.is_a?(ActiveRecord::Relation) && initial_scope.klass == self
+          raise ArgumentError, "initial_scope is not a relation of #{self}"
         end
       end
     end

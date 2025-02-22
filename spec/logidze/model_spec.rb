@@ -322,6 +322,13 @@ describe Logidze::Model, :db do
 
       expect(User.at(time: time(350)).size).to eq 1
     end
+
+    context "with initial scope" do
+      it "raises error if `initial_scope` is not a correct relation" do
+        expect { User.at(time: time(350), initial_scope: Class) }.to raise_error ArgumentError
+        expect { User.at(time: time(350), initial_scope: Comment) }.to raise_error ArgumentError
+      end
+    end
   end
 
   describe ".diff_from" do
@@ -351,6 +358,13 @@ describe Logidze::Model, :db do
             "active" => {"old" => true, "new" => false}
           }
       )
+    end
+
+    context "with initial scope" do
+      it "raises error if `initial_scope` is not a correct relation" do
+        expect { User.diff_from(time: time(350), initial_scope: Class) }.to raise_error ArgumentError
+        expect { User.diff_from(time: time(350), initial_scope: Comment) }.to raise_error ArgumentError
+      end
     end
   end
 
