@@ -20,7 +20,9 @@ module MemoryReport
 
   module_function
 
-  def call(msg, relation)
+  def call(msg, relation, gc_disable: true)
+    GC.disable if gc_disable
+
     buffer = nil
     delta = N / 10
     r0 = MemoryProfiler.report do
