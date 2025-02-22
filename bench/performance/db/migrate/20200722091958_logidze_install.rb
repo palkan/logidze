@@ -4,7 +4,7 @@ class LogidzeInstall < ActiveRecord::Migration[5.0]
   def change
     reversible do |dir|
       dir.up do
-        create_function :logidze_logger, version: 1
+        create_function :logidze_logger, version: 5
       end
 
       dir.down do
@@ -49,6 +49,16 @@ class LogidzeInstall < ActiveRecord::Migration[5.0]
 
       dir.down do
         execute "DROP FUNCTION logidze_compact_history(jsonb, integer) CASCADE"
+      end
+    end
+
+    reversible do |dir|
+      dir.up do
+        create_function :logidze_capture_exception, version: 1
+      end
+
+      dir.down do
+        execute "DROP FUNCTION logidze_capture_exception(jsonb) CASCADE"
       end
     end
   end
