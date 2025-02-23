@@ -11,16 +11,6 @@ module Logidze
     end
 
     module ClassMethods # :nodoc:
-      # Return records reverted to specified time
-      def at(**opts)
-        super(**opts.merge(initial_scope: includes(:logidze_data)))
-      end
-
-      # Return changes made to records since specified time
-      def diff_from(**opts)
-        super(**opts.merge(initial_scope: includes(:logidze_data)))
-      end
-
       # Nullify log_data column for a association
       #
       # @return [Integer] number of deleted +Logidze::LogidzeData+ records
@@ -62,6 +52,12 @@ module Logidze
         end
 
         args.join(", ")
+      end
+
+      private
+
+      def initial_scope
+        includes(:logidze_data)
       end
     end
 
