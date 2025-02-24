@@ -128,6 +128,10 @@ module Logidze
           escape_pgsql_string(value)
         end
 
+        def quoted_log_data_table_name
+          Logidze::LogidzeData.quoted_table_name if detached?
+        end
+
         def debounce_time
           options[:debounce_time]
         end
@@ -162,7 +166,7 @@ module Logidze
 
         def logidze_logger_parameters
           format_pgsql_args(limit, timestamp_column, filtered_columns, include_columns, debounce_time,
-            detached_loggable_type)
+            detached_loggable_type, quoted_log_data_table_name)
         end
 
         def logidze_snapshot_parameters

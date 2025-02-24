@@ -21,6 +21,7 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     -- 2. If implementation is `--detached` then we use detached_loggable_type to determine
     --    to which table current `log_data` record belongs
     detached_loggable_type text;
+    log_data_table_name text;
     log_data_is_empty boolean;
     log_data_ts_key_data text;
     ts timestamp with time zone;
@@ -39,15 +40,21 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     columns := NULLIF(TG_ARGV[2], 'null');
     include_columns := NULLIF(TG_ARGV[3], 'null');
     detached_loggable_type := NULLIF(TG_ARGV[5], 'null');
+    log_data_table_name := NULLIF(TG_ARGV[6], 'null');
 
     -- getting previous log_data if it exists for detached `log_data` storage variant
     IF detached_loggable_type IS NOT NULL
     THEN
-      SELECT ld.log_data INTO detached_log_data
-      FROM logidze_data ld
-      WHERE ld.loggable_type = detached_loggable_type
-        AND ld.loggable_id = NEW.id
-      LIMIT 1;
+      EXECUTE format(
+        'SELECT ldtn.log_data ' ||
+        'FROM %I ldtn ' ||
+        'WHERE ldtn.loggable_type = %L ' ||
+          'AND ldtn.loggable_id = %L' ||
+        'LIMIT 1',
+        log_data_table_name,
+        detached_loggable_type,
+        NEW.id
+      ) INTO detached_log_data;
     END IF;
 
     IF detached_loggable_type IS NULL
@@ -70,8 +77,14 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         THEN
           NEW.log_data := log_data;
         ELSE
-          INSERT INTO logidze_data (log_data, loggable_type, loggable_id)
-          VALUES (log_data, detached_loggable_type, NEW.id);
+          EXECUTE format(
+            'INSERT INTO %I(log_data, loggable_type, loggable_id) ' ||
+            'VALUES (%L, %L, %L);',
+            log_data_table_name,
+            log_data,
+            detached_loggable_type,
+            NEW.id
+          );
         END IF;
       END IF;
 
@@ -225,10 +238,18 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         NEW.log_data := log_data;
       ELSE
         detached_log_data = log_data;
-        UPDATE logidze_data
-        SET log_data = detached_log_data
-        WHERE logidze_data.loggable_type = detached_loggable_type
-          AND logidze_data.loggable_id = NEW.id;
+        EXECUTE format(
+          'UPDATE %I ' ||
+          'SET log_data = %L ' ||
+          'WHERE %I.loggable_type = %L ' ||
+          'AND %I.loggable_id = %L',
+          log_data_table_name,
+          detached_log_data,
+          log_data_table_name,
+          detached_loggable_type,
+          log_data_table_name,
+          NEW.id
+        );
       END IF;
     END IF;
 

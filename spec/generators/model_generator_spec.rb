@@ -66,7 +66,7 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
         it "creates migration w/o `log_data` column and with correct arguments", :aggregate_failures do
           is_expected.to be_a_file
-          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, null, null, 'User'\);/i)
+          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, null, null, 'User', #{Logidze::LogidzeData.quoted_table_name}\);/i)
           is_expected.not_to contain(/update "#{full_table_name("users")}"/i)
           is_expected.not_to contain "add_column :users, :log_data, :jsonb"
 
@@ -78,13 +78,13 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
 
           it "creates backfill query" do
             is_expected.to be_a_file
-            is_expected.to contain(/INSERT INTO logidze_data \(log_data, loggable_type, loggable_id\)/i)
+            is_expected.to contain(/INSERT INTO #{Logidze::LogidzeData.quoted_table_name} \(log_data, loggable_type, loggable_id\)/i)
             is_expected.to contain(/SELECT logidze_snapshot\(to_jsonb\(t\), 'updated_at'\), 'User', t.id/i)
-            is_expected.to contain(/FROM #{full_table_name("users")} t/i)
+            is_expected.to contain(/FROM "#{full_table_name("users")}" t/i)
             is_expected.to contain(/WHERE t.id not in/i)
             is_expected.to contain(/SELECT ld.loggable_id/i)
-            is_expected.to contain(/FROM logidze_data ld/i)
-            is_expected.to contain(/INNER JOIN #{full_table_name("users")} t ON ld.loggable_id = t.id/i)
+            is_expected.to contain(/FROM #{Logidze::LogidzeData.quoted_table_name} ld/i)
+            is_expected.to contain(/INNER JOIN "#{full_table_name("users")}" t ON ld.loggable_id = t.id/i)
             is_expected.to contain(/AND ld.loggable_type = 'User'/i)
           end
         end
