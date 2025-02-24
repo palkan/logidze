@@ -11,3 +11,7 @@ Examples:
 
     This will generate the migration to update existing trigger (drop and create).
 
+  rails generate logidze:Model User --detached
+
+    This will generate migration to add trigger for the <User> model.
+    This will also add `has_logidze detached: true` to the model.

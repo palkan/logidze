@@ -11,9 +11,9 @@ describe "triggers", :db do
         @old_post = klass.create!(title: "First", rating: 100, active: true)
         Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
           if klass == Post
-            successfully "rails generate logidze:model post --limit 4 --backfill"
+            successfully "rails generate logidze:model #{klass} --limit 4 --backfill"
           else
-            successfully "rails generate logidze:model DetachedPost --detached --limit 4 --backfill"
+            successfully "rails generate logidze:model #{klass} --detached --limit 4 --backfill"
           end
           successfully "rake db:migrate"
 

@@ -63,13 +63,13 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
       dir.up do
         <%- if detached?  %>
           execute <<~SQL
-            INSERT INTO logidze_data (log_data, loggable_type, loggable_id)
+            INSERT INTO <%= quoted_log_data_table_name %> (log_data, loggable_type, loggable_id)
             SELECT logidze_snapshot(<%= logidze_snapshot_parameters %>), <%= detached_loggable_type %>, t.id
-            FROM <%= full_table_name %> t
+            FROM "<%= full_table_name %>" t
             WHERE t.id NOT IN (
               SELECT ld.loggable_id
-              FROM logidze_data ld
-              INNER JOIN <%= full_table_name %> t ON ld.loggable_id = t.id
+              FROM <%= quoted_log_data_table_name %> ld
+              INNER JOIN "<%= full_table_name %>" t ON ld.loggable_id = t.id
               AND ld.loggable_type = <%= detached_loggable_type %>
             );
           SQL
