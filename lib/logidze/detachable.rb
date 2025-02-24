@@ -7,7 +7,7 @@ module Logidze
     included do
       has_one :logidze_data, as: :loggable, class_name: "::Logidze::LogidzeData", dependent: :destroy, autosave: true
 
-      delegate :log_data, to: :logidze_data, allow_nil: true
+      delegate :log_data, :log_data=, to: :logidze_data, allow_nil: true
     end
 
     module ClassMethods # :nodoc:
