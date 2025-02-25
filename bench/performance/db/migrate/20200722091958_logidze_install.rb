@@ -4,7 +4,7 @@ class LogidzeInstall < ActiveRecord::Migration[5.0]
   def change
     reversible do |dir|
       dir.up do
-        create_function :logidze_logger, version: 5
+        create_function :logidze_logger, version: 1
       end
 
       dir.down do
