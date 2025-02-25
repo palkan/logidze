@@ -48,13 +48,11 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       EXECUTE format(
         'SELECT ldtn.log_data ' ||
         'FROM %I ldtn ' ||
-        'WHERE ldtn.loggable_type = %L ' ||
-          'AND ldtn.loggable_id = %L' ||
+        'WHERE ldtn.loggable_type = $1 ' ||
+          'AND ldtn.loggable_id = $2 '  ||
         'LIMIT 1',
-        log_data_table_name,
-        detached_loggable_type,
-        NEW.id
-      ) INTO detached_log_data;
+        log_data_table_name
+      ) USING detached_loggable_type, NEW.id INTO detached_log_data;
     END IF;
 
     IF detached_loggable_type IS NULL
@@ -79,12 +77,9 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         ELSE
           EXECUTE format(
             'INSERT INTO %I(log_data, loggable_type, loggable_id) ' ||
-            'VALUES (%L, %L, %L);',
-            log_data_table_name,
-            log_data,
-            detached_loggable_type,
-            NEW.id
-          );
+            'VALUES ($1, $2, $3);',
+            log_data_table_name
+          ) USING log_data, detached_loggable_type, NEW.id;
         END IF;
       END IF;
 
@@ -240,16 +235,13 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
         detached_log_data = log_data;
         EXECUTE format(
           'UPDATE %I ' ||
-          'SET log_data = %L ' ||
-          'WHERE %I.loggable_type = %L ' ||
-          'AND %I.loggable_id = %L',
+          'SET log_data = $1 ' ||
+          'WHERE %I.loggable_type = $2 ' ||
+          'AND %I.loggable_id = $3',
           log_data_table_name,
-          detached_log_data,
           log_data_table_name,
-          detached_loggable_type,
-          log_data_table_name,
-          NEW.id
-        );
+          log_data_table_name
+        ) USING detached_log_data, detached_loggable_type, NEW.id;
       END IF;
     END IF;
 
