@@ -19,10 +19,10 @@ bundle exec ruby benchmarks/insert_bench.rb
 
 ```sh
 Comparison:
-          Plain INSERT:      438.4 i/s
-        Logidze INSERT:      399.6 i/s - same-ish: difference falls within error
-LogidzeDetached INSERT:      393.0 i/s - same-ish: difference falls within error
-     PaperTrail INSERT:      145.7 i/s - 3.01x  slower
+          Plain INSERT:      450.9 i/s
+        Logidze INSERT:      408.2 i/s - same-ish: difference falls within error
+LogidzeDetached INSERT:      359.8 i/s - same-ish: difference falls within error
+     PaperTrail INSERT:      183.9 i/s - same-ish: difference falls within error
 ```
 
 ## Update ([source](benchmarks/update_bench.rb))
@@ -31,20 +31,20 @@ When changeset has 2 fields:
 
 ```sh
 Comparison:
-          Plain UPDATE #1:      257.5 i/s
-LogidzeDetached UPDATE #1:      186.5 i/s - same-ish: difference falls within error
-        Logidze UPDATE #1:      173.5 i/s - same-ish: difference falls within error
-             PT UPDATE #1:      111.0 i/s - 2.32x  slower
+          Plain UPDATE #1:      204.8 i/s
+LogidzeDetached UPDATE #1:      188.4 i/s - same-ish: difference falls within error
+        Logidze UPDATE #1:      175.7 i/s - same-ish: difference falls within error
+             PT UPDATE #1:      114.2 i/s - same-ish: difference falls within error
 ```
 
 When changeset has 5 fields:
 
 ```sh
 Comparison:
-           Plain UPDATE #2:      214.4 i/s
-Logidze Detached UPDATE #2:      107.3 i/s - same-ish: difference falls within error
-         Logidze UPDATE #2:      105.6 i/s - same-ish: difference falls within error
-              PT UPDATE #2:       53.8 i/s - 3.99x  slower
+           Plain UPDATE #2:      117.8 i/s
+Logidze Detached UPDATE #2:      116.1 i/s - same-ish: difference falls within error
+         Logidze UPDATE #2:      115.4 i/s - same-ish: difference falls within error
+              PT UPDATE #2:       57.6 i/s - 2.04x  slower
 ```
 
 ## Getting diff ([source](benchmarks/diff_bench.rb))
@@ -56,20 +56,21 @@ When each record has 10 versions:
 
 ```sh
 Comparison:
-        Logidze DIFF:      185.2 i/s
-LogidzeDetached DIFF:      129.0 i/s - 1.44x  slower
-      PT (join) DIFF:        4.8 i/s - 38.18x  slower
-             PT DIFF:        3.3 i/s - 55.56x  slower
+        Logidze DIFF:      189.2 i/s
+LogidzeDetached DIFF:      124.0 i/s - 1.52x  slower
+      PT (join) DIFF:        4.4 i/s - 42.82x  slower
+             PT DIFF:        3.1 i/s - 60.69x  slower
 ```
 
 When each record has 100 versions:
 
 ```sh
+
 Comparison:
-        Logidze DIFF:       77.8 i/s
-LogidzeDetached DIFF:       71.8 i/s - 1.08x  slower
-             PT DIFF:        0.4 i/s - 205.70x  slower
-      PT (join) DIFF:        0.3 i/s - 293.59x  slower
+        Logidze DIFF:       78.5 i/s
+LogidzeDetached DIFF:       69.8 i/s - 1.13x  slower
+             PT DIFF:        0.4 i/s - 200.20x  slower
+      PT (join) DIFF:        0.3 i/s - 227.26x  slower
 ```
 
 ## Getting version at the specified time ([source](benchmarks/version_at_bench.rb))
@@ -80,28 +81,28 @@ When each record has 10 versions:
 
 ```sh
 Comparison:
-        Logidze AT single:      427.1 i/s
-LogidzeDetached AT single:      264.0 i/s - same-ish: difference falls within error
-             PT AT single:      161.9 i/s - 2.64x  slower
+        Logidze AT single:      468.3 i/s
+LogidzeDetached AT single:      262.3 i/s - same-ish: difference falls within error
+             PT AT single:      169.6 i/s - 2.76x  slower
 
 Comparison:
-        Logidze AT many:      293.2 i/s
-LogidzeDetached AT many:      195.2 i/s - 1.50x  slower
-             PT AT many:       26.0 i/s - 11.28x  slower
+        Logidze AT many:      283.7 i/s
+LogidzeDetached AT many:      199.3 i/s - 1.42x  slower
+             PT AT many:       27.0 i/s - 10.52x  slower
 ```
 
 When each record has 100 versions:
 
 ```sh
 Comparison:
-LogidzeDetached AT single:      411.8 i/s
-        Logidze AT single:      321.4 i/s - same-ish: difference falls within error
-             PT AT single:      134.6 i/s - 3.06x  slower
+        Logidze AT single:      339.2 i/s
+LogidzeDetached AT single:      219.6 i/s - same-ish: difference falls within error
+             PT AT single:      150.3 i/s - 2.26x  slower
 
 Comparison:
-        Logidze AT many:      168.1 i/s
-LogidzeDetached AT many:      128.2 i/s - 1.31x  slower
-             PT AT many:       24.7 i/s - 6.81x  slower
+        Logidze AT many:      167.9 i/s
+LogidzeDetached AT many:      130.2 i/s - 1.29x  slower
+             PT AT many:       24.2 i/s - 6.94x  slower
 ```
 
 **NOTE:** PaperTrail has N+1 problem when loading multiple records at the specified time (due to the usage of the `versions.subsequent` method).
@@ -114,33 +115,33 @@ When each record has 10 versions:
 
 ```sh
 Plain records
-Total Allocated:				44.46 KB
-Total Retained:					22.55 KB
-Retained_memsize memory (per record):		2.27 KB
+Total Allocated:				44.38 KB
+Total Retained:					22.52 KB
+Retained_memsize memory (per record):		2.35 KB
 
 PT with versions
-Total Allocated:				390.16 KB
-Total Retained:					225.06 KB
-Retained_memsize memory (per record):		204.38 KB
+Total Allocated:				387.58 KB
+Total Retained:					223.77 KB
+Retained_memsize memory (per record):		203.13 KB
 
 Logidze records
-Total Allocated:				76.5 KB
-Total Retained:					38.53 KB
-Retained_memsize memory (per record):		3.82 KB
+Total Allocated:				76.37 KB
+Total Retained:					38.46 KB
+Retained_memsize memory (per record):		3.72 KB
 
 LogidzeDetached records
-Total Allocated:				54.23 KB
-Total Retained:					24.3 KB
-Retained_memsize memory (per record):		-1488 B
+Total Allocated:				53.84 KB
+Total Retained:					24.1 KB
+Retained_memsize memory (per record):		-1768 B
 ```
 
 When each record has 100 versions:
 
 ```sh
 Plain records
-Total Allocated:				43.99 KB
-Total Retained:					22.32 KB
-Retained_memsize memory (per record):		2.27 KB
+Total Allocated:				44.3 KB
+Total Retained:					22.48 KB
+Retained_memsize memory (per record):		2.23 KB
 
 PT with versions
 Total Allocated:				3.32 MB
@@ -148,12 +149,12 @@ Total Retained:					1.99 MB
 Retained_memsize memory (per record):		1.97 MB
 
 Logidze records
-Total Allocated:				283.5 KB
-Total Retained:					142.03 KB
-Retained_memsize memory (per record):		14.46 KB
+Total Allocated:				281.22 KB
+Total Retained:					140.89 KB
+Retained_memsize memory (per record):		14.16 KB
 
 LogidzeDetached records
-Total Allocated:				53.61 KB
-Total Retained:					23.98 KB
-Retained_memsize memory (per record):		-1968 B
+Total Allocated:				53.29 KB
+Total Retained:					23.83 KB
+Retained_memsize memory (per record):		-1608 B
 ```
