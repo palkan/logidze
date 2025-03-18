@@ -5,9 +5,9 @@ class Post < ActiveRecord::Base
 
   validate :is_errored
 
-  has_logidze
+  has_logidze detached: LOGIDZE_DETACHED
 
-  belongs_to :user
+  belongs_to :user, optional: true
 
   def reload
     self.errored = nil

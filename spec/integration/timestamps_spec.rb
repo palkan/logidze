@@ -21,9 +21,9 @@ describe "log timestamps", :db do
     before(:all) do
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post"
+        successfully "rails generate logidze:model post #{LOGIDZE_DETACHED ? " --detached" : ""}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger"
+        successfully "rails generate logidze:model user --only-trigger #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -53,9 +53,9 @@ describe "log timestamps", :db do
       param = "--timestamp_column time"
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{param}"
+        successfully "rails generate logidze:model post #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{param}"
+        successfully "rails generate logidze:model user --only-trigger #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -77,9 +77,9 @@ describe "log timestamps", :db do
       param = "--timestamp_column nil"
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{param}"
+        successfully "rails generate logidze:model post #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{param}"
+        successfully "rails generate logidze:model user --only-trigger #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -89,7 +89,7 @@ describe "log timestamps", :db do
 
     it "uses statement_timestamp()", :aggregate_failures do
       expect(user).to use_statement_timestamp
-      expect(user).to use_statement_timestamp
+      expect(post).to use_statement_timestamp
     end
   end
 end

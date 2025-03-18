@@ -32,6 +32,12 @@ jobs:
           gemfile: rails8.gemfile
           fx: "false"
           after_trigger: "false"
+        - ruby: "3.4"
+          postgres: "16"
+          gemfile: rails8.gemfile
+          fx: "true"
+          after_trigger: "false"
+          detached: "true"
         - ruby: "3.3"
           postgres: "16"
           gemfile: rails8.gemfile
@@ -109,6 +115,7 @@ jobs:
         USE_FX: ${{ matrix.fx }}
         TABLE_NAME_PREFIX: ${{ matrix.table_name_prefix }}
         TABLE_NAME_SUFFIX: ${{ matrix.table_name_suffix }}
+        LOGIDZE_DETACHED: ${{ matrix.detached }}
       run: |
         bundle exec rspec --exclude-pattern=spec/acceptance/**/* -f d --force-color
     - name: Run RSpec (acceptance)

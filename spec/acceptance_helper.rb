@@ -74,6 +74,7 @@ RSpec.configure do |config|
 
         migrations_to_delete << Dir.glob("db/migrate/*_enable_hstore.rb").first
         migrations_to_delete << Dir.glob("db/migrate/*_logidze_install.rb").first
+        migrations_to_delete << Dir.glob("db/migrate/*_logidze_data.rb").first
 
         # Delete existing migrations
         migrations_to_delete.compact.each { |path| File.delete(path) }
@@ -86,6 +87,7 @@ RSpec.configure do |config|
           system <<-CMD
             rails db:drop db:create db:environment:set RAILS_ENV=test
             rails generate logidze:install
+            rails generate logidze:migration:logs
             rails db:migrate
           CMD
         end

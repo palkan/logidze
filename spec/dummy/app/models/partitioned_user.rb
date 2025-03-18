@@ -3,5 +3,5 @@
 class PartitionedUser < ActiveRecord::Base
   self.primary_key = "id"
 
-  has_logidze
+  has_logidze detached: LOGIDZE_DETACHED
 end

@@ -3,7 +3,7 @@
 require "spec_helper"
 require "acceptance_helper"
 
-describe "ignore log columns", :db do
+describe "ignore log columns", :db, skip: LOGIDZE_DETACHED do
   include_context "cleanup migrations"
 
   before(:all) do
