@@ -7,6 +7,8 @@ begin
 rescue LoadError # rubocop:disable Lint/HandleExceptions
 end
 
+LOGIDZE_DETACHED = ENV["LOGIDZE_DETACHED"] == "true"
+
 require "ammeter"
 require "timecop"
 

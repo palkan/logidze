@@ -7,7 +7,7 @@ module Logidze
     included do
       has_one :logidze_data, as: :loggable, class_name: "::Logidze::LogidzeData", dependent: :destroy, autosave: true
 
-      delegate :log_data, :log_data=, to: :logidze_data, allow_nil: true
+      delegate :log_data, to: :logidze_data, allow_nil: true
     end
 
     module ClassMethods # :nodoc:
@@ -92,6 +92,19 @@ module Logidze
       SQL
 
       reload_log_data
+    end
+
+    def raw_log_data
+      logidze_data&.read_attribute_before_type_cast(:log_data)
+    end
+
+    def log_data=(v)
+      logidze_data&.assign_attributes(log_data: v) || build_logidze_data(log_data: v)
+      v # rubocop:disable Lint/Void
+    end
+
+    def dup
+      super.tap { _1.logidze_data = logidze_data.dup }
     end
 
     protected

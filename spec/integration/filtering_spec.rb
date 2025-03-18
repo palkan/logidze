@@ -6,7 +6,7 @@ describe "columns filtering", :db do
   it "cannot be used with both only and except options" do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post " \
-                     "--only=title --except=created_at"
+                     "--only=title --except=created_at #{LOGIDZE_DETACHED ? " --detached" : ""}"
     end
   end
 
@@ -18,7 +18,7 @@ describe "columns filtering", :db do
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:model post " \
-                     "--except=#{@except.join(" ")}"
+                     "--except=#{@except.join(" ")} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -74,7 +74,7 @@ describe "columns filtering", :db do
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:model post " \
-                     "--only=#{@only.join(" ")}"
+                     "--only=#{@only.join(" ")} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -129,7 +129,7 @@ describe "columns filtering", :db do
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:model post " \
-                     "--only=#{@only.join(" ")}"
+                     "--only=#{@only.join(" ")} #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables

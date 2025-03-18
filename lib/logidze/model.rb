@@ -250,6 +250,10 @@ module Logidze
       reload_log_data
     end
 
+    def raw_log_data
+      read_attribute_before_type_cast(:log_data)
+    end
+
     protected
 
     def apply_diff(version, diff)

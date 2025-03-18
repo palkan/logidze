@@ -41,6 +41,8 @@ module Dummy
   class Application < Rails::Application
     config.eager_load = false
 
+    config.load_defaults "#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}"
+
     if TABLE_NAME_PREFIX
       $stdout.puts "🔩 Using table_name_prefix = '#{TABLE_NAME_PREFIX}'"
       config.active_record.table_name_prefix = TABLE_NAME_PREFIX

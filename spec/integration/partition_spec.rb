@@ -10,7 +10,7 @@ describe "partition change", :db do
       skip if database_version < 11
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model partitioned_user --after-trigger"
+        successfully "rails generate logidze:model partitioned_user --after-trigger #{LOGIDZE_DETACHED ? " --detached" : ""}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables

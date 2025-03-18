@@ -2,6 +2,7 @@
 
 class User < ActiveRecord::Base
   has_logidze
+  has_logidze detached: LOGIDZE_DETACHED
 
   delegate :responsible_id, :meta, to: :log_data
 
