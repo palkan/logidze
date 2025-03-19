@@ -65,7 +65,9 @@ module Logidze
         indents = "  " * (class_name.scan("::").count + 1)
         macros_name = detached? ? "has_logidze detached: true\n" : "has_logidze\n"
 
-        inject_into_class(model_file_path, class_name.demodulize, indents + macros_name)
+        if File.readlines(model_file_path).grep(/has_logidze/).empty?
+          inject_into_class(model_file_path, class_name.demodulize, indents + macros_name)
+        end
       end
 
       no_tasks do
