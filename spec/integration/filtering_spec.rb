@@ -150,7 +150,8 @@ describe "columns filtering", :db do
       ActiveRecord::Base.connection_pool.disconnect!
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post --except=updated_at --update"
+        successfully "rails generate logidze:model post --except=updated_at #{LOGIDZE_DETACHED ? " --detached" : ""} " \
+                     "--update"
         successfully "rake db:migrate"
 
         ActiveRecord::Base.connection_pool.disconnect!
