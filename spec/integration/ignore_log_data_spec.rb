@@ -9,7 +9,7 @@ describe "ignore log columns", :db, skip: LOGIDZE_DETACHED do
   before(:all) do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       successfully "rails generate logidze:model post"
-      successfully "rails generate logidze:model post_comment"
+
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
