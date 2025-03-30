@@ -6,6 +6,8 @@ describe "triggers", :db do
   include_context "cleanup migrations"
 
   before(:all) do
+    Post.reset_column_information
+
     @old_post = Post.create!(title: "First", rating: 100, active: true)
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       successfully "rails generate logidze:model post --limit 4 --backfill #{LOGIDZE_DETACHED ? " --detached" : ""}"
