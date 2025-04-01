@@ -36,22 +36,6 @@ module Logidze
         SQL
       end
 
-      # Computes args for creating initializing snapshots in +.create_logidze_snapshot+ and +#create_logidze_snapshot!+
-      def snapshot_query_args(timestamp: nil, only: nil, except: nil)
-        args = ["'null'"]
-
-        args[0] = "'#{timestamp}'" if timestamp
-
-        columns = only || except
-
-        if columns
-          args[1] = "'{#{columns.join(",")}}'"
-          args[2] = only ? "true" : "false"
-        end
-
-        args.join(", ")
-      end
-
       private
 
       def initial_scope

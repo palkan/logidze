@@ -44,6 +44,26 @@ module Logidze
 
       # Initialize log_data with the current state if it's null
       def create_logidze_snapshot(timestamp: nil, only: nil, except: nil)
+        without_logging do
+          where(log_data: nil).update_all(
+            <<~SQL.squish
+              log_data = logidze_snapshot(
+                to_jsonb(#{quoted_table_name}),
+                #{snapshot_query_args(timestamp: timestamp, only: only, except: except)}
+              )
+            SQL
+          )
+        end
+      end
+
+      private
+
+      def initial_scope
+        all
+      end
+
+      # Computes args for creating initializing snapshots in +.create_logidze_snapshot+ and +#create_logidze_snapshot!+
+      def snapshot_query_args(timestamp: nil, only: nil, except: nil)
         args = ["'null'"]
 
         args[0] = "'#{timestamp}'" if timestamp
@@ -55,19 +75,7 @@ module Logidze
           args[2] = only ? "true" : "false"
         end
 
-        without_logging do
-          where(log_data: nil).update_all(
-            <<~SQL
-              log_data = logidze_snapshot(to_jsonb(#{quoted_table_name}), #{args.join(", ")})
-            SQL
-          )
-        end
-      end
-
-      private
-
-      def initial_scope
-        all
+        args.join(", ")
       end
     end
 
