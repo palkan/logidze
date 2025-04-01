@@ -19,7 +19,7 @@ module Logidze
       end
 
       # Initialize log_data with the current state if it's null
-      def create_logidze_snapshot(timestamp: nil, only: nil, except: nil)
+      def create_logidze_snapshot(timestamp: nil, only: nil, except: nil, sql_filter: nil)
         ActiveRecord::Base.connection.execute <<~SQL.squish
           INSERT INTO #{Logidze::LogidzeData.quoted_table_name} (log_data, loggable_type, loggable_id)
           SELECT logidze_snapshot(
@@ -29,6 +29,7 @@ module Logidze
             '#{name}',
             #{quoted_table_name}.id
           FROM #{quoted_table_name}
+          #{sql_filter}
           ON CONFLICT (loggable_type, loggable_id)
           DO UPDATE
           SET log_data = EXCLUDED.log_data;
@@ -70,20 +71,8 @@ module Logidze
 
     # Initialize log_data with the current state if it's null for a single record
     def create_logidze_snapshot!(timestamp: nil, only: nil, except: nil)
-      ActiveRecord::Base.connection.execute <<~SQL.squish
-        INSERT INTO #{Logidze::LogidzeData.quoted_table_name} (log_data, loggable_type, loggable_id)
-        SELECT logidze_snapshot(
-            to_jsonb(#{self.class.quoted_table_name}),
-            #{self.class.snapshot_query_args(timestamp: timestamp, only: only, except: except)}
-          ),
-          '#{self.class.name}',
-          #{self.class.quoted_table_name}.id
-        FROM #{self.class.quoted_table_name}
-        WHERE #{self.class.quoted_table_name}.id = #{id}
-        ON CONFLICT (loggable_type, loggable_id)
-        DO UPDATE
-        SET log_data = EXCLUDED.log_data;
-      SQL
+      id_filter = "WHERE #{self.class.quoted_table_name}.id = #{id}"
+      self.class.create_logidze_snapshot(timestamp: timestamp, only: only, except: except, sql_filter: id_filter)
 
       reload_log_data
     end
