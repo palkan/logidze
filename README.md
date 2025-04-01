@@ -213,7 +213,7 @@ If it concerns you, you may configure Logidze to store history data in a separat
 bundle exec rails logidze:model Post --detached
 ```
 
-**IMPORTANT:** Using `--detached` mode for storing historic data negatively affects performance, although it is still better compared to PaperTrail.
+**IMPORTANT:** Using `--detached` mode for storing historic data slightly decreases performance. Check [bench results] for the details.
 
 ## Usage
 
@@ -657,3 +657,4 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/palka
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 [fx]: https://github.com/teoljungberg/fx
+[bench results]: https://github.com/palkan/logidze/blob/feat-log-data-separate-storage/bench/performance/README.md
