@@ -29,12 +29,9 @@ module Logidze
             '#{name}',
             #{quoted_table_name}.id
           FROM #{quoted_table_name}
-          WHERE #{quoted_table_name}.id NOT IN (
-            SELECT ld.loggable_id
-            FROM #{Logidze::LogidzeData.quoted_table_name} ld
-            INNER JOIN #{quoted_table_name} on ld.loggable_id = #{quoted_table_name}.id
-            AND ld.loggable_type = '#{name}'
-          );
+          ON CONFLICT (loggable_type, loggable_id)
+          DO UPDATE
+          SET log_data = EXCLUDED.log_data;
         SQL
       end
 
@@ -82,13 +79,10 @@ module Logidze
           '#{self.class.name}',
           #{self.class.quoted_table_name}.id
         FROM #{self.class.quoted_table_name}
-        WHERE #{self.class.quoted_table_name}.id NOT IN (
-          SELECT ld.loggable_id
-          FROM #{Logidze::LogidzeData.quoted_table_name} ld
-          INNER JOIN #{self.class.quoted_table_name} on ld.loggable_id = #{self.class.quoted_table_name}.id
-          AND ld.loggable_type = '#{self.class.name}'
-        )
-        AND #{self.class.quoted_table_name}.id = #{id};
+        WHERE #{self.class.quoted_table_name}.id = #{id}
+        ON CONFLICT (loggable_type, loggable_id)
+        DO UPDATE
+        SET log_data = EXCLUDED.log_data;
       SQL
 
       reload_log_data
