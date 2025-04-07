@@ -20,7 +20,7 @@ describe "Logidze migrations" do
         rails runner "#{check_logidze_command}"
       )
 
-      # Rollback twice to remove both hstore and logidze
+      # Rollback three times to remove hstore, logidze and logidze_data schema changes
       successfully "rake db:rollback"
       successfully "rake db:rollback"
       successfully "rake db:rollback"

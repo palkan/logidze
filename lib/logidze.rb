@@ -30,6 +30,9 @@ module Logidze
     attr_accessor :sort_triggers_by_name
     # Determines what Logidze should do when upgrade is needed (:raise | :warn | :ignore)
     attr_reader :on_pending_upgrade
+    # Determines if we should treat all models as detached regardless of the +detached: true+ macros presence
+    # Usable for gem specs setup
+    attr_accessor :treat_models_as_detached
 
     # Temporary disable DB triggers.
     #
@@ -72,4 +75,5 @@ module Logidze
   self.return_self_if_log_data_is_empty = true
   self.on_pending_upgrade = :ignore
   self.sort_triggers_by_name = false
+  self.treat_models_as_detached = false
 end

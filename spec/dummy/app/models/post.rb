@@ -5,7 +5,7 @@ class Post < ActiveRecord::Base
 
   validate :is_errored
 
-  has_logidze detached: LOGIDZE_DETACHED
+  has_logidze
 
   belongs_to :user, optional: true
 

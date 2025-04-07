@@ -25,6 +25,11 @@ if USE_FX
   $stdout.puts "🔩 Fx is loaded"
 end
 
+# Store all table log data separately or in the origin table depending on the ENV variable.
+# Used to simplify testing
+LOGIDZE_DETACHED = ENV["LOGIDZE_DETACHED"] == "true"
+Logidze.treat_models_as_detached = LOGIDZE_DETACHED
+
 if AFTER_TRIGGER
   require "generators/logidze/model/model_generator"
 
