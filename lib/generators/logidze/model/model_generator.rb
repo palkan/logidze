@@ -63,11 +63,9 @@ module Logidze
         return if update?
 
         indents = "  " * (class_name.scan("::").count + 1)
-        macros_name = detached? ? "has_logidze detached: true\n" : "has_logidze\n"
+        macros_name = (detached? && !Logidze.treat_models_as_detached) ? "has_logidze detached: true\n" : "has_logidze\n"
 
-        if File.readlines("#{destination_root}/#{model_file_path}").grep(/has_logidze/).empty?
-          inject_into_class(model_file_path, class_name.demodulize, indents + macros_name)
-        end
+        inject_into_class(model_file_path, class_name.demodulize, indents + macros_name)
       end
 
       no_tasks do

@@ -64,6 +64,13 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
       context "with detached" do
         let(:base_args) { ["user", "--no-after-trigger", "--detached"] }
 
+        around(:example) do |example|
+          old_value = Logidze.treat_models_as_detached
+          Logidze.treat_models_as_detached = false
+          example.run
+          Logidze.treat_models_as_detached = old_value
+        end
+
         it "creates migration w/o `log_data` column and with correct arguments", :aggregate_failures do
           is_expected.to be_a_file
           is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, null, null, 'User', #{Logidze::LogidzeData.quoted_table_name}\);/i)
