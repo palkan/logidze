@@ -65,12 +65,9 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
             INSERT INTO <%= quoted_log_data_table_name %> (log_data, loggable_type, loggable_id)
             SELECT logidze_snapshot(<%= logidze_snapshot_parameters %>), <%= detached_loggable_type %>, t.id
             FROM "<%= full_table_name %>" t
-            WHERE t.id NOT IN (
-              SELECT ld.loggable_id
-              FROM <%= quoted_log_data_table_name %> ld
-              INNER JOIN "<%= full_table_name %>" t ON ld.loggable_id = t.id
-              AND ld.loggable_type = <%= detached_loggable_type %>
-            );
+            ON CONFLICT (loggable_type, loggable_id)
+            DO UPDATE
+            SET log_data = EXCLUDED.log_data;
           SQL
         <%- else %>
           execute <<~SQL
