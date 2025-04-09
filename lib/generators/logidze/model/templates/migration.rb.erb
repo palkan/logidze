@@ -58,7 +58,6 @@ class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::M
     end
 <%- end -%>
 <%- if backfill? -%>
-
     reversible do |dir|
       dir.up do
         <%- if detached?  %>

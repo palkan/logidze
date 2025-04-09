@@ -6,7 +6,7 @@ describe "columns filtering", :db do
   it "cannot be used with both only and except options" do
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
       unsuccessfully "rails generate logidze:model post " \
-                     "--only=title --except=created_at #{LOGIDZE_DETACHED ? " --detached" : ""}"
+                     "--only=title --except=created_at"
     end
   end
 
@@ -18,7 +18,7 @@ describe "columns filtering", :db do
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         successfully "rails generate logidze:model post " \
-                     "--except=#{@except.join(" ")} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+                     "--except=#{@except.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -73,8 +73,7 @@ describe "columns filtering", :db do
       @only = %w[title meta]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post " \
-                     "--only=#{@only.join(" ")} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model post --only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -128,8 +127,7 @@ describe "columns filtering", :db do
       @only = %w[title rating]
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post " \
-                     "--only=#{@only.join(" ")} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model post --only=#{@only.join(" ")}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -150,8 +148,7 @@ describe "columns filtering", :db do
       ActiveRecord::Base.connection_pool.disconnect!
 
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-        successfully "rails generate logidze:model post --except=updated_at #{LOGIDZE_DETACHED ? " --detached" : ""} " \
-                     "--update"
+        successfully "rails generate logidze:model post --except=updated_at --update"
         successfully "rake db:migrate"
 
         ActiveRecord::Base.connection_pool.disconnect!

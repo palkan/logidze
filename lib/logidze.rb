@@ -30,9 +30,12 @@ module Logidze
     attr_accessor :sort_triggers_by_name
     # Determines what Logidze should do when upgrade is needed (:raise | :warn | :ignore)
     attr_reader :on_pending_upgrade
-    # Determines if we should treat all models as detached regardless of the +detached: true+ macros presence
-    # Usable for gem specs setup
-    attr_accessor :treat_models_as_detached
+    # Determines where to store +log_data+:
+    # - +:inline+ - force Logidze to store it in the origin table in the +log_data+ column
+    # - +:detached+ - force Logidze to  store it in the +logidze_data+ table in the +log_data+ column
+    #
+    # By default we do not set +log_data_placement+ value and rely on `has_logidze` macros
+    attr_accessor :log_data_placement
 
     # Temporary disable DB triggers.
     #
@@ -57,6 +60,14 @@ module Logidze
       @on_pending_upgrade = mode
     end
 
+    def detached_log_placement?
+      @log_data_placement == :detached
+    end
+
+    def inline_log_placement?
+      @log_data_placement == :inline
+    end
+
     private
 
     def with_logidze_setting(name, value)
@@ -75,5 +86,5 @@ module Logidze
   self.return_self_if_log_data_is_empty = true
   self.on_pending_upgrade = :ignore
   self.sort_triggers_by_name = false
-  self.treat_models_as_detached = false
+  self.log_data_placement = nil
 end

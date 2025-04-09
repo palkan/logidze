@@ -10,7 +10,7 @@ describe "triggers", :db do
 
     @old_post = Post.create!(title: "First", rating: 100, active: true)
     Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
-      successfully "rails generate logidze:model post --limit 4 --backfill #{LOGIDZE_DETACHED ? " --detached" : ""}"
+      successfully "rails generate logidze:model post --limit 4 --backfill"
       successfully "rake db:migrate"
 
       # Close active connections to handle db variables
