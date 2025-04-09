@@ -21,9 +21,9 @@ describe "log timestamps", :db do
     before(:all) do
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model post"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model user --only-trigger"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -53,9 +53,9 @@ describe "log timestamps", :db do
       param = "--timestamp_column time"
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model post #{param}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model user --only-trigger #{param}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables
@@ -77,9 +77,9 @@ describe "log timestamps", :db do
       param = "--timestamp_column nil"
       Dir.chdir("#{File.dirname(__FILE__)}/../dummy") do
         # Post has an 'updated_at' column
-        successfully "rails generate logidze:model post #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model post #{param}"
         # User has a 'time' column
-        successfully "rails generate logidze:model user --only-trigger #{param} #{LOGIDZE_DETACHED ? " --detached" : ""}"
+        successfully "rails generate logidze:model user --only-trigger #{param}"
         successfully "rake db:migrate"
 
         # Close active connections to handle db variables

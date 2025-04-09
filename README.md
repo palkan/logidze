@@ -213,6 +213,14 @@ If it concerns you, you may configure Logidze to store history data in a separat
 bundle exec rails logidze:model Post --detached
 ```
 
+You can also configure Logidze to always store history data in a separate table for all models:
+
+```ruby
+# config/initializers/logidze.rb
+
+Logidze.log_data_placement = :detached
+```
+
 **IMPORTANT:** Using `--detached` mode for storing historic data slightly decreases performance. Check [bench results] for the details.
 
 ## Usage
