@@ -88,11 +88,9 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
             is_expected.to contain(/INSERT INTO #{Logidze::LogidzeData.quoted_table_name} \(log_data, loggable_type, loggable_id\)/i)
             is_expected.to contain(/SELECT logidze_snapshot\(to_jsonb\(t\), 'updated_at'\), 'User', t.id/i)
             is_expected.to contain(/FROM "#{full_table_name("users")}" t/i)
-            is_expected.to contain(/WHERE t.id not in/i)
-            is_expected.to contain(/SELECT ld.loggable_id/i)
-            is_expected.to contain(/FROM #{Logidze::LogidzeData.quoted_table_name} ld/i)
-            is_expected.to contain(/INNER JOIN "#{full_table_name("users")}" t ON ld.loggable_id = t.id/i)
-            is_expected.to contain(/AND ld.loggable_type = 'User'/i)
+            is_expected.to contain(/ON CONFLICT \(loggable_type, loggable_id\)/i)
+            is_expected.to contain(/DO UPDATE/i)
+            is_expected.to contain(/SET log_data = EXCLUDED.log_data;/i)
           end
         end
       end
