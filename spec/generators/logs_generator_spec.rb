@@ -24,7 +24,7 @@ describe Logidze::Generators::Migration::LogsGenerator, type: :generator do
       is_expected.to contain "create_table :logidze_data"
       is_expected.to contain "t.jsonb :log_data"
       is_expected.to contain "t.belongs_to :loggable, polymorphic: true, " \
-                             "index: { name: \"index_logidze_loggable\", unique: true }"
+                             "index: {name: \"index_logidze_loggable\", unique: true}"
     end
   end
 end
