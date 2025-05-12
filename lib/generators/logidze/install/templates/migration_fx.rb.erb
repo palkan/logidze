@@ -1,41 +1,22 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
   def change
-  <%- if update? -%>
-    reversible do |dir|
-      dir.up do
-        # Drop legacy functions (<1.0)
-        execute <<~SQL
-          DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb);
-          DROP FUNCTION IF EXISTS logidze_snapshot(jsonb);
-          DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb, text[]);
-          DROP FUNCTION IF EXISTS logidze_snapshot(jsonb, text[]);
-          DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb, timestamp with time zone, text[]);
-          DROP FUNCTION IF EXISTS logidze_snapshot(jsonb, text, text[]);
-          DROP FUNCTION IF EXISTS logidze_exclude_keys(jsonb, VARIADIC text[]);
-          DROP FUNCTION IF EXISTS logidze_compact_history(jsonb);
-        SQL
-      end
-    end
-
-  <%- end -%>
   <%- function_definitions.each do |f| -%>
     <%- previous_version = previous_version_for(f.name) -%>
     <%- if previous_version -%>
       <%- if previous_version != f.version -%>
-    update_function :<%= f.name %>, version: <%= f.version %>, revert_to_version: <%= previous_version %>
-      <%- end -%>
-    <%- else -%>
     reversible do |dir|
       dir.up do
         create_function :<%= f.name %>, version: <%= f.version %>
       end
 
       dir.down do
-        execute "DROP FUNCTION IF EXISTS <%= f.name %>(<%= f.signature %>) CASCADE"
+        create_function :<%= f.name %>, version: <%= previous_version %>
       end
     end
-
-    <%- end -%>
+      <%- end %>
+    <%- else -%>
+    create_function :<%= f.name %>, version: <%= f.version %>
+    <%- end %>
   <%- end -%>
   end
 end

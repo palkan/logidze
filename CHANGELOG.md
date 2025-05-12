@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Don't drop functions in the upgrade migration. ([@palkan][])
+
 ## 1.4.0 (2025-05-09) 🎇
 
 - Support Rails 7.2 ([@atomaka][])

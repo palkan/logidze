@@ -1,19 +1,5 @@
 class <%= @migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
   def up
-<%- if update? -%>
-    # Drop legacy functions (<1.0)
-    execute <<~SQL
-      DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb);
-      DROP FUNCTION IF EXISTS logidze_snapshot(jsonb);
-      DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb, text[]);
-      DROP FUNCTION IF EXISTS logidze_snapshot(jsonb, text[]);
-      DROP FUNCTION IF EXISTS logidze_version(bigint, jsonb, timestamp with time zone, text[]);
-      DROP FUNCTION IF EXISTS logidze_snapshot(jsonb, text, text[]);
-      DROP FUNCTION IF EXISTS logidze_exclude_keys(jsonb, VARIADIC text[]);
-      DROP FUNCTION IF EXISTS logidze_compact_history(jsonb);
-    SQL
-
-<%- end -%>
     execute <<~SQL
 <%- function_definitions.each do |f| -%>
 <%= inject_sql("#{f.name}.sql", indent: 6) %>

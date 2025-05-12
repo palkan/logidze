@@ -49,14 +49,6 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         is_expected.to contain("create_function :logidze_filter_keys, version: 1")
         is_expected.to contain("create_function :logidze_compact_history, version: 1")
         is_expected.to contain("create_function :logidze_capture_exception, version: 1")
-
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_logger")
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_logger_after")
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_snapshot")
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_version")
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_filter_keys")
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_compact_history")
-        is_expected.to contain("DROP FUNCTION IF EXISTS logidze_capture_exception")
       end
 
       it "creates function files" do
@@ -145,12 +137,21 @@ describe Logidze::Generators::InstallGenerator, type: :generator do
         run_generator(args)
 
         is_expected.to be_a_file
-        is_expected.to contain("update_function :logidze_version, version: 2, revert_to_version: 3")
-        is_expected.to contain("update_function :logidze_snapshot, version: 3, revert_to_version: 4")
-        is_expected.not_to contain("update_function :logidze_filter_keys")
-        is_expected.to contain("update_function :logidze_compact_history, version: 1, revert_to_version: 5")
-        is_expected.to contain("update_function :logidze_logger, version: 5, revert_to_version: 7")
-        is_expected.to contain("update_function :logidze_logger_after, version: 5, revert_to_version: 7")
+        is_expected.to contain("create_function :logidze_version, version: 2")
+        is_expected.to contain("create_function :logidze_version, version: 3")
+
+        is_expected.to contain("create_function :logidze_snapshot, version: 3")
+        is_expected.to contain("create_function :logidze_snapshot, version: 4")
+
+        is_expected.not_to contain("create_function :logidze_filter_keys")
+        is_expected.to contain("create_function :logidze_compact_history, version: 1")
+
+        is_expected.to contain("create_function :logidze_logger, version: 5")
+        is_expected.to contain("create_function :logidze_logger, version: 7")
+
+        is_expected.to contain("create_function :logidze_logger_after, version: 5")
+        is_expected.to contain("create_function :logidze_logger_after, version: 7")
+
         is_expected.to contain("create_function :logidze_capture_exception")
       end
 
