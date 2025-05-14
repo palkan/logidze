@@ -37,5 +37,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "rspec-rails", ">= 4.0"
   spec.add_development_dependency "timecop", "~> 0.8"
-  spec.add_development_dependency "concurrent-ruby", "1.3.4" # Remove once https://github.com/rails/rails/issues/54263 is resolved
 end
