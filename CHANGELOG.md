@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+## 1.4.1 (2025-06-05)
+
 - Don't drop functions in the upgrade migration. ([@palkan][])
 
 ## 1.4.0 (2025-05-09) 🎇
