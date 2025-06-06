@@ -376,4 +376,89 @@ describe "logs metadata", :db do
       end
     end
   end
+
+  describe ".with_meta!" do
+    subject { User.create!(name: "test", age: 10, active: false) }
+
+    after { Logidze.clear_meta! }
+
+    context "setting meta for connection" do
+
+      it "sets meta for connection and persists across operations" do
+        Logidze.with_meta!(meta)
+
+        expect(subject.reload.meta).to eq(meta)
+      end
+
+      it "handles nil" do
+        Logidze.with_meta!(nil)
+
+        expect(subject.reload.meta).to be_nil
+        expect(subject.log_data.current_version.data.keys).not_to include(Logidze::History::Version::META)
+      end
+
+      it "cannot be called inside block version" do
+        Logidze.with_meta(meta) do
+          expect { Logidze.with_meta!(meta2) }.to raise_error(StandardError, /cannot be called from within a with_meta block/)
+        end
+      end
+    end
+  end
+
+  describe ".with_responsible!" do
+    let(:responsible) { User.create!(name: "owner") }
+
+    subject { User.create!(name: "test", age: 10, active: false) }
+
+    after { Logidze.clear_responsible! }
+
+    context "setting responsible for connection" do
+      it "sets responsible for connection and persists across operations" do
+        Logidze.with_responsible!(responsible.id)
+
+        expect(subject.reload.whodunnit).to eq(responsible)
+
+        subject.update!(age: 11)
+        expect(subject.reload.whodunnit).to eq(responsible)
+      end
+
+      it "handles nil responsible_id" do
+        Logidze.with_responsible!(nil)
+
+        expect(subject.reload.whodunnit).to be_nil
+      end
+
+      it "can be cleared with clear_responsible!" do
+        Logidze.with_responsible!(responsible.id)
+
+        expect(subject.reload.whodunnit).to eq(responsible)
+
+        Logidze.clear_responsible!
+
+        subject.update!(age: 12)
+        expect(subject.reload.whodunnit).to be_nil
+      end
+
+      it "can be changed to a different responsible" do
+        responsible2 = User.create!(name: "owner2")
+
+        Logidze.with_responsible!(responsible.id)
+        expect(subject.reload.whodunnit).to eq(responsible)
+
+        Logidze.with_responsible!(responsible2.id)
+        subject.update!(age: 11)
+        expect(subject.reload.whodunnit).to eq(responsible2)
+      end
+
+      it "can add to existing metadata" do
+        Logidze.with_meta!(meta)
+
+        Logidze.with_responsible!(responsible.id)
+        expect(subject.reload.whodunnit).to eq (responsible)
+        expect(subject.meta).to eq(meta.merge(
+          Logidze::History::Version::META_RESPONSIBLE => responsible.id
+        ))
+      end
+    end
+  end
 end
