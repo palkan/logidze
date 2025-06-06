@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "http://github.com/palkan/logidze"
   spec.license = "MIT"
 
-  spec.files = Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
+  spec.files = Dir.glob("app/**/*") + Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = ">= 2.7.0"
