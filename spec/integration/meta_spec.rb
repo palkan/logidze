@@ -383,7 +383,6 @@ describe "logs metadata", :db do
     after { Logidze.clear_meta! }
 
     context "setting meta for connection" do
-
       it "sets meta for connection and persists across operations" do
         Logidze.with_meta!(meta)
 
@@ -454,7 +453,7 @@ describe "logs metadata", :db do
         Logidze.with_meta!(meta)
 
         Logidze.with_responsible!(responsible.id)
-        expect(subject.reload.whodunnit).to eq (responsible)
+        expect(subject.reload.whodunnit).to eq(responsible)
         expect(subject.meta).to eq(meta.merge(
           Logidze::History::Version::META_RESPONSIBLE => responsible.id
         ))
