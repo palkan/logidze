@@ -42,6 +42,7 @@ Other requirements:
   - [Basic API](#basic-api)
   - [Track meta information](#track-meta-information)
   - [Track responsibility](#track-responsibility)
+  - [Persisted metadata](#persisted-metadata)
   - [Disable logging temporary](#disable-logging-temporary)
   - [Reset log](#reset-log)
   - [Creating full snapshot instead of diffs](#full-snapshots)
@@ -409,6 +410,26 @@ Logidze.with_responsible(user.id, transactional: false) do
   post.save!
 end
 ```
+
+#### Persisted metadata
+
+You can also set metadata and responsibility that persists for the database connection using the bang versions of these methods:
+
+```ruby
+Logidze.with_meta!({ip: request.ip})
+post.save!
+
+Logidze.with_responsible!(user.id)
+post.save!
+```
+
+This persisted information needs to be explicitly cleared.
+
+```ruby
+Logidze.clear_meta!
+```
+
+**Important:** Persisted metadata is set at the connection level and will affect all subsequent operations on that connection until cleared. Always ensure you call `clear_meta!` when done, especially in web applications where connections are reused.
 
 ### Disable logging temporary
 

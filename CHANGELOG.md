@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Add block-less versions of `with_responsible` and `with_metata`. ([@atomaka][])
+
 ## 1.4.1 (2025-06-05)
 
 - Don't drop functions in the upgrade migration. ([@palkan][])
