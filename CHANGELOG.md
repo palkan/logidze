@@ -2,6 +2,8 @@
 
 ## master (unreleased)
 
+- Add block-less versions of `with_responsible` and `with_metata`. ([@atomaka][])
+
 ## 1.4.1 (2025-06-05)
 
 - Don't drop functions in the upgrade migration. ([@palkan][])
@@ -416,3 +418,4 @@ This is a quick fix for a more general problem (see [#59](https://github.com/pal
 [@SparLaimor]: https://github.com/SparLaimor
 [@tagirahmad]: https://github.com/tagirahmad
 [@tylerhunt]: https://github.com/tylerhunt
+[@atomaka]: https://github.com/atomaka
