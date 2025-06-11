@@ -36,10 +36,6 @@ module Logidze # :nodoc:
       with_meta!(meta)
     end
 
-    def clear_responsible!
-      clear_meta!
-    end
-
     class MetaBase # :nodoc:
       attr_reader :meta
 

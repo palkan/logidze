@@ -409,7 +409,7 @@ describe "logs metadata", :db do
 
     subject { User.create!(name: "test", age: 10, active: false) }
 
-    after { Logidze.clear_responsible! }
+    after { Logidze.clear_meta! }
 
     context "setting responsible for connection" do
       it "sets responsible for connection and persists across operations" do
@@ -427,12 +427,12 @@ describe "logs metadata", :db do
         expect(subject.reload.whodunnit).to be_nil
       end
 
-      it "can be cleared with clear_responsible!" do
+      it "can be cleared with clear_meta!" do
         Logidze.with_responsible!(responsible.id)
 
         expect(subject.reload.whodunnit).to eq(responsible)
 
-        Logidze.clear_responsible!
+        Logidze.clear_meta!
 
         subject.update!(age: 12)
         expect(subject.reload.whodunnit).to be_nil
