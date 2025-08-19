@@ -210,7 +210,7 @@ By default, Logidze stores history data in the `log_data` column in the origin r
 If it concerns you, you may configure Logidze to store history data in a separate table by providing `--detached` option to the migration:
 
 ```sh
-bundle exec rails logidze:model Post --detached
+bundle exec rails generate logidze:model Post --detached
 ```
 
 You can also configure Logidze to always store history data in a separate table for all models:
@@ -220,6 +220,8 @@ You can also configure Logidze to always store history data in a separate table 
 
 Logidze.log_data_placement = :detached
 ```
+
+**NOTE:** You may need to upgrade your `logdize_logger` function. Check [upgrading](https://github.com/palkan/logidze/tree/master?tab=readme-ov-file#upgrading) for more details
 
 **IMPORTANT:** Using `--detached` mode for storing historic data slightly decreases performance. Check [bench results] for the details.
 
