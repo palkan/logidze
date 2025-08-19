@@ -207,8 +207,15 @@ bundle exec rails generate logidze:model Post --after-trigger
 ### Storing history data in a separate table
 
 By default, Logidze stores history data in the `log_data` column in the origin record table, which might lead to table bloat.
-If it concerns you, you may configure Logidze to store history data in a separate table by providing `--detached` option to the migration:
+If it concerns you, you may configure Logidze to store history data in a separate table instead.
 
+1. First, generate the shared `logidze_data` table (only once per project):
+
+```sh
+bundle exec rails generate logidze:migration:logs
+```
+
+2. Then, create your model migration with the --detached option:
 ```sh
 bundle exec rails generate logidze:model Post --detached
 ```
