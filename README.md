@@ -217,6 +217,7 @@ bundle exec rails generate logidze:migration:logs
 ```
 
 2. Then, create your model migration with the --detached option:
+
 ```sh
 bundle exec rails generate logidze:model Post --detached
 ```
