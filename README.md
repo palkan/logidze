@@ -532,7 +532,9 @@ If you try to call `#log_data` on the model loaded in such way, you'll get `nil`
 
 Unlike, for example, PaperTrail, Logidze is designed to **only track changes**. If the record has been deleted, **everything is lost**.
 
-If you want to keep changes history after records deletion as well, consider using specialized tools for soft-delete, such as, [Discard](https://github.com/jhawthorn/discard) or [Paranoia](https://github.com/rubysherpas/paranoia).
+For deletion tracking, you can use a separate library, for example, [Athar](https://github.com/milkstrawai/athar) (which is, basically, Logidze for tracking deletes).
+
+Traditional soft-delete tools, such as, [Discard](https://github.com/jhawthorn/discard) or [Paranoia](https://github.com/rubysherpas/paranoia), should work well with Logidze, too.
 
 See also the discussion: [#61](https://github.com/palkan/logidze/issues/61).
 
