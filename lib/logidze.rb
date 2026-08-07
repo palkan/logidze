@@ -37,6 +37,11 @@ module Logidze
     # By default we do not set +log_data_placement+ value and rely on `has_logidze` macros
     attr_accessor :log_data_placement
 
+    # Determines whether or not with_meta and with_responsible wrap their block
+    # in a transaction. Defaults to true.
+    attr_accessor :transactional_default
+
+
     # Temporary disable DB triggers.
     #
     # @example
@@ -87,4 +92,5 @@ module Logidze
   self.on_pending_upgrade = :ignore
   self.sort_triggers_by_name = false
   self.log_data_placement = nil
+  self.transactional_default = true
 end

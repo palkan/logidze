@@ -3,12 +3,12 @@
 module Logidze # :nodoc:
   # Provide methods to attach meta information
   module Meta
-    def with_meta(meta, transactional: true, &block)
+    def with_meta(meta, transactional: Logidze.transactional_default, &block)
       wrapper = transactional ? MetaWithTransaction : MetaWithoutTransaction
       wrapper.wrap_with(meta, &block)
     end
 
-    def with_responsible(responsible_id, transactional: true, &block)
+    def with_responsible(responsible_id, transactional: Logidze.transactional_default, &block)
       return yield if responsible_id.nil?
 
       meta = {Logidze::History::Version::META_RESPONSIBLE => responsible_id}
