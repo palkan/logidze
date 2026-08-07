@@ -95,6 +95,19 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         end
       end
 
+      context "with track_deletes" do
+        let(:base_args) { ["user", "--no-after-trigger", "--track-deletes"] }
+
+        it "creates a migration with INSERT/UPDATE/DELETE trigger and injects macro", :aggregate_failures do
+          is_expected.to be_a_file
+          is_expected.to contain(/before update or insert or delete on "#{full_table_name("users")}" for each row/i)
+          is_expected.to contain(/execute procedure logidze_logger\(null, 'updated_at', null, null, null, 'User', #{Logidze::LogidzeData.quoted_table_name}\);/i)
+          is_expected.not_to contain "add_column :users, :log_data, :jsonb"
+
+          expect(file("app/models/user.rb")).to contain "has_logidze detached: true, track_deletes: true"
+        end
+      end
+
       context "with fx" do
         let(:fx_args) { use_fx_args }
 

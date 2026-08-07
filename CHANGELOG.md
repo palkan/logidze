@@ -2,6 +2,18 @@
 
 ## master (unreleased)
 
+- Add `track_deletes` option to preserve `log_data` after a record is physically
+  deleted and append a deletion version capturing who / when. Only supported
+  with detached log placement. Enable via `Logidze.track_deletes = true`,
+  `has_logidze detached: true, track_deletes: true`, or
+  `rails g logidze:model Post --track-deletes`. The deletion version has a
+  top-level `_d: true` marker, and the `has_one :logidze_data` association no
+  longer uses `dependent: :destroy` when the feature is enabled.
+
+  Bumps `logidze_logger` function to version 6. Existing installations should
+  run `rails g logidze:install --update` to upgrade the function before using
+  the new feature.
+
 - Add block-less versions of `with_responsible` and `with_metata`. ([@atomaka][])
 
 ## 1.4.1 (2025-06-05)

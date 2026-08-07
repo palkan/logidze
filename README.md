@@ -39,6 +39,7 @@ Other requirements:
   - [Undoing a Generated Invocation](#undoing-a-generated-invocation)
   - [Using with partitioned tables](#using-with-partitioned-tables)
   - [Storing history data in a separate table](#storing-history-data-in-a-separate-table)
+    - [Tracking deletes](#tracking-deletes)
 - [Usage](#usage)
   - [Basic API](#basic-api)
   - [Track meta information](#track-meta-information)
@@ -234,6 +235,85 @@ Logidze.log_data_placement = :detached
 **NOTE:** You may need to upgrade your `logdize_logger` function. Check [upgrading](https://github.com/palkan/logidze/tree/master?tab=readme-ov-file#upgrading) for more details
 
 **IMPORTANT:** Using `--detached` mode for storing historic data slightly decreases performance. Check [bench results] for the details.
+
+#### Tracking deletes
+
+When using `--detached`, you can also ask Logidze to preserve `log_data` after
+the origin record is physically deleted and append a final "deletion" version
+that captures _who_ and _when_ (via the usual `Logidze.with_responsible` /
+`Logidze.with_meta` helpers). This gives you a lightweight, DB-level audit trail
+for deletions without adopting a soft-delete pattern.
+
+The usual alternative — adding a `deleted_at` column via `paranoia`, `discard`,
+or a hand-rolled flag — works, but has well-known tradeoffs: every query has to
+remember to filter `WHERE deleted_at IS NULL` (and miss-filtering is a common
+source of data-leak bugs), indexes and foreign-key semantics have to account
+for the extra state, and the table accumulates rows indefinitely which can
+bloat storage and slow down queries over time. Delete tracking in Logidze
+sidesteps all of this: the row is physically gone from the tracked table and
+the audit trail lives on the `logidze_data` side.
+
+> **Note:** "soft delete" as an audit mechanism is not the same thing as a
+> user-facing _deactivated_ / _paused_ / _archived_ state, even though people
+> sometimes conflate the two. Those are real domain states that belong on the
+> model as their own column(s) with their own queries; they should not be
+> reused to mean "deleted". This feature is strictly for the audit-trail case.
+
+```sh
+bundle exec rails generate logidze:model Post --track-deletes
+```
+
+`--track-deletes` implies `--detached`. You can also enable it globally:
+
+```ruby
+# config/initializers/logidze.rb
+
+Logidze.log_data_placement = :detached
+Logidze.track_deletes = true
+```
+
+Or per-model:
+
+```ruby
+class Post < ApplicationRecord
+  has_logidze detached: true, track_deletes: true
+end
+```
+
+When enabled:
+
+- The generated trigger fires on `INSERT`, `UPDATE`, and `DELETE`.
+- On `DELETE`, a new version is appended to the retained `logidze_data.log_data`
+  with:
+  - `c` — an empty diff (`{}`), since no columns changed at delete time
+  - `m` — the current `Logidze.with_meta` / `Logidze.with_responsible` payload (if any)
+  - `_d: true` — a top-level marker identifying the version as a deletion
+- The `has_one :logidze_data` association is declared **without** `dependent: :destroy`
+  so the log survives the origin record.
+- Deletes cascaded via `ON DELETE CASCADE` are captured just like direct deletes —
+  the trigger fires regardless of how the row is removed.
+
+```ruby
+post = Post.create!(title: "Hello")
+Logidze.with_responsible(current_user.id) { post.destroy! }
+
+data = Logidze::LogidzeData.find_by!(loggable_type: "Post", loggable_id: post.id)
+data.log_data.versions.last.data["_d"]         # => true
+data.log_data.versions.last.responsible_id     # => current_user.id
+```
+
+**IMPORTANT — do not reuse ids.** The `logidze_data` table identifies rows by
+`(loggable_type, loggable_id)`. If a new record is inserted with the same id as
+a previously-deleted one, its history will be appended to the deleted record's
+history rather than starting fresh — the two are indistinguishable to Logidze.
+Make sure your models never reuse ids (e.g. use monotonically increasing
+sequences or UUIDs). This matters for any Logidze-tracked detached model, but
+it's especially important when `track_deletes` is enabled, since deleted logs
+are retained indefinitely and become available targets for id collisions.
+
+**NOTE:** Tracking deletes only makes sense with detached log placement; in
+inline mode the `log_data` column is physically removed with the row. Passing
+`track_deletes: true` without detached mode raises `ArgumentError`.
 
 ## Usage
 

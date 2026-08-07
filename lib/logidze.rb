@@ -36,6 +36,11 @@ module Logidze
     #
     # By default we do not set +log_data_placement+ value and rely on `has_logidze` macros
     attr_accessor :log_data_placement
+    # Determines whether to keep +log_data+ after the origin record is physically deleted
+    # and append a "deletion" version capturing +who+ / +when+ of the delete.
+    #
+    # Requires +log_data_placement+ to be +:detached+.
+    attr_accessor :track_deletes
 
     # Temporary disable DB triggers.
     #
@@ -87,4 +92,5 @@ module Logidze
   self.on_pending_upgrade = :ignore
   self.sort_triggers_by_name = false
   self.log_data_placement = nil
+  self.track_deletes = false
 end

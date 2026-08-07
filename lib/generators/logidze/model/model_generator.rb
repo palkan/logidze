@@ -17,6 +17,10 @@ module Logidze
       class_option :detached, type: :boolean, optional: true,
         desc: "Store history data in a separate table"
 
+      class_option :track_deletes, type: :boolean, optional: true,
+        desc: "Keep history data after the origin record is physically deleted " \
+          "and append a deletion version (implies --detached)"
+
       class_option :limit, type: :numeric, optional: true, desc: "Specify history size limit"
 
       class_option :debounce_time, type: :numeric, optional: true,
@@ -63,7 +67,13 @@ module Logidze
         return if update?
 
         indents = "  " * (class_name.scan("::").count + 1)
-        macros_name = detached? ? "has_logidze detached: true\n" : "has_logidze\n"
+        macros_name = if track_deletes?
+          "has_logidze detached: true, track_deletes: true\n"
+        elsif detached?
+          "has_logidze detached: true\n"
+        else
+          "has_logidze\n"
+        end
 
         if File.readlines("#{destination_root}/#{model_file_path}").grep(/has_logidze/).empty?
           inject_into_class(model_file_path, class_name.demodulize, indents + macros_name)
@@ -99,7 +109,11 @@ module Logidze
         end
 
         def detached?
-          options[:detached] || Logidze.detached_log_placement?
+          options[:detached] || track_deletes? || Logidze.detached_log_placement?
+        end
+
+        def track_deletes?
+          options[:track_deletes] || Logidze.track_deletes
         end
 
         def only_trigger?

@@ -5,8 +5,6 @@ module Logidze
     extend ActiveSupport::Concern
 
     included do
-      has_one :logidze_data, as: :loggable, class_name: "::Logidze::LogidzeData", dependent: :destroy, autosave: true
-
       delegate :log_data, to: :logidze_data, allow_nil: true
     end
 

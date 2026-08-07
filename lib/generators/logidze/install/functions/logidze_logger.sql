@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
-  -- version: 5
+  -- version: 6
   DECLARE
     changes jsonb;
     version jsonb;
@@ -41,6 +41,53 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
     include_columns := NULLIF(TG_ARGV[3], 'null');
     detached_loggable_type := NULLIF(TG_ARGV[5], 'null');
     log_data_table_name := NULLIF(TG_ARGV[6], 'null');
+
+    -- Handle DELETE separately: append a "deletion" version (marked with top-level `_d: true`)
+    -- to the retained +logidze_data+ row. Only meaningful in detached mode: in inline mode
+    -- the +log_data+ column disappears with the row, so there is nothing to preserve.
+    IF TG_OP = 'DELETE' THEN
+      IF detached_loggable_type IS NULL THEN
+        RETURN OLD;
+      END IF;
+
+      EXECUTE format(
+        'SELECT ldtn.log_data FROM %I ldtn ' ||
+        'WHERE ldtn.loggable_type = $1 AND ldtn.loggable_id = $2 LIMIT 1',
+        log_data_table_name
+      ) USING detached_loggable_type, OLD.id INTO detached_log_data;
+
+      IF detached_log_data IS NULL OR detached_log_data = '{}'::jsonb THEN
+        -- No prior log: seed from OLD so the deletion version has context.
+        IF columns IS NOT NULL THEN
+          log_data := logidze_snapshot(to_jsonb(OLD.*), ts_column, columns, include_columns);
+        ELSE
+          log_data := logidze_snapshot(to_jsonb(OLD.*), ts_column);
+        END IF;
+      ELSE
+        log_data := detached_log_data;
+      END IF;
+
+      new_v := (log_data#>>'{h,-1,v}')::int + 1;
+      size := jsonb_array_length(log_data->'h');
+      version := logidze_version(new_v, '{}'::jsonb, statement_timestamp());
+      version := jsonb_set(version, '{_d}', 'true'::jsonb);
+
+      log_data := jsonb_set(log_data, ARRAY['h', size::text], version, true);
+      log_data := jsonb_set(log_data, '{v}', to_jsonb(new_v));
+
+      history_limit := NULLIF(TG_ARGV[0], 'null');
+      IF history_limit IS NOT NULL AND history_limit <= size THEN
+        log_data := logidze_compact_history(log_data, size - history_limit + 1);
+      END IF;
+
+      EXECUTE format(
+        'INSERT INTO %I(log_data, loggable_type, loggable_id) VALUES ($1, $2, $3) ' ||
+        'ON CONFLICT (loggable_type, loggable_id) DO UPDATE SET log_data = EXCLUDED.log_data',
+        log_data_table_name
+      ) USING log_data, detached_loggable_type, OLD.id;
+
+      RETURN OLD;
+    END IF;
 
     -- getting previous log_data if it exists for detached `log_data` storage variant
     IF detached_loggable_type IS NOT NULL
@@ -266,7 +313,11 @@ CREATE OR REPLACE FUNCTION logidze_logger() RETURNS TRIGGER AS $body$
       );
       err_captured = logidze_capture_exception(err_jsonb);
       IF err_captured THEN
-        return NEW;
+        IF TG_OP = 'DELETE' THEN
+          return OLD;
+        ELSE
+          return NEW;
+        END IF;
       ELSE
         RAISE;
       END IF;

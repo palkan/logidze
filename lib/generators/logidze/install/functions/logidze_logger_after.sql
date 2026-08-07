@@ -1,3 +1,3 @@
 CREATE OR REPLACE FUNCTION logidze_logger_after() RETURNS TRIGGER AS $body$
-  -- version: 5
+  -- version: 6
 <%= generate_logidze_logger_after %>
