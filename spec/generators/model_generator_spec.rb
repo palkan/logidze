@@ -118,6 +118,29 @@ describe Logidze::Generators::ModelGenerator, type: :generator do
         end
       end
 
+      context "with default_history_size_limit" do
+        around do |example|
+          old_value = Logidze.default_history_size_limit
+          Logidze.default_history_size_limit = 100
+          example.run
+          Logidze.default_history_size_limit = old_value
+        end
+
+        it "uses the configured default when --limit is not passed" do
+          is_expected.to be_a_file
+          is_expected.to contain(/execute procedure logidze_logger\(100, 'updated_at'\);/i)
+        end
+
+        context "when --limit is explicitly passed" do
+          let(:base_args) { ["user", "--limit=5", "--no-after-trigger"] }
+
+          it "prefers the explicit --limit over the default" do
+            is_expected.to be_a_file
+            is_expected.to contain(/execute procedure logidze_logger\(5, 'updated_at'\);/i)
+          end
+        end
+      end
+
       context "with debounce_time" do
         let(:base_args) { ["user", "--debounce_time=5000", "--no-after-trigger"] }
 

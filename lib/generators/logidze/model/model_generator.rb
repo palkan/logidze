@@ -91,7 +91,7 @@ module Logidze
         end
 
         def limit
-          options[:limit]
+          options[:limit] || Logidze.default_history_size_limit
         end
 
         def backfill?

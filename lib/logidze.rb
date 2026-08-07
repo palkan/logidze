@@ -30,6 +30,9 @@ module Logidze
     attr_accessor :sort_triggers_by_name
     # Determines what Logidze should do when upgrade is needed (:raise | :warn | :ignore)
     attr_reader :on_pending_upgrade
+    # Sets the default history size limit for newly generated triggers.
+    # When set, the generator uses this value unless --limit is explicitly passed.
+    attr_accessor :default_history_size_limit
     # Determines where to store +log_data+:
     # - +:inline+ - force Logidze to store it in the origin table in the +log_data+ column
     # - +:detached+ - force Logidze to  store it in the +logidze_data+ table in the +log_data+ column
@@ -86,5 +89,6 @@ module Logidze
   self.return_self_if_log_data_is_empty = true
   self.on_pending_upgrade = :ignore
   self.sort_triggers_by_name = false
+  self.default_history_size_limit = nil
   self.log_data_placement = nil
 end

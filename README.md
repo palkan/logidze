@@ -159,6 +159,15 @@ You can provide the `limit` option to `generate` to limit the size of the log (b
 bundle exec rails generate logidze:model Post --limit=10
 ```
 
+You can also set a default limit globally so that every generated trigger uses it automatically:
+
+```ruby
+# config/initializers/logidze.rb
+Logidze.default_history_size_limit = 100
+```
+
+The explicit `--limit` flag still takes precedence when passed.
+
 ### Tracking only selected columns
 
 You can log only particular columns changes. There are mutually exclusive `except` and `only` options for this:
