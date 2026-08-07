@@ -65,6 +65,18 @@ module Logidze # :nodoc:
           pg_set_meta_param(prev_meta)
         end
       end
+
+      # When a PG transaction enters an error state (e.g., from a constraint
+      # violation), all subsequent SQL commands fail with InFailedSqlTransaction
+      # until the transaction is rolled back. Since SET LOCAL changes are
+      # transaction-scoped, PG automatically reverts them on rollback, so
+      # explicit cleanup is unnecessary and would only raise a secondary error.
+      def transaction_in_error_state?
+        raw_conn = connection.raw_connection
+        raw_conn.transaction_status == PG::PQTRANS_INERROR
+      rescue => _e
+        false
+      end
     end
 
     class MetaWrapper < MetaBase # :nodoc:
@@ -97,7 +109,7 @@ module Logidze # :nodoc:
         result = block.call
         result
       ensure
-        pg_reset_meta_param(prev_meta)
+        pg_reset_meta_param(prev_meta) unless transaction_in_error_state?
         meta_stack.pop
         Thread.current[:logidze_in_block] = was_in_block
       end

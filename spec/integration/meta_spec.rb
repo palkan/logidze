@@ -49,6 +49,29 @@ describe "logs metadata", :db do
         expect(subject.reload.meta).to be_nil
       end
 
+      it "handles PG-level error in transaction without raising InFailedSqlTransaction" do
+        # When a PG error (e.g., unique violation) occurs inside with_meta,
+        # the ensure block should skip SET LOCAL cleanup rather than raising
+        # a secondary PG::InFailedSqlTransaction error.
+        expect {
+          Logidze.with_meta(meta) do
+            ActiveRecord::Base.connection.execute("SELECT 1 FROM nonexistent_table_xyz")
+          end
+        }.to raise_error(ActiveRecord::StatementInvalid, /nonexistent_table_xyz/)
+      end
+
+      it "cleans up meta stack after PG-level error" do
+        ignore_exceptions do
+          Logidze.with_meta(meta) do
+            Logidze.with_meta(meta2) do
+              ActiveRecord::Base.connection.execute("SELECT 1 FROM nonexistent_table_xyz")
+            end
+          end
+        end
+
+        expect(Thread.current[:meta]).to eq([])
+      end
+
       it "handles block" do
         block = -> { subject }
 
